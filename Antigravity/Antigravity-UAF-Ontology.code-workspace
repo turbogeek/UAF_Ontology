@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../OntologyForMuggles"
+		},
+		{
+			"path": "../../vom"
+		},
+		{
+			"path": "../../TutorialForCatiaMagicApiMCP"
+		}
+	]
+}
