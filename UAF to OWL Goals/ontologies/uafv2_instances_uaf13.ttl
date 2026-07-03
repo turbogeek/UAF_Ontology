@@ -1,0 +1,2093 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix uaf: <http://purl.org/uaf/ontology#> .
+@prefix uaf2: <http://purl.org/uaf/uaf2#> .
+@prefix uafv2_13: <http://purl.org/uaf/example/uafv2_13#> .
+
+uafv2_13: a owl:Ontology ;
+    rdfs:label "UAFv2 Test Cases UAF 1.3 Instances" ;
+    rdfs:comment "OWL NamedIndividuals representing the translated UAF 1.3 model instances." ;
+    owl:imports <http://purl.org/uaf/ontology> .
+
+uafv2_13:inst-aa a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "AA" ;
+    uaf2:canonical "StrategicUserModel::AA" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'AA'" .
+
+uafv2_13:inst-action1 a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "action1" ;
+    uaf2:canonical "OperationalSample::action1" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'action1'" .
+
+uafv2_13:inst-actiondef a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "ActionDef" ;
+    uaf2:canonical "OperationalSample::ActionDef" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action def): 'ActionDef'" .
+
+uafv2_13:inst-airbus320 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Airbus320" ;
+    uaf2:canonical "ServicesUserModel::Airbus320" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part def): 'Airbus320'" .
+
+uafv2_13:inst-aircraft a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Aircraft" ;
+    uaf2:canonical "ServicesUserModel::Aircraft" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Aircraft'" .
+
+uafv2_13:inst-aircraftblocked a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "AircraftBlocked" ;
+    uaf2:canonical "ServicesUserModel::AircraftBlocked" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'AircraftBlocked'" .
+
+uafv2_13:inst-aircrafttowingvehilesystem a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "AircraftTowingVehileSystem" ;
+    uaf2:canonical "ServicesUserModel::AircraftTowingVehileSystem" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part def): 'AircraftTowingVehileSystem'" .
+
+uafv2_13:inst-aircraftunblocked a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "AircraftUnblocked" ;
+    uaf2:canonical "ServicesUserModel::AircraftUnblocked" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'AircraftUnblocked'" .
+
+uafv2_13:inst-airportterminal a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "AirportTerminal" ;
+    uaf2:canonical "ServicesUserModel::AirportTerminal" ;
+    rdfs:comment "UAFv2 Model instance of operationalConfiguration (part): 'AirportTerminal'" .
+
+uafv2_13:inst-analyse-distress-signal-and-create-new-sar-operation-tracking-up-or-discard-distress a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Analyse Distress Signal And Create New SAR operation Tracking Up or Discard Distress" ;
+    uaf2:canonical "Operational Model::Analyse Distress Signal And Create New SAR operation Tracking Up or Discard Distress" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Analyse Distress Signal And Create New SAR operation Tracking Up or Discard Distress'" .
+
+uafv2_13:inst-atvs a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "atvs" ;
+    uaf2:canonical "ServicesUserModel::atvs" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part): 'atvs'" .
+
+uafv2_13:inst-bettyboss a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "BettyBoss" ;
+    uaf2:canonical "UserModel::BettyBoss" ;
+    rdfs:comment "UAFv2 Model instance of person (part def): 'BettyBoss'" .
+
+uafv2_13:inst-bicycle a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Bicycle" ;
+    uaf2:canonical "RequiremnetSample::Bicycle" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part def): 'Bicycle'" .
+
+uafv2_13:inst-bicycleproperties a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "bicycleProperties" ;
+    uaf2:canonical "RequiremnetSample::bicycleProperties" ;
+    rdfs:comment "UAFv2 Model instance of measurement (attribute): 'bicycleProperties'" .
+
+uafv2_13:inst-bla a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "bla" ;
+    uaf2:canonical "tests::bla" ;
+    rdfs:comment "UAFv2 Model instance of testukas (part): 'bla'" .
+
+uafv2_13:inst-blaref a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "blaRef" ;
+    uaf2:canonical "tests::blaRef" ;
+    rdfs:comment "UAFv2 Model instance of testukas (part): 'blaRef'" .
+
+uafv2_13:inst-building a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Building" ;
+    uaf2:canonical "LocationUserModel::Building" ;
+    rdfs:comment "UAFv2 Model instance of site (part): 'Building'" .
+
+uafv2_13:inst-buyer a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Buyer" ;
+    uaf2:canonical "ServicesUserModel3::Buyer" ;
+    rdfs:comment "UAFv2 Model instance of serviceAgent (part def): 'Buyer'" .
+
+uafv2_13:inst-c2chief a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "c2Chief" ;
+    uaf2:canonical "UserModel::c2Chief" ;
+    rdfs:comment "UAFv2 Model instance of position (part): 'c2Chief'" .
+
+uafv2_13:inst-cameo a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Cameo" ;
+    uaf2:canonical "LocationUserModel::Cameo" ;
+    rdfs:comment "UAFv2 Model instance of software (part): 'Cameo'" .
+
+uafv2_13:inst-cameosimtoolkit a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CameoSimToolkit" ;
+    uaf2:canonical "userModel::CameoSimToolkit" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'CameoSimToolkit'" .
+
+uafv2_13:inst-cameosimtoolkit2024x a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CameoSimToolkit2024x" ;
+    uaf2:canonical "userModel::CameoSimToolkit2024x" ;
+    rdfs:comment "UAFv2 Model instance of software (part def): 'CameoSimToolkit2024x'" .
+
+uafv2_13:inst-cameosimtoolkit2024xga a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CameoSimToolkit2024xGA" ;
+    uaf2:canonical "userModel::CameoSimToolkit2024xGA" ;
+    rdfs:comment "UAFv2 Model instance of software (part def): 'CameoSimToolkit2024xGA'" .
+
+uafv2_13:inst-cameosimtoolkit2024xsb a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CameoSimToolkit2024xSB" ;
+    uaf2:canonical "userModel::CameoSimToolkit2024xSB" ;
+    rdfs:comment "UAFv2 Model instance of software (part def): 'CameoSimToolkit2024xSB'" .
+
+uafv2_13:inst-camsimtoolkit a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "camSimToolkit" ;
+    uaf2:canonical "userModel::camSimToolkit" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'camSimToolkit'" .
+
+uafv2_13:inst-cardealer a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CarDealer" ;
+    uaf2:canonical "ServicesUserModel3::CarDealer" ;
+    rdfs:comment "UAFv2 Model instance of organization (part def): 'CarDealer'" .
+
+uafv2_13:inst-cardealernetwork a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "carDealerNetwork" ;
+    uaf2:canonical "ServicesUserModel3::carDealerNetwork" ;
+    rdfs:comment "UAFv2 Model instance of resourceConfiguration (part): 'carDealerNetwork'" .
+
+uafv2_13:inst-carpurchasing a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CarPurchasing" ;
+    uaf2:canonical "ServicesUserModel3::CarPurchasing" ;
+    rdfs:comment "UAFv2 Model instance of resourceService (connection def): 'CarPurchasing'" .
+
+uafv2_13:inst-carstorage a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "carStorage" ;
+    uaf2:canonical "ServicesUserModel3::carStorage" ;
+    rdfs:comment "UAFv2 Model instance of organization (part): 'carStorage'" .
+
+uafv2_13:inst-cbhd a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "cbhd" ;
+    uaf2:canonical "OperationalUserModel::cbhd" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'cbhd'" .
+
+uafv2_13:inst-cc1 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "cc1" ;
+    uaf2:canonical "Operational Model::cc1" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'cc1'" .
+
+uafv2_13:inst-cc2 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "cc2" ;
+    uaf2:canonical "Operational Model::cc2" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'cc2'" .
+
+uafv2_13:inst-cc3 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "cc3" ;
+    uaf2:canonical "Operational Model::cc3" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'cc3'" .
+
+uafv2_13:inst-ceo a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CEO" ;
+    uaf2:canonical "UserModel::CEO" ;
+    rdfs:comment "UAFv2 Model instance of position (part def): 'CEO'" .
+
+uafv2_13:inst-child a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Child" ;
+    uaf2:canonical "RequiremnetSample::Child" ;
+    rdfs:comment "UAFv2 Model instance of person (part def): 'Child'" .
+
+uafv2_13:inst-coastguard a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CoastGuard" ;
+    uaf2:canonical "UserModel::CoastGuard" ;
+    rdfs:comment "UAFv2 Model instance of organization (part def): 'CoastGuard'" .
+
+uafv2_13:inst-coastguard2023q1 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CoastGuard2023Q1" ;
+    uaf2:canonical "UserModel::CoastGuard2023Q1" ;
+    rdfs:comment "UAFv2 Model instance of organization (part): 'CoastGuard2023Q1'" .
+
+uafv2_13:inst-color a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "color" ;
+    uaf2:canonical "RequiremnetSample::color" ;
+    rdfs:comment "UAFv2 Model instance of measurement (attribute): 'color'" .
+
+uafv2_13:inst-connect a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "connect" ;
+    uaf2:canonical "StrategicUserModel::connect" ;
+    rdfs:comment "UAFv2 Model instance of strategicConnector (connection): 'connect'" .
+
+uafv2_13:inst-connectionbetweenhubanddevice a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "ConnectionBetweenHubAndDevice" ;
+    uaf2:canonical "OperationalUserModel::ConnectionBetweenHubAndDevice" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection def): 'ConnectionBetweenHubAndDevice'" .
+
+uafv2_13:inst-consultant a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Consultant" ;
+    uaf2:canonical "UserModel::Consultant" ;
+    rdfs:comment "UAFv2 Model instance of position (part def): 'Consultant'" .
+
+uafv2_13:inst-consultantatssi a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "ConsultantAtSSI" ;
+    uaf2:canonical "UserModel::ConsultantAtSSI" ;
+    rdfs:comment "UAFv2 Model instance of position (part def): 'ConsultantAtSSI'" .
+
+uafv2_13:inst-consultants a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "consultants" ;
+    uaf2:canonical "UserModel::consultants" ;
+    rdfs:comment "UAFv2 Model instance of position (part): 'consultants'" .
+
+uafv2_13:inst-consultingcompany a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "ConsultingCompany" ;
+    uaf2:canonical "UserModel::ConsultingCompany" ;
+    rdfs:comment "UAFv2 Model instance of organization (part def): 'ConsultingCompany'" .
+
+uafv2_13:inst-consumer a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "consumer" ;
+    uaf2:canonical "ServicesUserModel3::consumer" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'consumer'" .
+
+uafv2_13:inst-country a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Country" ;
+    uaf2:canonical "LocationUserModel::Country" ;
+    rdfs:comment "UAFv2 Model instance of geoPoliticalExtent (part def): 'Country'" .
+
+uafv2_13:inst-cst2024x a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CST2024x" ;
+    uaf2:canonical "userModel::CST2024x" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'CST2024x'" .
+
+uafv2_13:inst-cst2026x a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "CST2026x" ;
+    uaf2:canonical "userModel::CST2026x" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'CST2026x'" .
+
+uafv2_13:inst-dealer a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Dealer" ;
+    uaf2:canonical "ServicesUserModel3::Dealer" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Dealer'" .
+
+uafv2_13:inst-dealernetworkarchitecture a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "dealerNetworkArchitecture" ;
+    uaf2:canonical "ServicesUserModel3::dealerNetworkArchitecture" ;
+    rdfs:comment "UAFv2 Model instance of operationalConfiguration (part): 'dealerNetworkArchitecture'" .
+
+uafv2_13:inst-dealerrequest a uaf:UML2_5Metamodel__Port,
+        owl:NamedIndividual ;
+    rdfs:label "dealerRequest" ;
+    uaf2:canonical "ServicesUserModel3::dealerRequest" ;
+    rdfs:comment "UAFv2 Model instance of operationalPort (port): 'dealerRequest'" .
+
+uafv2_13:inst-dealertomanufacturer a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "dealerToManufacturer" ;
+    uaf2:canonical "ServicesUserModel3::dealerToManufacturer" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'dealerToManufacturer'" .
+
+uafv2_13:inst-digitaltransformationphase a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "DigitalTransformationPhase" ;
+    uaf2:canonical "StrategicUserModel::DigitalTransformationPhase" ;
+    rdfs:comment "UAFv2 Model instance of enterprise (part def): 'DigitalTransformationPhase'" .
+
+uafv2_13:inst-distressed-party a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Distressed Party" ;
+    uaf2:canonical "Operational Model::Distressed Party" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Distressed Party'" .
+
+uafv2_13:inst-distressedparty a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "DistressedParty" ;
+    uaf2:canonical "OperationalUserModel::DistressedParty" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'DistressedParty'" .
+
+uafv2_13:inst-distressedpartytorescueoe3 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "DistressedPartyToRescueOE3" ;
+    uaf2:canonical "Operational Model::DistressedPartyToRescueOE3" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'DistressedPartyToRescueOE3'" .
+
+uafv2_13:inst-distressedpartytorescueoe31 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "DistressedPartyToRescueOE31" ;
+    uaf2:canonical "Operational Model::DistressedPartyToRescueOE31" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'DistressedPartyToRescueOE31'" .
+
+uafv2_13:inst-distressedpartytosarmonitoroe3 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "DistressedPartyToSARMonitorOE3" ;
+    uaf2:canonical "Operational Model::DistressedPartyToSARMonitorOE3" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'DistressedPartyToSARMonitorOE3'" .
+
+uafv2_13:inst-distressedpartytosearch a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "DistressedPartyToSearch" ;
+    uaf2:canonical "Operational Model::DistressedPartyToSearch" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'DistressedPartyToSearch'" .
+
+uafv2_13:inst-distressmessage a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "DistressMessage" ;
+    uaf2:canonical "OperationalUserModel::DistressMessage" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'DistressMessage'" .
+
+uafv2_13:inst-distresssignalflow a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "distressSignalFlow" ;
+    uaf2:canonical "OperationalUserModel::distressSignalFlow" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'distressSignalFlow'" .
+
+uafv2_13:inst-dp a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "dp" ;
+    uaf2:canonical "Operational Model::dp" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'dp'" .
+
+uafv2_13:inst-dsf a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "dsf" ;
+    uaf2:canonical "OperationalUserModel::dsf" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'dsf'" .
+
+uafv2_13:inst-effort a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Effort" ;
+    uaf2:canonical "ServicesUserModel::Effort" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'Effort'" .
+
+uafv2_13:inst-employee a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "employee" ;
+    uaf2:canonical "UserModel::employee" ;
+    rdfs:comment "UAFv2 Model instance of person (part): 'employee'" .
+
+uafv2_13:inst-enterpriseb a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "EnterpriseB" ;
+    uaf2:canonical "Sample::EnterpriseB" ;
+    rdfs:comment "UAFv2 Model instance of enterprise (part def): 'EnterpriseB'" .
+
+uafv2_13:inst-enterpriseininitiative a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "enterpriseInInitiative" ;
+    uaf2:canonical "StrategicUserModel::enterpriseInInitiative" ;
+    rdfs:comment "UAFv2 Model instance of enterprise (part): 'enterpriseInInitiative'" .
+
+uafv2_13:inst-enterpriseproject a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "EnterpriseProject" ;
+    uaf2:canonical "Sample::EnterpriseProject" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'EnterpriseProject'" .
+
+uafv2_13:inst-enterpriseref a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "enterpriseRef" ;
+    uaf2:canonical "StrategicUserModel::enterpriseRef" ;
+    rdfs:comment "UAFv2 Model instance of enterprise (part): 'enterpriseRef'" .
+
+uafv2_13:inst-establish-safe-place a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Establish Safe Place" ;
+    uaf2:canonical "Operational Model::Establish Safe Place" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Establish Safe Place'" .
+
+uafv2_13:inst-fte a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "FTE" ;
+    uaf2:canonical "UserModel::FTE" ;
+    rdfs:comment "UAFv2 Model instance of position (part def): 'FTE'" .
+
+uafv2_13:inst-gofortaxiway a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "GoForTaxiway" ;
+    uaf2:canonical "ServicesUserModel::GoForTaxiway" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'GoForTaxiway'" .
+
+uafv2_13:inst-groundsystem a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "GroundSystem" ;
+    uaf2:canonical "ServicesUserModel::GroundSystem" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'GroundSystem'" .
+
+uafv2_13:inst-groupleader a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "GroupLeader" ;
+    uaf2:canonical "UserModel::GroupLeader" ;
+    rdfs:comment "UAFv2 Model instance of position (part def): 'GroupLeader'" .
+
+uafv2_13:inst-groupleaders a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "groupLeaders" ;
+    uaf2:canonical "UserModel::groupLeaders" ;
+    rdfs:comment "UAFv2 Model instance of position (part): 'groupLeaders'" .
+
+uafv2_13:inst-gs a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "gs" ;
+    uaf2:canonical "ServicesUserModel::gs" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'gs'" .
+
+uafv2_13:inst-gstooac a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "gsTooAC" ;
+    uaf2:canonical "ServicesUserModel::gsTooAC" ;
+    rdfs:comment "UAFv2 Model instance of service (connection): 'gsTooAC'" .
+
+uafv2_13:inst-health-service a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Health Service" ;
+    uaf2:canonical "Operational Model::Health Service" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Health Service'" .
+
+uafv2_13:inst-healthservicetoplaceofsafetycc3 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToPlaceOfSafetyCC3" ;
+    uaf2:canonical "Operational Model::HealthServiceToPlaceOfSafetyCC3" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToPlaceOfSafetyCC3'" .
+
+uafv2_13:inst-healthservicetoplaceofsafetyoe45 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToPlaceOfSafetyOE45" ;
+    uaf2:canonical "Operational Model::HealthServiceToPlaceOfSafetyOE45" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToPlaceOfSafetyOE45'" .
+
+uafv2_13:inst-healthservicetoplaceofsafetyoe46 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToPlaceOfSafetyOE46" ;
+    uaf2:canonical "Operational Model::HealthServiceToPlaceOfSafetyOE46" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToPlaceOfSafetyOE46'" .
+
+uafv2_13:inst-healthservicetoplaceofsafetyoe47 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToPlaceOfSafetyOE47" ;
+    uaf2:canonical "Operational Model::HealthServiceToPlaceOfSafetyOE47" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToPlaceOfSafetyOE47'" .
+
+uafv2_13:inst-healthservicetoplaceofsafetyoe60 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToPlaceOfSafetyOE60" ;
+    uaf2:canonical "Operational Model::HealthServiceToPlaceOfSafetyOE60" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToPlaceOfSafetyOE60'" .
+
+uafv2_13:inst-healthservicetotacticalc2oe54 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToTacticalC2OE54" ;
+    uaf2:canonical "Operational Model::HealthServiceToTacticalC2OE54" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToTacticalC2OE54'" .
+
+uafv2_13:inst-healthservicetotacticalc2oe55 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToTacticalC2OE55" ;
+    uaf2:canonical "Operational Model::HealthServiceToTacticalC2OE55" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToTacticalC2OE55'" .
+
+uafv2_13:inst-healthservicetotacticalc2oe56 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToTacticalC2OE56" ;
+    uaf2:canonical "Operational Model::HealthServiceToTacticalC2OE56" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToTacticalC2OE56'" .
+
+uafv2_13:inst-healthservicetotacticalc2oe59 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "HealthServiceToTacticalC2OE59" ;
+    uaf2:canonical "Operational Model::HealthServiceToTacticalC2OE59" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'HealthServiceToTacticalC2OE59'" .
+
+uafv2_13:inst-hs a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "hs" ;
+    uaf2:canonical "Operational Model::hs" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'hs'" .
+
+uafv2_13:inst-human a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Human" ;
+    uaf2:canonical "UserModel::Human" ;
+    rdfs:comment "UAFv2 Model instance of person (part def): 'Human'" .
+
+uafv2_13:inst-initiatee-safe-place-establishment a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Initiatee Safe Place Establishment" ;
+    uaf2:canonical "Operational Model::Initiatee Safe Place Establishment" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Initiatee Safe Place Establishment'" .
+
+uafv2_13:inst-insurancepartner a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "insurancePartner" ;
+    uaf2:canonical "ServicesUserModel3::insurancePartner" ;
+    rdfs:comment "UAFv2 Model instance of organization (part): 'insurancePartner'" .
+
+uafv2_13:inst-java a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "JAVA" ;
+    uaf2:canonical "userModel::JAVA" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'JAVA'" .
+
+uafv2_13:inst-jdkdeployment_cst2026x a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "JDKdeployment_CST2026x" ;
+    uaf2:canonical "userModel::JDKdeployment_CST2026x" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'JDKdeployment_CST2026x'" .
+
+uafv2_13:inst-john a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "John" ;
+    uaf2:canonical "RequiremnetSample::John" ;
+    rdfs:comment "UAFv2 Model instance of person (part def): 'John'" .
+
+uafv2_13:inst-johnsbicycle a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "JohnsBicycle" ;
+    uaf2:canonical "RequiremnetSample::JohnsBicycle" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part): 'JohnsBicycle'" .
+
+uafv2_13:inst-lithuania a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Lithuania" ;
+    uaf2:canonical "LocationUserModel::Lithuania" ;
+    rdfs:comment "UAFv2 Model instance of geoPoliticalExtent (part def): 'Lithuania'" .
+
+uafv2_13:inst-mainframe a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Mainframe" ;
+    uaf2:canonical "LocationUserModel::Mainframe" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part): 'Mainframe'" .
+
+uafv2_13:inst-mainproject a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "MainProject" ;
+    uaf2:canonical "Sample::MainProject" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'MainProject'" .
+
+uafv2_13:inst-manufacturer a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Manufacturer" ;
+    uaf2:canonical "ServicesUserModel3::Manufacturer" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Manufacturer'" .
+
+uafv2_13:inst-manufacturerserviceprovision a uaf:UML2_5Metamodel__Port,
+        owl:NamedIndividual ;
+    rdfs:label "manufacturerServiceProvision" ;
+    uaf2:canonical "ServicesUserModel3::manufacturerServiceProvision" ;
+    rdfs:comment "UAFv2 Model instance of operationalPort (port): 'manufacturerServiceProvision'" .
+
+uafv2_13:inst-manufacturertodealer a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "manufacturerToDealer" ;
+    uaf2:canonical "ServicesUserModel3::manufacturerToDealer" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'manufacturerToDealer'" .
+
+uafv2_13:inst-matthewatssi2025 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "MatthewAtSSI2025" ;
+    uaf2:canonical "UserModel::MatthewAtSSI2025" ;
+    rdfs:comment "UAFv2 Model instance of person (part): 'MatthewAtSSI2025'" .
+
+uafv2_13:inst-mechanical a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "mechanical" ;
+    uaf2:canonical "ServicesUserModel::mechanical" ;
+    rdfs:comment "UAFv2 Model instance of resourceConnector (connection): 'mechanical'" .
+
+uafv2_13:inst-mn a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "mn" ;
+    uaf2:canonical "Operational Model::mn" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'mn'" .
+
+uafv2_13:inst-ms a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "MS" ;
+    uaf2:canonical "RequiremnetSample::MS" ;
+    rdfs:comment "UAFv2 Model instance of measurementSet (attribute def): 'MS'" .
+
+uafv2_13:inst-oac a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "oac" ;
+    uaf2:canonical "ServicesUserModel::oac" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'oac'" .
+
+uafv2_13:inst-oc1 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc1" ;
+    uaf2:canonical "Operational Model::oc1" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc1'" .
+
+uafv2_13:inst-oc10 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc10" ;
+    uaf2:canonical "Operational Model::oc10" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc10'" .
+
+uafv2_13:inst-oc11 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc11" ;
+    uaf2:canonical "Operational Model::oc11" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc11'" .
+
+uafv2_13:inst-oc12 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc12" ;
+    uaf2:canonical "Operational Model::oc12" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc12'" .
+
+uafv2_13:inst-oc13 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc13" ;
+    uaf2:canonical "Operational Model::oc13" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc13'" .
+
+uafv2_13:inst-oc14 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc14" ;
+    uaf2:canonical "Operational Model::oc14" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc14'" .
+
+uafv2_13:inst-oc2 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc2" ;
+    uaf2:canonical "Operational Model::oc2" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc2'" .
+
+uafv2_13:inst-oc3 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc3" ;
+    uaf2:canonical "Operational Model::oc3" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc3'" .
+
+uafv2_13:inst-oc4 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc4" ;
+    uaf2:canonical "Operational Model::oc4" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc4'" .
+
+uafv2_13:inst-oc5 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc5" ;
+    uaf2:canonical "Operational Model::oc5" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc5'" .
+
+uafv2_13:inst-oc6 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc6" ;
+    uaf2:canonical "Operational Model::oc6" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc6'" .
+
+uafv2_13:inst-oc7 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc7" ;
+    uaf2:canonical "Operational Model::oc7" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc7'" .
+
+uafv2_13:inst-oc8 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc8" ;
+    uaf2:canonical "Operational Model::oc8" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc8'" .
+
+uafv2_13:inst-oc9 a uaf:UML2_5Metamodel__Connector,
+        owl:NamedIndividual ;
+    rdfs:label "oc9" ;
+    uaf2:canonical "Operational Model::oc9" ;
+    rdfs:comment "UAFv2 Model instance of operationalConnector (connection): 'oc9'" .
+
+uafv2_13:inst-oe1 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe1" ;
+    uaf2:canonical "Operational Model::oe1" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe1'" .
+
+uafv2_13:inst-oe10 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe10" ;
+    uaf2:canonical "Operational Model::oe10" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe10'" .
+
+uafv2_13:inst-oe11 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe11" ;
+    uaf2:canonical "Operational Model::oe11" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe11'" .
+
+uafv2_13:inst-oe12 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe12" ;
+    uaf2:canonical "Operational Model::oe12" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe12'" .
+
+uafv2_13:inst-oe121 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe121" ;
+    uaf2:canonical "Operational Model::oe121" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe121'" .
+
+uafv2_13:inst-oe13 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe13" ;
+    uaf2:canonical "Operational Model::oe13" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe13'" .
+
+uafv2_13:inst-oe14 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe14" ;
+    uaf2:canonical "Operational Model::oe14" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe14'" .
+
+uafv2_13:inst-oe15 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe15" ;
+    uaf2:canonical "Operational Model::oe15" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe15'" .
+
+uafv2_13:inst-oe17 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe17" ;
+    uaf2:canonical "Operational Model::oe17" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe17'" .
+
+uafv2_13:inst-oe18 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe18" ;
+    uaf2:canonical "Operational Model::oe18" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe18'" .
+
+uafv2_13:inst-oe19 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe19" ;
+    uaf2:canonical "Operational Model::oe19" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe19'" .
+
+uafv2_13:inst-oe2 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe2" ;
+    uaf2:canonical "Operational Model::oe2" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe2'" .
+
+uafv2_13:inst-oe20 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe20" ;
+    uaf2:canonical "Operational Model::oe20" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe20'" .
+
+uafv2_13:inst-oe21 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe21" ;
+    uaf2:canonical "Operational Model::oe21" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe21'" .
+
+uafv2_13:inst-oe22 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe22" ;
+    uaf2:canonical "Operational Model::oe22" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe22'" .
+
+uafv2_13:inst-oe23 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe23" ;
+    uaf2:canonical "Operational Model::oe23" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe23'" .
+
+uafv2_13:inst-oe24 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe24" ;
+    uaf2:canonical "Operational Model::oe24" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe24'" .
+
+uafv2_13:inst-oe25 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe25" ;
+    uaf2:canonical "Operational Model::oe25" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe25'" .
+
+uafv2_13:inst-oe26 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe26" ;
+    uaf2:canonical "Operational Model::oe26" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe26'" .
+
+uafv2_13:inst-oe27 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe27" ;
+    uaf2:canonical "Operational Model::oe27" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe27'" .
+
+uafv2_13:inst-oe29 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe29" ;
+    uaf2:canonical "Operational Model::oe29" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe29'" .
+
+uafv2_13:inst-oe3 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe3" ;
+    uaf2:canonical "Operational Model::oe3" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe3'" .
+
+uafv2_13:inst-oe30 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe30" ;
+    uaf2:canonical "Operational Model::oe30" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe30'" .
+
+uafv2_13:inst-oe31 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe31" ;
+    uaf2:canonical "Operational Model::oe31" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe31'" .
+
+uafv2_13:inst-oe32 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe32" ;
+    uaf2:canonical "Operational Model::oe32" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe32'" .
+
+uafv2_13:inst-oe33 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe33" ;
+    uaf2:canonical "Operational Model::oe33" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe33'" .
+
+uafv2_13:inst-oe34 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe34" ;
+    uaf2:canonical "Operational Model::oe34" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe34'" .
+
+uafv2_13:inst-oe35 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe35" ;
+    uaf2:canonical "Operational Model::oe35" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe35'" .
+
+uafv2_13:inst-oe36 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe36" ;
+    uaf2:canonical "Operational Model::oe36" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe36'" .
+
+uafv2_13:inst-oe37 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe37" ;
+    uaf2:canonical "Operational Model::oe37" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe37'" .
+
+uafv2_13:inst-oe38 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe38" ;
+    uaf2:canonical "Operational Model::oe38" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe38'" .
+
+uafv2_13:inst-oe39 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe39" ;
+    uaf2:canonical "Operational Model::oe39" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe39'" .
+
+uafv2_13:inst-oe4 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe4" ;
+    uaf2:canonical "Operational Model::oe4" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe4'" .
+
+uafv2_13:inst-oe40 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe40" ;
+    uaf2:canonical "Operational Model::oe40" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe40'" .
+
+uafv2_13:inst-oe41 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe41" ;
+    uaf2:canonical "Operational Model::oe41" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe41'" .
+
+uafv2_13:inst-oe42 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe42" ;
+    uaf2:canonical "Operational Model::oe42" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe42'" .
+
+uafv2_13:inst-oe43 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe43" ;
+    uaf2:canonical "Operational Model::oe43" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe43'" .
+
+uafv2_13:inst-oe45 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe45" ;
+    uaf2:canonical "Operational Model::oe45" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe45'" .
+
+uafv2_13:inst-oe452 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe452" ;
+    uaf2:canonical "Operational Model::oe452" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe452'" .
+
+uafv2_13:inst-oe46 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe46" ;
+    uaf2:canonical "Operational Model::oe46" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe46'" .
+
+uafv2_13:inst-oe47 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe47" ;
+    uaf2:canonical "Operational Model::oe47" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe47'" .
+
+uafv2_13:inst-oe48 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe48" ;
+    uaf2:canonical "Operational Model::oe48" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe48'" .
+
+uafv2_13:inst-oe49 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe49" ;
+    uaf2:canonical "Operational Model::oe49" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe49'" .
+
+uafv2_13:inst-oe50 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe50" ;
+    uaf2:canonical "Operational Model::oe50" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe50'" .
+
+uafv2_13:inst-oe51 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe51" ;
+    uaf2:canonical "Operational Model::oe51" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe51'" .
+
+uafv2_13:inst-oe53 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe53" ;
+    uaf2:canonical "Operational Model::oe53" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe53'" .
+
+uafv2_13:inst-oe54 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe54" ;
+    uaf2:canonical "Operational Model::oe54" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe54'" .
+
+uafv2_13:inst-oe55 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe55" ;
+    uaf2:canonical "Operational Model::oe55" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe55'" .
+
+uafv2_13:inst-oe56 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe56" ;
+    uaf2:canonical "Operational Model::oe56" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe56'" .
+
+uafv2_13:inst-oe57 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe57" ;
+    uaf2:canonical "Operational Model::oe57" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe57'" .
+
+uafv2_13:inst-oe58 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe58" ;
+    uaf2:canonical "Operational Model::oe58" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe58'" .
+
+uafv2_13:inst-oe59 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe59" ;
+    uaf2:canonical "Operational Model::oe59" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe59'" .
+
+uafv2_13:inst-oe6 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe6" ;
+    uaf2:canonical "Operational Model::oe6" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe6'" .
+
+uafv2_13:inst-oe60 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe60" ;
+    uaf2:canonical "Operational Model::oe60" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe60'" .
+
+uafv2_13:inst-oe63 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe63" ;
+    uaf2:canonical "Operational Model::oe63" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe63'" .
+
+uafv2_13:inst-oe64 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe64" ;
+    uaf2:canonical "Operational Model::oe64" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe64'" .
+
+uafv2_13:inst-oe7 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe7" ;
+    uaf2:canonical "Operational Model::oe7" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe7'" .
+
+uafv2_13:inst-oe8 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe8" ;
+    uaf2:canonical "Operational Model::oe8" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe8'" .
+
+uafv2_13:inst-oe9 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "oe9" ;
+    uaf2:canonical "Operational Model::oe9" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow): 'oe9'" .
+
+uafv2_13:inst-oem a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "OEM" ;
+    uaf2:canonical "ServicesUserModel3::OEM" ;
+    rdfs:comment "UAFv2 Model instance of organization (part def): 'OEM'" .
+
+uafv2_13:inst-openjdk8 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "openJDK8" ;
+    uaf2:canonical "userModel::openJDK8" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'openJDK8'" .
+
+uafv2_13:inst-oraclejdk8 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "oracleJDK8" ;
+    uaf2:canonical "userModel::oracleJDK8" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'oracleJDK8'" .
+
+uafv2_13:inst-orderer a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Orderer" ;
+    uaf2:canonical "ServicesUserModel3::Orderer" ;
+    rdfs:comment "UAFv2 Model instance of serviceAgent (part def): 'Orderer'" .
+
+uafv2_13:inst-ordering a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "ordering" ;
+    uaf2:canonical "ServicesUserModel3::ordering" ;
+    rdfs:comment "UAFv2 Model instance of service (connection): 'ordering'" .
+
+uafv2_13:inst-orderinginterface a uaf:UML2_5Metamodel__Port,
+        owl:NamedIndividual ;
+    rdfs:label "OrderingInterface" ;
+    uaf2:canonical "ServicesUserModel3::OrderingInterface" ;
+    rdfs:comment "UAFv2 Model instance of operationalPort (port def): 'OrderingInterface'" .
+
+uafv2_13:inst-orderprocessor a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "OrderProcessor" ;
+    uaf2:canonical "ServicesUserModel3::OrderProcessor" ;
+    rdfs:comment "UAFv2 Model instance of serviceAgent (part def): 'OrderProcessor'" .
+
+uafv2_13:inst-ownedaction1 a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "ownedAction1" ;
+    uaf2:canonical "OperationalSample::ownedAction1" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'ownedAction1'" .
+
+uafv2_13:inst-part1 a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "part1" ;
+    uaf2:canonical "OperationalSample::part1" ;
+    rdfs:comment "UAFv2 Model instance of OperationalMetadata::operationalPerformer (part): 'part1'" .
+
+uafv2_13:inst-part2 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "part2" ;
+    uaf2:canonical "OperationalSample::part2" ;
+    rdfs:comment "UAFv2 Model instance of OperationalMetadata::operationalConfiguration (part): 'part2'" .
+
+uafv2_13:inst-part3 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "part3" ;
+    uaf2:canonical "OperationalSample::part3" ;
+    rdfs:comment "UAFv2 Model instance of OperationalMetadata::operationalConfiguration (part): 'part3'" .
+
+uafv2_13:inst-part4 a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "part4" ;
+    uaf2:canonical "OperationalSample::part4" ;
+    rdfs:comment "UAFv2 Model instance of OperationalMetadata::operationalPerformer (part): 'part4'" .
+
+uafv2_13:inst-pid a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "pid" ;
+    uaf2:canonical "OperationalUserModel::pid" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'pid'" .
+
+uafv2_13:inst-place-of-safety a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Place Of Safety" ;
+    uaf2:canonical "Operational Model::Place Of Safety" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Place Of Safety'" .
+
+uafv2_13:inst-placeofsafetytohealthservicecc1 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceCC1" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceCC1" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceCC1'" .
+
+uafv2_13:inst-placeofsafetytohealthservicecc2 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceCC2" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceCC2" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceCC2'" .
+
+uafv2_13:inst-placeofsafetytohealthserviceoe48 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceOE48" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceOE48" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceOE48'" .
+
+uafv2_13:inst-placeofsafetytohealthserviceoe49 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceOE49" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceOE49" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceOE49'" .
+
+uafv2_13:inst-placeofsafetytohealthserviceoe50 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceOE50" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceOE50" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceOE50'" .
+
+uafv2_13:inst-placeofsafetytohealthserviceoe51 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceOE51" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceOE51" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceOE51'" .
+
+uafv2_13:inst-placeofsafetytohealthserviceoe52 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceOE52" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceOE52" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceOE52'" .
+
+uafv2_13:inst-placeofsafetytohealthserviceoe59 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToHealthServiceOE59" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToHealthServiceOE59" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToHealthServiceOE59'" .
+
+uafv2_13:inst-placeofsafetytotacticalc2oe48 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "PlaceOfSafetyToTacticalC2OE48" ;
+    uaf2:canonical "Operational Model::PlaceOfSafetyToTacticalC2OE48" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'PlaceOfSafetyToTacticalC2OE48'" .
+
+uafv2_13:inst-premises a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Premises" ;
+    uaf2:canonical "LocationUserModel::Premises" ;
+    rdfs:comment "UAFv2 Model instance of site (part def): 'Premises'" .
+
+uafv2_13:inst-primebuildingplot a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "PrimeBuildingPlot" ;
+    uaf2:canonical "LocationUserModel::PrimeBuildingPlot" ;
+    rdfs:comment "UAFv2 Model instance of site (part): 'PrimeBuildingPlot'" .
+
+uafv2_13:inst-principal a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "principal" ;
+    uaf2:canonical "UserModel::principal" ;
+    rdfs:comment "UAFv2 Model instance of position (part): 'principal'" .
+
+uafv2_13:inst-projectaref a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectARef" ;
+    uaf2:canonical "Sample::projectARef" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'projectARef'" .
+
+uafv2_13:inst-projectdef a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "ProjectDef" ;
+    uaf2:canonical "Sample::ProjectDef" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'ProjectDef'" .
+
+uafv2_13:inst-projectpart a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectPart" ;
+    uaf2:canonical "Sample::projectPart" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'projectPart'" .
+
+uafv2_13:inst-projectpartofmainproject a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectPartOfMainProject" ;
+    uaf2:canonical "Sample::projectPartOfMainProject" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'projectPartOfMainProject'" .
+
+uafv2_13:inst-projectrefofmainproject a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectRefOfMainProject" ;
+    uaf2:canonical "Sample::projectRefOfMainProject" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'projectRefOfMainProject'" .
+
+uafv2_13:inst-projecttoproject a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectToproject" ;
+    uaf2:canonical "userModel::projectToproject" ;
+    rdfs:comment "UAFv2 Model instance of projectDependency (connection): 'projectToproject'" .
+
+uafv2_13:inst-projecttoproject1 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectToproject1" ;
+    uaf2:canonical "userModel::projectToproject1" ;
+    rdfs:comment "UAFv2 Model instance of projectDependency (connection): 'projectToproject1'" .
+
+uafv2_13:inst-projecttoproject2 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectToproject2" ;
+    uaf2:canonical "userModel::projectToproject2" ;
+    rdfs:comment "UAFv2 Model instance of projectDependency (connection): 'projectToproject2'" .
+
+uafv2_13:inst-projectusagepackagelevel a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "projectUsagePackageLevel" ;
+    uaf2:canonical "Sample::projectUsagePackageLevel" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'projectUsagePackageLevel'" .
+
+uafv2_13:inst-provider a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "provider" ;
+    uaf2:canonical "ServicesUserModel3::provider" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'provider'" .
+
+uafv2_13:inst-prt a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Prt" ;
+    uaf2:canonical "Sample::Prt" ;
+    rdfs:comment "UAFv2 Model instance of situation (part def): 'Prt'" .
+
+uafv2_13:inst-purchase a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Purchase" ;
+    uaf2:canonical "RequiremnetSample::Purchase" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'Purchase'" .
+
+uafv2_13:inst-purchasebicycle a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "PurchaseBicycle" ;
+    uaf2:canonical "RequiremnetSample::PurchaseBicycle" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'PurchaseBicycle'" .
+
+uafv2_13:inst-purchasebycicleforjohn a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "purchaseBycicleForJohn" ;
+    uaf2:canonical "RequiremnetSample::purchaseBycicleForJohn" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'purchaseBycicleForJohn'" .
+
+uafv2_13:inst-purchasedgoods a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "PurchasedGoods" ;
+    uaf2:canonical "ServicesUserModel3::PurchasedGoods" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part def): 'PurchasedGoods'" .
+
+uafv2_13:inst-purchaserequest a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "purchaseRequest" ;
+    uaf2:canonical "ServicesUserModel3::purchaseRequest" ;
+    rdfs:comment "UAFv2 Model instance of servicePort (port): 'purchaseRequest'" .
+
+uafv2_13:inst-purchaserequester a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "purchaseRequester" ;
+    uaf2:canonical "ServicesUserModel3::purchaseRequester" ;
+    rdfs:comment "UAFv2 Model instance of serviceAgent (part): 'purchaseRequester'" .
+
+uafv2_13:inst-purchaseserviceprovision a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "purchaseServiceProvision" ;
+    uaf2:canonical "ServicesUserModel3::purchaseServiceProvision" ;
+    rdfs:comment "UAFv2 Model instance of servicePort (port): 'purchaseServiceProvision'" .
+
+uafv2_13:inst-purchaseserviceprovisioner a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "purchaseServiceProvisioner" ;
+    uaf2:canonical "ServicesUserModel3::purchaseServiceProvisioner" ;
+    rdfs:comment "UAFv2 Model instance of serviceAgent (part): 'purchaseServiceProvisioner'" .
+
+uafv2_13:inst-purchasing a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Purchasing" ;
+    uaf2:canonical "ServicesUserModel3::Purchasing" ;
+    rdfs:comment "UAFv2 Model instance of service (connection def): 'Purchasing'" .
+
+uafv2_13:inst-purchasinginterface a uaf:UML2_5Metamodel__Port,
+        owl:NamedIndividual ;
+    rdfs:label "PurchasingInterface" ;
+    uaf2:canonical "ServicesUserModel3::PurchasingInterface" ;
+    rdfs:comment "UAFv2 Model instance of operationalPort (port def): 'PurchasingInterface'" .
+
+uafv2_13:inst-pushback a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "PushBack" ;
+    uaf2:canonical "ServicesUserModel::PushBack" ;
+    rdfs:comment "UAFv2 Model instance of service (connection def): 'PushBack'" .
+
+uafv2_13:inst-receiced-distress-and-transmit-new-track-or-track-update a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Receiced Distress and Transmit New Track or Track Update" ;
+    uaf2:canonical "Operational Model::Receiced Distress and Transmit New Track or Track Update" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Receiced Distress and Transmit New Track or Track Update'" .
+
+uafv2_13:inst-receivedistresssignal a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "ReceiveDistressSignal" ;
+    uaf2:canonical "OperationalUserModel::ReceiveDistressSignal" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'ReceiveDistressSignal'" .
+
+uafv2_13:inst-refenterprise a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "refEnterprise" ;
+    uaf2:canonical "Sample::refEnterprise" ;
+    rdfs:comment "UAFv2 Model instance of enterprise (part): 'refEnterprise'" .
+
+uafv2_13:inst-request a uaf:UML2_5Metamodel__Port,
+        owl:NamedIndividual ;
+    rdfs:label "request" ;
+    uaf2:canonical "ServicesUserModel3::request" ;
+    rdfs:comment "UAFv2 Model instance of operationalPort (port): 'request'" .
+
+uafv2_13:inst-request-safe-place-establishment a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Request Safe Place Establishment" ;
+    uaf2:canonical "Operational Model::Request Safe Place Establishment" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Request Safe Place Establishment'" .
+
+uafv2_13:inst-requestparkingbrake a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "RequestParkingBrake" ;
+    uaf2:canonical "ServicesUserModel::RequestParkingBrake" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'RequestParkingBrake'" .
+
+uafv2_13:inst-requestpushback a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "RequestPushback" ;
+    uaf2:canonical "ServicesUserModel::RequestPushback" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'RequestPushback'" .
+
+uafv2_13:inst-requesttoserviceprovision a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "requestToServiceProvision" ;
+    uaf2:canonical "ServicesUserModel3::requestToServiceProvision" ;
+    rdfs:comment "UAFv2 Model instance of serviceExchange (flow): 'requestToServiceProvision'" .
+
+uafv2_13:inst-requestunparkaircraft a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "RequestUnparkAircraft" ;
+    uaf2:canonical "ServicesUserModel::RequestUnparkAircraft" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'RequestUnparkAircraft'" .
+
+uafv2_13:inst-rescue a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Rescue" ;
+    uaf2:canonical "Operational Model::Rescue" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Rescue'" .
+
+uafv2_13:inst-rescue-ship a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Rescue Ship" ;
+    uaf2:canonical "StandardSample::Rescue Ship" ;
+    rdfs:comment "UAFv2 Model instance of capabilityConfiguration (part def): 'Rescue Ship'" .
+
+uafv2_13:inst-rescueactivity a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "RescueActivity" ;
+    uaf2:canonical "OperationalUserModel::RescueActivity" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'RescueActivity'" .
+
+uafv2_13:inst-rescuecontext a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "rescueContext" ;
+    uaf2:canonical "OperationalUserModel::rescueContext" ;
+    rdfs:comment "UAFv2 Model instance of operationalConfiguration (part): 'rescueContext'" .
+
+uafv2_13:inst-rescuecontext1 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "rescueContext1" ;
+    uaf2:canonical "OperationalUserModel::rescueContext1" ;
+    rdfs:comment "UAFv2 Model instance of operationalConfiguration (part): 'rescueContext1'" .
+
+uafv2_13:inst-rescuer a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Rescuer" ;
+    uaf2:canonical "OperationalUserModel::Rescuer" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Rescuer'" .
+
+uafv2_13:inst-rescuetodistressedpartyoe22 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToDistressedPartyOE22" ;
+    uaf2:canonical "Operational Model::RescueToDistressedPartyOE22" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToDistressedPartyOE22'" .
+
+uafv2_13:inst-rescuetoplaceofsafetyoe12 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToPlaceOfSafetyOE12" ;
+    uaf2:canonical "Operational Model::RescueToPlaceOfSafetyOE12" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToPlaceOfSafetyOE12'" .
+
+uafv2_13:inst-rescuetoplaceofsafetyoe121 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToPlaceOfSafetyOE121" ;
+    uaf2:canonical "Operational Model::RescueToPlaceOfSafetyOE121" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToPlaceOfSafetyOE121'" .
+
+uafv2_13:inst-rescuetoplaceofsafetyoe30 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToPlaceOfSafetyOE30" ;
+    uaf2:canonical "Operational Model::RescueToPlaceOfSafetyOE30" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToPlaceOfSafetyOE30'" .
+
+uafv2_13:inst-rescuetosarassetcontrolleroe19 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToSARAssetControllerOE19" ;
+    uaf2:canonical "Operational Model::RescueToSARAssetControllerOE19" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToSARAssetControllerOE19'" .
+
+uafv2_13:inst-rescuetosarassetcontrolleroe23 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToSARAssetControllerOE23" ;
+    uaf2:canonical "Operational Model::RescueToSARAssetControllerOE23" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToSARAssetControllerOE23'" .
+
+uafv2_13:inst-rescuetosarassetcontrolleroe6 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToSARAssetControllerOE6" ;
+    uaf2:canonical "Operational Model::RescueToSARAssetControllerOE6" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToSARAssetControllerOE6'" .
+
+uafv2_13:inst-rescuetosarassetcontrolleroe9 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToSARAssetControllerOE9" ;
+    uaf2:canonical "Operational Model::RescueToSARAssetControllerOE9" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToSARAssetControllerOE9'" .
+
+uafv2_13:inst-rescuetosearch a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToSearch" ;
+    uaf2:canonical "Operational Model::RescueToSearch" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToSearch'" .
+
+uafv2_13:inst-rescuetotacticalc2oe10 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToTacticalC2OE10" ;
+    uaf2:canonical "Operational Model::RescueToTacticalC2OE10" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToTacticalC2OE10'" .
+
+uafv2_13:inst-rescuetotacticalc2oe13 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToTacticalC2OE13" ;
+    uaf2:canonical "Operational Model::RescueToTacticalC2OE13" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToTacticalC2OE13'" .
+
+uafv2_13:inst-rescuetotacticalc2oe15 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToTacticalC2OE15" ;
+    uaf2:canonical "Operational Model::RescueToTacticalC2OE15" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToTacticalC2OE15'" .
+
+uafv2_13:inst-rescuetotacticalc2oe43 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToTacticalC2OE43" ;
+    uaf2:canonical "Operational Model::RescueToTacticalC2OE43" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToTacticalC2OE43'" .
+
+uafv2_13:inst-rescuetotacticalc2oe64 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "RescueToTacticalC2OE64" ;
+    uaf2:canonical "Operational Model::RescueToTacticalC2OE64" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'RescueToTacticalC2OE64'" .
+
+uafv2_13:inst-rn a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "rn" ;
+    uaf2:canonical "Operational Model::rn" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'rn'" .
+
+uafv2_13:inst-rscr a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "rscr" ;
+    uaf2:canonical "OperationalUserModel::rscr" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'rscr'" .
+
+uafv2_13:inst-sac a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "sac" ;
+    uaf2:canonical "Operational Model::sac" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'sac'" .
+
+uafv2_13:inst-sar-asset-controller a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "SAR Asset Controller" ;
+    uaf2:canonical "Operational Model::SAR Asset Controller" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'SAR Asset Controller'" .
+
+uafv2_13:inst-sar-monitor a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "SAR Monitor" ;
+    uaf2:canonical "Operational Model::SAR Monitor" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'SAR Monitor'" .
+
+uafv2_13:inst-sar-operation a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SAR Operation" ;
+    uaf2:canonical "Operational Model::SAR Operation" ;
+    rdfs:comment "UAFv2 Model instance of operationalConfiguration (part): 'SAR Operation'" .
+
+uafv2_13:inst-sarassetcontrollertorescueoe2 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToRescueOE2" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToRescueOE2" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToRescueOE2'" .
+
+uafv2_13:inst-sarassetcontrollertorescueoe35 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToRescueOE35" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToRescueOE35" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToRescueOE35'" .
+
+uafv2_13:inst-sarassetcontrollertorescueoe36 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToRescueOE36" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToRescueOE36" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToRescueOE36'" .
+
+uafv2_13:inst-sarassetcontrollertorescueoe39 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToRescueOE39" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToRescueOE39" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToRescueOE39'" .
+
+uafv2_13:inst-sarassetcontrollertorescueoe40 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToRescueOE40" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToRescueOE40" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToRescueOE40'" .
+
+uafv2_13:inst-sarassetcontrollertosearchoe2 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToSearchOE2" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToSearchOE2" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToSearchOE2'" .
+
+uafv2_13:inst-sarassetcontrollertosearchoe35 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToSearchOE35" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToSearchOE35" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToSearchOE35'" .
+
+uafv2_13:inst-sarassetcontrollertosearchoe36 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToSearchOE36" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToSearchOE36" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToSearchOE36'" .
+
+uafv2_13:inst-sarassetcontrollertosearchoe39 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToSearchOE39" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToSearchOE39" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToSearchOE39'" .
+
+uafv2_13:inst-sarassetcontrollertosearchoe40 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToSearchOE40" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToSearchOE40" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToSearchOE40'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe35 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE35" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE35" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE35'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe36 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE36" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE36" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE36'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe37 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE37" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE37" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE37'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe38 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE38" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE38" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE38'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe39 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE39" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE39" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE39'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe4 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE4" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE4" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE4'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe40 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE40" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE40" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE40'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe41 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE41" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE41" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE41'" .
+
+uafv2_13:inst-sarassetcontrollertotacticalc2tooe42 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARAssetControllerToTacticalC2ToOE42" ;
+    uaf2:canonical "Operational Model::SARAssetControllerToTacticalC2ToOE42" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARAssetControllerToTacticalC2ToOE42'" .
+
+uafv2_13:inst-sarc2manager a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SARC2Manager" ;
+    uaf2:canonical "UserModel::SARC2Manager" ;
+    rdfs:comment "UAFv2 Model instance of position (part): 'SARC2Manager'" .
+
+uafv2_13:inst-sarcommander a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SARCommander" ;
+    uaf2:canonical "UserModel::SARCommander" ;
+    rdfs:comment "UAFv2 Model instance of position (part def): 'SARCommander'" .
+
+uafv2_13:inst-sarenterprisephase a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SAREnterprisePhase" ;
+    uaf2:canonical "Sample::SAREnterprisePhase" ;
+    rdfs:comment "UAFv2 Model instance of enterprise (part def): 'SAREnterprisePhase'" .
+
+uafv2_13:inst-sargovernmentdepartment a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SARGovernmentDepartment" ;
+    uaf2:canonical "UserModel::SARGovernmentDepartment" ;
+    rdfs:comment "UAFv2 Model instance of organization (part def): 'SARGovernmentDepartment'" .
+
+uafv2_13:inst-sarmonitortotacticalc2oe18 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARMonitorToTacticalC2OE18" ;
+    uaf2:canonical "Operational Model::SARMonitorToTacticalC2OE18" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARMonitorToTacticalC2OE18'" .
+
+uafv2_13:inst-sarmonitortotacticalc2oe26 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARMonitorToTacticalC2OE26" ;
+    uaf2:canonical "Operational Model::SARMonitorToTacticalC2OE26" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARMonitorToTacticalC2OE26'" .
+
+uafv2_13:inst-sarmonitortotacticalc2oe34 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SARMonitorToTacticalC2OE34" ;
+    uaf2:canonical "Operational Model::SARMonitorToTacticalC2OE34" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SARMonitorToTacticalC2OE34'" .
+
+uafv2_13:inst-sdk_11 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SDK_11" ;
+    uaf2:canonical "userModel::SDK_11" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'SDK_11'" .
+
+uafv2_13:inst-sdk_12 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SDK_12" ;
+    uaf2:canonical "userModel::SDK_12" ;
+    rdfs:comment "UAFv2 Model instance of project (part): 'SDK_12'" .
+
+uafv2_13:inst-search a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Search" ;
+    uaf2:canonical "Operational Model::Search" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Search'" .
+
+uafv2_13:inst-searchtodistressedparty a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToDistressedParty" ;
+    uaf2:canonical "Operational Model::SearchToDistressedParty" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToDistressedParty'" .
+
+uafv2_13:inst-searchtorescue a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToRescue" ;
+    uaf2:canonical "Operational Model::SearchToRescue" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToRescue'" .
+
+uafv2_13:inst-searchtosarassetcontrolleroe20 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToSARAssetControllerOE20" ;
+    uaf2:canonical "Operational Model::SearchToSARAssetControllerOE20" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToSARAssetControllerOE20'" .
+
+uafv2_13:inst-searchtosarassetcontrolleroe24 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToSARAssetControllerOE24" ;
+    uaf2:canonical "Operational Model::SearchToSARAssetControllerOE24" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToSARAssetControllerOE24'" .
+
+uafv2_13:inst-searchtosarassetcontrolleroe6 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToSARAssetControllerOE6" ;
+    uaf2:canonical "Operational Model::SearchToSARAssetControllerOE6" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToSARAssetControllerOE6'" .
+
+uafv2_13:inst-searchtosarassetcontrolleroe9 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToSARAssetControllerOE9" ;
+    uaf2:canonical "Operational Model::SearchToSARAssetControllerOE9" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToSARAssetControllerOE9'" .
+
+uafv2_13:inst-searchtotacticalc2oe11 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToTacticalC2OE11" ;
+    uaf2:canonical "Operational Model::SearchToTacticalC2OE11" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToTacticalC2OE11'" .
+
+uafv2_13:inst-searchtotacticalc2oe14 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToTacticalC2OE14" ;
+    uaf2:canonical "Operational Model::SearchToTacticalC2OE14" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToTacticalC2OE14'" .
+
+uafv2_13:inst-searchtotacticalc2oe20 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToTacticalC2OE20" ;
+    uaf2:canonical "Operational Model::SearchToTacticalC2OE20" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToTacticalC2OE20'" .
+
+uafv2_13:inst-searchtotacticalc2oe63 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "SearchToTacticalC2OE63" ;
+    uaf2:canonical "Operational Model::SearchToTacticalC2OE63" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'SearchToTacticalC2OE63'" .
+
+uafv2_13:inst-seller a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Seller" ;
+    uaf2:canonical "ServicesUserModel3::Seller" ;
+    rdfs:comment "UAFv2 Model instance of serviceAgent (part def): 'Seller'" .
+
+uafv2_13:inst-senddistresssignal a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "SendDistressSignal" ;
+    uaf2:canonical "OperationalUserModel::SendDistressSignal" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'SendDistressSignal'" .
+
+uafv2_13:inst-serviceprovision a uaf:UML2_5Metamodel__Port,
+        owl:NamedIndividual ;
+    rdfs:label "serviceProvision" ;
+    uaf2:canonical "ServicesUserModel3::serviceProvision" ;
+    rdfs:comment "UAFv2 Model instance of operationalPort (port): 'serviceProvision'" .
+
+uafv2_13:inst-serviceprovisiontorequest a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "serviceProvisionToRequest" ;
+    uaf2:canonical "ServicesUserModel3::serviceProvisionToRequest" ;
+    rdfs:comment "UAFv2 Model instance of serviceExchange (flow): 'serviceProvisionToRequest'" .
+
+uafv2_13:inst-sn a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "sn" ;
+    uaf2:canonical "Operational Model::sn" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'sn'" .
+
+uafv2_13:inst-softwaredeploymentproject a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SoftwareDeploymentProject" ;
+    uaf2:canonical "userModel::SoftwareDeploymentProject" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'SoftwareDeploymentProject'" .
+
+uafv2_13:inst-softwareportfolio a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SoftwarePortfolio" ;
+    uaf2:canonical "userModel::SoftwarePortfolio" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'SoftwarePortfolio'" .
+
+uafv2_13:inst-softwareproject a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SoftwareProject" ;
+    uaf2:canonical "userModel::SoftwareProject" ;
+    rdfs:comment "UAFv2 Model instance of project (part def): 'SoftwareProject'" .
+
+uafv2_13:inst-sp a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "sp" ;
+    uaf2:canonical "Operational Model::sp" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'sp'" .
+
+uafv2_13:inst-ssi a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SSI" ;
+    uaf2:canonical "UserModel::SSI" ;
+    rdfs:comment "UAFv2 Model instance of organization (part def): 'SSI'" .
+
+uafv2_13:inst-ssi2025 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SSI2025" ;
+    uaf2:canonical "UserModel::SSI2025" ;
+    rdfs:comment "UAFv2 Model instance of organization (part): 'SSI2025'" .
+
+uafv2_13:inst-stc a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "stc" ;
+    uaf2:canonical "Operational Model::stc" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part): 'stc'" .
+
+uafv2_13:inst-steering a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Steering" ;
+    uaf2:canonical "ServicesUserModel::Steering" ;
+    rdfs:comment "UAFv2 Model instance of serviceFunction (action): 'Steering'" .
+
+uafv2_13:inst-store-completion-of-safe-place-establishment a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Store Completion Of Safe Place Establishment" ;
+    uaf2:canonical "Operational Model::Store Completion Of Safe Place Establishment" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Store Completion Of Safe Place Establishment'" .
+
+uafv2_13:inst-store-safe-operational-status-and-inform-sar-c2-of-safe-place-existance a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Store Safe Operational Status And Inform SAR C2 Of Safe Place Existance" ;
+    uaf2:canonical "Operational Model::Store Safe Operational Status And Inform SAR C2 Of Safe Place Existance" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Store Safe Operational Status And Inform SAR C2 Of Safe Place Existance'" .
+
+uafv2_13:inst-systemx a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "SystemX" ;
+    uaf2:canonical "OperationalUserModel::SystemX" ;
+    rdfs:comment "UAFv2 Model instance of system (part def): 'SystemX'" .
+
+uafv2_13:inst-tactical-c2 a uaf:OperationalPerformer,
+        owl:NamedIndividual ;
+    rdfs:label "Tactical C2" ;
+    uaf2:canonical "Operational Model::Tactical C2" ;
+    rdfs:comment "UAFv2 Model instance of operationalPerformer (part def): 'Tactical C2'" .
+
+uafv2_13:inst-tacticalc2tohealthserviceoe53 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToHealthServiceOE53" ;
+    uaf2:canonical "Operational Model::TacticalC2ToHealthServiceOE53" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToHealthServiceOE53'" .
+
+uafv2_13:inst-tacticalc2tohealthserviceoe58 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToHealthServiceOE58" ;
+    uaf2:canonical "Operational Model::TacticalC2ToHealthServiceOE58" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToHealthServiceOE58'" .
+
+uafv2_13:inst-tacticalc2torescueoe17 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToRescueOE17" ;
+    uaf2:canonical "Operational Model::TacticalC2ToRescueOE17" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToRescueOE17'" .
+
+uafv2_13:inst-tacticalc2torescueoe7 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToRescueOE7" ;
+    uaf2:canonical "Operational Model::TacticalC2ToRescueOE7" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToRescueOE7'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe1 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE1" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE1" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE1'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe13 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE13" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE13" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE13'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe14 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE14" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE14" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE14'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe25 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE25" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE25" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE25'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe29 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE29" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE29" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE29'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe32 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE32" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE32" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE32'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe33 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE33" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE33" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE33'" .
+
+uafv2_13:inst-tacticalc2tosarassetcontrolleroe57 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARAssetControllerOE57" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARAssetControllerOE57" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARAssetControllerOE57'" .
+
+uafv2_13:inst-tacticalc2tosarmonitoroe25 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARMonitorOE25" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARMonitorOE25" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARMonitorOE25'" .
+
+uafv2_13:inst-tacticalc2tosarmonitoroe27 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARMonitorOE27" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARMonitorOE27" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARMonitorOE27'" .
+
+uafv2_13:inst-tacticalc2tosarmonitoroe29 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARMonitorOE29" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARMonitorOE29" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARMonitorOE29'" .
+
+uafv2_13:inst-tacticalc2tosarmonitoroe31 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSARMonitorOE31" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSARMonitorOE31" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSARMonitorOE31'" .
+
+uafv2_13:inst-tacticalc2tosearchoe17 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSearchOE17" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSearchOE17" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSearchOE17'" .
+
+uafv2_13:inst-tacticalc2tosearchoe8 a uaf:OperationalExchange,
+        owl:NamedIndividual ;
+    rdfs:label "TacticalC2ToSearchOE8" ;
+    uaf2:canonical "Operational Model::TacticalC2ToSearchOE8" ;
+    rdfs:comment "UAFv2 Model instance of operationalExchange (flow def): 'TacticalC2ToSearchOE8'" .
+
+uafv2_13:inst-tattribute a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "tAttribute" ;
+    uaf2:canonical "tests::tAttribute" ;
+    rdfs:comment "UAFv2 Model instance of m (attribute def): 'tAttribute'" .
+
+uafv2_13:inst-terminal a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "Terminal" ;
+    uaf2:canonical "ServicesUserModel::Terminal" ;
+    rdfs:comment "UAFv2 Model instance of resourceConfiguration (part): 'Terminal'" .
+
+uafv2_13:inst-thematthewhause a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "TheMatthewHause" ;
+    uaf2:canonical "UserModel::TheMatthewHause" ;
+    rdfs:comment "UAFv2 Model instance of person (part def): 'TheMatthewHause'" .
+
+uafv2_13:inst-tpart a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "tPart" ;
+    uaf2:canonical "tests::tPart" ;
+    rdfs:comment "UAFv2 Model instance of m (part def): 'tPart'" .
+
+uafv2_13:inst-transmit-distress-signal a uaf:OperationalActivity,
+        owl:NamedIndividual ;
+    rdfs:label "Transmit Distress Signal" ;
+    uaf2:canonical "Operational Model::Transmit Distress Signal" ;
+    rdfs:comment "UAFv2 Model instance of operationalActivity (action): 'Transmit Distress Signal'" .
+
+uafv2_13:inst-trekdomanesl6gen4 a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "TrekDomaneSL6Gen4" ;
+    uaf2:canonical "RequiremnetSample::TrekDomaneSL6Gen4" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part def): 'TrekDomaneSL6Gen4'" .
+
+uafv2_13:inst-trekdomanesl6gen4snxxxx a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "TrekDomaneSL6Gen4SNXXXX" ;
+    uaf2:canonical "RequiremnetSample::TrekDomaneSL6Gen4SNXXXX" ;
+    rdfs:comment "UAFv2 Model instance of hardware (part def): 'TrekDomaneSL6Gen4SNXXXX'" .
+
+uafv2_13:inst-vehicleinpection a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "vehicleInpection" ;
+    uaf2:canonical "ServicesUserModel3::vehicleInpection" ;
+    rdfs:comment "UAFv2 Model instance of organization (part): 'vehicleInpection'" .
+
+uafv2_13:inst-visual a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "visual" ;
+    uaf2:canonical "ServicesUserModel::visual" ;
+    rdfs:comment "UAFv2 Model instance of resourceConnector (connection): 'visual'" .
+
+uafv2_13:inst-wheeldiameter a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "wheelDiameter" ;
+    uaf2:canonical "RequiremnetSample::wheelDiameter" ;
+    rdfs:comment "UAFv2 Model instance of measurement (attribute): 'wheelDiameter'" .
+
+uafv2_13:inst-wired_audio a uaf:UML2_5Metamodel__Element,
+        owl:NamedIndividual ;
+    rdfs:label "wired_audio" ;
+    uaf2:canonical "ServicesUserModel::wired_audio" ;
+    rdfs:comment "UAFv2 Model instance of resourceConnector (connection): 'wired_audio'" .
+
