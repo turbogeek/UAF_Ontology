@@ -2,7 +2,10 @@
 
 This tutorial explains how to use the generated UAF OWL 2 DL ontology to model enterprise architectures, execute reasoners, and check for logical consistency.
 
+*   For a comparative report on foundational upper ontologies (gUFO, BFO, DOLCE, IDEAS 4D) and how UAF concepts map to them, see [Foundational Ontologies in Engineering](file:///e:/_Documents/git/UAF_Ontology/tutorial/FOUNDATIONAL_ONTOLOGIES.md).
+
 ---
+
 
 ## 1. Importing the Ontology
 In your ontology editor (such as Protégé) or RDF/OWL library (such as Apache Jena or rdflib):

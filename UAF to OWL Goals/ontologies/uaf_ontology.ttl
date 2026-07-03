@@ -2683,9 +2683,9 @@ uaf:Refine rdf:type owl:Class ;
 
 uaf:Message rdf:type owl:Class ;
             uaf:xmiID "_17_0_5_1_7d40257_1410986424808_135934_31414" ;
-            rdfs:subClassOf gufo:Event ;
+            rdfs:subClassOf uaf:InformationContentEntity ;
             rdfs:label "Message" ;
-            rdfs:comment "Mapped from UML/XMI metamodel element Message." .
+            rdfs:comment "Mapped from UML/XMI metamodel element Message. Note: Classified as an Information Content Entity (ICE) under gufo:AbstractIndividual." .
 
 uaf:FilteredSemanticElement rdf:type owl:Class ;
             uaf:xmiID "_17_0_5_1_7d40257_1410986432707_59390_31438" ;
@@ -4207,3 +4207,53 @@ uaf:source rdf:type owl:DatatypeProperty ;
              rdfs:range xsd:string ;
              rdfs:label "source" ;
              rdfs:comment "Mapped from UML/XMI metamodel attribute source." .
+
+# --- Information Content Entity (ICE) Framework ---
+
+uaf:InformationContentEntity rdf:type owl:Class ;
+            rdfs:subClassOf gufo:AbstractIndividual ;
+            rdfs:label "Information Content Entity" ;
+            rdfs:comment "An entity that represents information content (ICE), such as a message, document, or schema." .
+
+uaf:Message rdfs:subClassOf uaf:InformationContentEntity .
+
+uaf:Schema rdf:type owl:Class ;
+            rdfs:subClassOf uaf:InformationContentEntity ;
+            rdfs:label "Schema" ;
+            rdfs:comment "A schema that describes the structure of data." .
+
+uaf:DesignEvent rdf:type owl:Class ;
+            rdfs:subClassOf gufo:Event ;
+            rdfs:label "Design Event" ;
+            rdfs:comment "An event during which a schema or architecture is designed." .
+
+uaf:carriesDataThatRepresents rdf:type owl:ObjectProperty ;
+            rdfs:domain uaf:Message ;
+            rdfs:range gufo:Event ;
+            rdfs:label "carries data that represents" ;
+            rdfs:comment "Relates a message to the event whose data it carries." .
+
+uaf:conformsTo rdf:type owl:ObjectProperty ;
+            rdfs:domain uaf:Message ;
+            rdfs:range uaf:Schema ;
+            rdfs:label "conforms to" ;
+            rdfs:comment "Relates a message to the schema it conforms to." .
+
+uaf:wasResultOf rdf:type owl:ObjectProperty ;
+            rdfs:domain uaf:Schema ;
+            rdfs:range uaf:DesignEvent ;
+            rdfs:label "was result of" ;
+            rdfs:comment "Relates a schema to the design event that produced it." .
+
+# Restrictions
+uaf:Message rdfs:subClassOf [
+    rdf:type owl:Restriction ;
+    owl:onProperty uaf:carriesDataThatRepresents ;
+    owl:someValuesFrom gufo:Event
+] .
+
+uaf:Schema rdfs:subClassOf [
+    rdf:type owl:Restriction ;
+    owl:onProperty uaf:wasResultOf ;
+    owl:someValuesFrom uaf:DesignEvent
+] .

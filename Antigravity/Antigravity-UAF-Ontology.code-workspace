@@ -11,6 +11,18 @@
 		},
 		{
 			"path": "../../TutorialForCatiaMagicApiMCP"
+		},
+		{
+			"path": "../../UAFSML"
+		},
+		{
+			"path": "../../Examples"
+		},
+		{
+			"path": "../../Example-model"
+		},
+		{
+			"path": "../../UAFv2-Samples"
 		}
 	]
 }
