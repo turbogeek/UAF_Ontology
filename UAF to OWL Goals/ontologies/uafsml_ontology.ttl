@@ -12,7 +12,7 @@
                 <http://omg.org/spec/KerML> ,
                 <http://omg.org/spec/SysML2> ;
     rdfs:label "UAFSML 2.0 (UAF for SysML v2) Ontology" ;
-    rdfs:comment "OWL representation of the UAF 2.0 (UAFSML) library definitions and viewpoints inheriting from standard SysML v2 and KerML." .
+    rdfs:comment "OWL representation of the UAF 2.0 (UAFSML) library definitions, viewpoints, and metadata inheriting from standard SysML v2 and KerML." .
 
 # --- Metamodel Core Inheritance ---
 
@@ -131,6 +131,12 @@ uafsml:lib-mission rdf:type owl:Class ;
     sysml2:canonical "Mission" ;
     rdfs:comment "Library package defined in Mission.sysml" .
 
+uafsml:def-mission-threads rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Mission Threads" ;
+    sysml2:canonical "Mission::Mission Threads" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Mission Threads'" .
+
 uafsml:def-mission-threads-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
     rdfs:label "Mission Threads View" ;
@@ -142,6 +148,12 @@ uafsml:lib-operational-view-specifications rdf:type owl:Class ;
     rdfs:label "Operational View Specifications" ;
     sysml2:canonical "Operational View Specifications" ;
     rdfs:comment "Library package defined in Operational View Specifications.sysml" .
+
+uafsml:def-operational-taxonomy rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational Taxonomy" ;
+    sysml2:canonical "Operational View Specifications::Operational Taxonomy" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Taxonomy'" .
 
 uafsml:def-operational-taxonomy-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
@@ -161,6 +173,12 @@ uafsml:def-security-view rdf:type owl:Class ;
     sysml2:canonical "Operational View Specifications::Security View" ;
     rdfs:comment "SysML v2 view def definition: 'Security View'" .
 
+uafsml:def-operational-structure rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational Structure" ;
+    sysml2:canonical "Operational View Specifications::Operational Structure" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Structure'" .
+
 uafsml:def-operational-structure-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
     rdfs:label "Operational Structure Table" ;
@@ -172,6 +190,12 @@ uafsml:def-operational-structure-view rdf:type owl:Class ;
     rdfs:label "Operational Structure View" ;
     sysml2:canonical "Operational View Specifications::Operational Structure View" ;
     rdfs:comment "SysML v2 view def definition: 'Operational Structure View'" .
+
+uafsml:def-operational-connectivity rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational Connectivity" ;
+    sysml2:canonical "Operational View Specifications::Operational Connectivity" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Connectivity'" .
 
 uafsml:def-operational-connectivity-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
@@ -185,11 +209,23 @@ uafsml:def-operational-internal-connectivity-view rdf:type owl:Class ;
     sysml2:canonical "Operational View Specifications::Operational Internal-Connectivity View" ;
     rdfs:comment "SysML v2 view def definition: 'Operational Internal-Connectivity View'" .
 
+uafsml:def-operational-processes rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational Processes" ;
+    sysml2:canonical "Operational View Specifications::Operational Processes" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Processes'" .
+
 uafsml:def-operational-processes-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
     rdfs:label "Operational Processes View" ;
     sysml2:canonical "Operational View Specifications::Operational Processes View" ;
     rdfs:comment "SysML v2 view def definition: 'Operational Processes View'" .
+
+uafsml:def-operational-states rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational States" ;
+    sysml2:canonical "Operational View Specifications::Operational States" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational States'" .
 
 uafsml:def-operational-states-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
@@ -197,17 +233,35 @@ uafsml:def-operational-states-view rdf:type owl:Class ;
     sysml2:canonical "Operational View Specifications::Operational States View" ;
     rdfs:comment "SysML v2 view def definition: 'Operational States View'" .
 
+uafsml:def-operational-sequences rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational Sequences" ;
+    sysml2:canonical "Operational View Specifications::Operational Sequences" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Sequences'" .
+
 uafsml:def-operational-sequences-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
     rdfs:label "Operational Sequences View" ;
     sysml2:canonical "Operational View Specifications::Operational Sequences View" ;
     rdfs:comment "SysML v2 view def definition: 'Operational Sequences View'" .
 
+uafsml:def-operational-constraints rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational Constraints" ;
+    sysml2:canonical "Operational View Specifications::Operational Constraints" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Constraints'" .
+
 uafsml:def-operational-constraints-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
     rdfs:label "Operational Constraints Table" ;
     sysml2:canonical "Operational View Specifications::Operational Constraints Table" ;
     rdfs:comment "SysML v2 view def definition: 'Operational Constraints Table'" .
+
+uafsml:def-operational-traceability rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Operational Traceability" ;
+    sysml2:canonical "Operational View Specifications::Operational Traceability" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Traceability'" .
 
 uafsml:def-operational-traceability-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
@@ -220,6 +274,36 @@ uafsml:lib-operational-viewpoints rdf:type owl:Class ;
     rdfs:label "Operational Viewpoints" ;
     sysml2:canonical "Operational Viewpoints" ;
     rdfs:comment "Library package defined in Operational Viewpoints.sysml" .
+
+uafsml:def-operational rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Operational" ;
+    sysml2:canonical "Operational Viewpoints::Operational" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational'" .
+
+uafsml:def-operational-motivation rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Operational Motivation" ;
+    sysml2:canonical "Operational Viewpoints::Operational Motivation" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Motivation'" .
+
+uafsml:def-operational-composition rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Operational Composition" ;
+    sysml2:canonical "Operational Viewpoints::Operational Composition" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Composition'" .
+
+uafsml:def-operational-behavior rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Operational Behavior" ;
+    sysml2:canonical "Operational Viewpoints::Operational Behavior" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Behavior'" .
+
+uafsml:def-operational-rules rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Operational Rules" ;
+    sysml2:canonical "Operational Viewpoints::Operational Rules" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Operational Rules'" .
 
 uafsml:lib-operational-views rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -352,6 +436,72 @@ uafsml:lib-personnel-viewpoints rdf:type owl:Class ;
     rdfs:label "Personnel Viewpoints" ;
     sysml2:canonical "Personnel Viewpoints" ;
     rdfs:comment "Library package defined in Personnel Viewpoints.sysml" .
+
+uafsml:def-personnel rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel'" .
+
+uafsml:def-personnel-motivation rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Motivation" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Motivation" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Motivation'" .
+
+uafsml:def-personnel-structure rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Structure" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Structure" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Structure'" .
+
+uafsml:def-personnel-taxonomy rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Taxonomy" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Taxonomy" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Taxonomy'" .
+
+uafsml:def-personnel-composition rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Composition" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Composition" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Composition'" .
+
+uafsml:def-personnel-connectivity rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Connectivity" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Connectivity" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Connectivity'" .
+
+uafsml:def-personnel-behavior rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Behavior" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Behavior" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Behavior'" .
+
+uafsml:def-personnel-processes rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Processes" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Processes" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Processes'" .
+
+uafsml:def-personnel-states rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel States" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel States" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel States'" .
+
+uafsml:def-personnel-rules rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Rules" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Rules" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Rules'" .
+
+uafsml:def-personnel-life-cycle rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Personnel Life Cycle" ;
+    sysml2:canonical "Personnel Viewpoints::Personnel Life Cycle" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Personnel Life Cycle'" .
 
 uafsml:lib-personnel-views rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -503,6 +653,12 @@ uafsml:lib-projects-viewpoints rdf:type owl:Class ;
     sysml2:canonical "Projects Viewpoints" ;
     rdfs:comment "Library package defined in Projects Viewpoints.sysml" .
 
+uafsml:def-projects rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Projects" ;
+    sysml2:canonical "Projects Viewpoints::Projects" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Projects'" .
+
 uafsml:lib-projects-views rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "Projects Views" ;
@@ -520,6 +676,12 @@ uafsml:lib-requirements-view-specifications rdf:type owl:Class ;
     rdfs:label "Requirements View Specifications" ;
     sysml2:canonical "Requirements View Specifications" ;
     rdfs:comment "Library package defined in Requirements View Specifications.sysml" .
+
+uafsml:def-requirements rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Requirements" ;
+    sysml2:canonical "Requirements View Specifications::Requirements" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Requirements'" .
 
 uafsml:def-requirements-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
@@ -689,6 +851,72 @@ uafsml:lib-resources-viewpoints rdf:type owl:Class ;
     sysml2:canonical "Resources Viewpoints" ;
     rdfs:comment "Library package defined in Resources Viewpoints.sysml" .
 
+uafsml:def-resources rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources" ;
+    sysml2:canonical "Resources Viewpoints::Resources" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources'" .
+
+uafsml:def-resources-motivation rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Motivation" ;
+    sysml2:canonical "Resources Viewpoints::Resources Motivation" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Motivation'" .
+
+uafsml:def-resources-structure rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Structure" ;
+    sysml2:canonical "Resources Viewpoints::Resources Structure" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Structure'" .
+
+uafsml:def-resources-taxonomy rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Taxonomy" ;
+    sysml2:canonical "Resources Viewpoints::Resources Taxonomy" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Taxonomy'" .
+
+uafsml:def-resources-composition rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Composition" ;
+    sysml2:canonical "Resources Viewpoints::Resources Composition" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Composition'" .
+
+uafsml:def-resources-connectivity rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Connectivity" ;
+    sysml2:canonical "Resources Viewpoints::Resources Connectivity" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Connectivity'" .
+
+uafsml:def-resources-behavior rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Behavior" ;
+    sysml2:canonical "Resources Viewpoints::Resources Behavior" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Behavior'" .
+
+uafsml:def-resources-processes rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Processes" ;
+    sysml2:canonical "Resources Viewpoints::Resources Processes" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Processes'" .
+
+uafsml:def-resources-states rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources States" ;
+    sysml2:canonical "Resources Viewpoints::Resources States" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources States'" .
+
+uafsml:def-resources-rules rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Rules" ;
+    sysml2:canonical "Resources Viewpoints::Resources Rules" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Rules'" .
+
+uafsml:def-resources-life-cycle rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resources Life Cycle" ;
+    sysml2:canonical "Resources Viewpoints::Resources Life Cycle" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resources Life Cycle'" .
+
 uafsml:lib-resources-views rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "Resources Views" ;
@@ -761,6 +989,12 @@ uafsml:lib-strategic-view-specifications rdf:type owl:Class ;
     sysml2:canonical "Strategic View Specifications" ;
     rdfs:comment "Library package defined in Strategic View Specifications.sysml" .
 
+uafsml:def-strategic-motivation rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Motivation" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Motivation" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Motivation'" .
+
 uafsml:def-strategic-motivation-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
     rdfs:label "Strategic Motivation Table" ;
@@ -785,6 +1019,12 @@ uafsml:def-general-strategic-motivation-view rdf:type owl:Class ;
     sysml2:canonical "Strategic View Specifications::General Strategic Motivation View" ;
     rdfs:comment "SysML v2 view def definition: 'General Strategic Motivation View'" .
 
+uafsml:def-strategic-taxonomy rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Taxonomy" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Taxonomy" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Taxonomy'" .
+
 uafsml:def-strategic-taxonomy-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
     rdfs:label "Strategic Taxonomy Table" ;
@@ -797,11 +1037,23 @@ uafsml:def-strategic-taxonomy-view rdf:type owl:Class ;
     sysml2:canonical "Strategic View Specifications::Strategic Taxonomy View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Taxonomy View'" .
 
+uafsml:def-strategic-structure rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Structure" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Structure" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Structure'" .
+
 uafsml:def-strategic-structure-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
     rdfs:label "Strategic Structure View" ;
     sysml2:canonical "Strategic View Specifications::Strategic Structure View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Structure View'" .
+
+uafsml:def-strategic-connectivity rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Connectivity" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Connectivity" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Connectivity'" .
 
 uafsml:def-strategic-connectivity-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
@@ -815,11 +1067,23 @@ uafsml:def-strategic-connectivity-view rdf:type owl:Class ;
     sysml2:canonical "Strategic View Specifications::Strategic Connectivity View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Connectivity View'" .
 
+uafsml:def-strategic-processes rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Processes" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Processes" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Processes'" .
+
 uafsml:def-strategic-processes-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
     rdfs:label "Strategic Processes View" ;
     sysml2:canonical "Strategic View Specifications::Strategic Processes View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Processes View'" .
+
+uafsml:def-mission-phases rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Mission Phases" ;
+    sysml2:canonical "Strategic View Specifications::Mission Phases" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Mission Phases'" .
 
 uafsml:def-mission-phases-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
@@ -827,17 +1091,35 @@ uafsml:def-mission-phases-view rdf:type owl:Class ;
     sysml2:canonical "Strategic View Specifications::Mission Phases View" ;
     rdfs:comment "SysML v2 view def definition: 'Mission Phases View'" .
 
+uafsml:def-strategic-states rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic States" ;
+    sysml2:canonical "Strategic View Specifications::Strategic States" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic States'" .
+
 uafsml:def-strategic-states-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
     rdfs:label "Strategic States View" ;
     sysml2:canonical "Strategic View Specifications::Strategic States View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic States View'" .
 
+uafsml:def-strategic-information rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Information" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Information" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Information'" .
+
 uafsml:def-strategic-information-view rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-generalview ;
     rdfs:label "Strategic Information View" ;
     sysml2:canonical "Strategic View Specifications::Strategic Information View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Information View'" .
+
+uafsml:def-strategic-constraints rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Constraints" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Constraints" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Constraints'" .
 
 uafsml:def-strategic-constraints-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
@@ -851,6 +1133,12 @@ uafsml:def-strategic-constraints-view rdf:type owl:Class ;
     sysml2:canonical "Strategic View Specifications::Strategic Constraints View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Constraints View'" .
 
+uafsml:def-strategic-deployment rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Deployment" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Deployment" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Deployment'" .
+
 uafsml:def-strategic-deployment-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
     rdfs:label "Strategic Deployment Table" ;
@@ -863,6 +1151,12 @@ uafsml:def-strategic-deployment-view rdf:type owl:Class ;
     sysml2:canonical "Strategic View Specifications::Strategic Deployment View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Deployment View'" .
 
+uafsml:def-strategic-phasing rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Phasing" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Phasing" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Phasing'" .
+
 uafsml:def-strategic-phasing-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
     rdfs:label "Strategic Phasing Table" ;
@@ -874,6 +1168,12 @@ uafsml:def-strategic-phasing-view rdf:type owl:Class ;
     rdfs:label "Strategic Phasing View" ;
     sysml2:canonical "Strategic View Specifications::Strategic Phasing View" ;
     rdfs:comment "SysML v2 view def definition: 'Strategic Phasing View'" .
+
+uafsml:def-strategic-traceability rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-viewpointdefinition ;
+    rdfs:label "Strategic Traceability" ;
+    sysml2:canonical "Strategic View Specifications::Strategic Traceability" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Traceability'" .
 
 uafsml:def-strategic-traceability-table rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-gridview ;
@@ -892,6 +1192,36 @@ uafsml:lib-strategic-viewpoints rdf:type owl:Class ;
     rdfs:label "Strategic Viewpoints" ;
     sysml2:canonical "Strategic Viewpoints" ;
     rdfs:comment "Library package defined in Strategic Viewpoints.sysml" .
+
+uafsml:def-strategic rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Strategic" ;
+    sysml2:canonical "Strategic Viewpoints::Strategic" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic'" .
+
+uafsml:def-strategic-composition rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Strategic Composition" ;
+    sysml2:canonical "Strategic Viewpoints::Strategic Composition" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Composition'" .
+
+uafsml:def-strategic-behavior rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Strategic Behavior" ;
+    sysml2:canonical "Strategic Viewpoints::Strategic Behavior" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Behavior'" .
+
+uafsml:def-strategic-rules rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Strategic Rules" ;
+    sysml2:canonical "Strategic Viewpoints::Strategic Rules" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Rules'" .
+
+uafsml:def-strategic-life-cycle rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Strategic Life Cycle" ;
+    sysml2:canonical "Strategic Viewpoints::Strategic Life Cycle" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Strategic Life Cycle'" .
 
 uafsml:lib-strategic-views rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1055,6 +1385,66 @@ uafsml:lib-uaf-aspects rdf:type owl:Class ;
     sysml2:canonical "UAF Aspects" ;
     rdfs:comment "Library package defined in UAF Aspects.sysml" .
 
+uafsml:def-motivation rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Motivation" ;
+    sysml2:canonical "UAF Aspects::Motivation" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Motivation'" .
+
+uafsml:def-structure rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Structure" ;
+    sysml2:canonical "UAF Aspects::Structure" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Structure'" .
+
+uafsml:def-behavior rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Behavior" ;
+    sysml2:canonical "UAF Aspects::Behavior" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Behavior'" .
+
+uafsml:def-taxonomy rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-composition ;
+    rdfs:label "Taxonomy" ;
+    sysml2:canonical "UAF Aspects::Taxonomy" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Taxonomy'" .
+
+uafsml:def-composition rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Composition" ;
+    sysml2:canonical "UAF Aspects::Composition" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Composition'" .
+
+uafsml:def-connectivity rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Connectivity" ;
+    sysml2:canonical "UAF Aspects::Connectivity" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Connectivity'" .
+
+uafsml:def-processes rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Processes" ;
+    sysml2:canonical "UAF Aspects::Processes" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Processes'" .
+
+uafsml:def-states rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "States" ;
+    sysml2:canonical "UAF Aspects::States" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'States'" .
+
+uafsml:def-rules rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Rules" ;
+    sysml2:canonical "UAF Aspects::Rules" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Rules'" .
+
+uafsml:def-lifecycle rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "LifeCycle" ;
+    sysml2:canonical "UAF Aspects::LifeCycle" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'LifeCycle'" .
+
 uafsml:lib-uaf-cross-cutings-view-specifications rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "UAF Cross-cutings View Specifications" ;
@@ -1066,6 +1456,24 @@ uafsml:lib-uaf-cross-cutings-viewpoints rdf:type owl:Class ;
     rdfs:label "UAF Cross-cutings Viewpoints" ;
     sysml2:canonical "UAF Cross-cutings Viewpoints" ;
     rdfs:comment "Library package defined in UAF Cross-cutings Viewpoints.sysml" .
+
+uafsml:def-measurements rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Measurements" ;
+    sysml2:canonical "UAF Cross-cutings Viewpoints::Measurements" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Measurements'" .
+
+uafsml:def-risks rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Risks" ;
+    sysml2:canonical "UAF Cross-cutings Viewpoints::Risks" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Risks'" .
+
+uafsml:def-standards rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Standards" ;
+    sysml2:canonical "UAF Cross-cutings Viewpoints::Standards" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Standards'" .
 
 uafsml:lib-uaf-cross-cutting-views rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1355,6 +1763,48 @@ uafsml:def-uaf-grid-v2 rdf:type owl:Class ;
     sysml2:canonical "UAF Viewpoints::UAF Grid v2" ;
     rdfs:comment "SysML v2 viewpoint def definition: 'UAF Grid v2'" .
 
+uafsml:def-architecture-management rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Architecture Management" ;
+    sysml2:canonical "UAF Viewpoints::Architecture Management" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Architecture Management'" .
+
+uafsml:def-summary-overview rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Summary & Overview" ;
+    sysml2:canonical "UAF Viewpoints::Summary & Overview" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Summary & Overview'" .
+
+uafsml:def-services rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Services" ;
+    sysml2:canonical "UAF Viewpoints::Services" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Services'" .
+
+uafsml:def-security rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Security" ;
+    sysml2:canonical "UAF Viewpoints::Security" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Security'" .
+
+uafsml:def-individuals rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Individuals" ;
+    sysml2:canonical "UAF Viewpoints::Individuals" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Individuals'" .
+
+uafsml:def-environment rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Environment" ;
+    sysml2:canonical "UAF Viewpoints::Environment" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Environment'" .
+
+uafsml:def-resilience rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-uaf ;
+    rdfs:label "Resilience" ;
+    sysml2:canonical "UAF Viewpoints::Resilience" ;
+    rdfs:comment "SysML v2 viewpoint def definition: 'Resilience'" .
+
 uafsml:lib-uafgrid rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "UAFGrid" ;
@@ -1421,11 +1871,23 @@ uafsml:lib-architecturemanagementlibrary rdf:type owl:Class ;
     sysml2:canonical "ArchitectureManagementLibrary" ;
     rdfs:comment "Library package defined in ArchitectureManagementLibrary.sysml" .
 
+uafsml:def-alias rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-metadatadefinition ;
+    rdfs:label "Alias" ;
+    sysml2:canonical "ArchitectureManagementLibrary::Alias" ;
+    rdfs:comment "SysML v2 metadata def definition: 'Alias'" .
+
 uafsml:lib-corelibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "CoreLibrary" ;
     sysml2:canonical "CoreLibrary" ;
     rdfs:comment "Library package defined in CoreLibrary.sysml" .
+
+uafsml:def-agentconnector rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-propertyset ;
+    rdfs:label "AgentConnector" ;
+    sysml2:canonical "CoreLibrary::AgentConnector" ;
+    rdfs:comment "SysML v2 connection def definition: 'AgentConnector'" .
 
 uafsml:def-desirer rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-uafelement ;
@@ -1433,11 +1895,29 @@ uafsml:def-desirer rdf:type owl:Class ;
     sysml2:canonical "CoreLibrary::Desirer" ;
     rdfs:comment "SysML v2 part def definition: 'Desirer'" .
 
+uafsml:def-versionsuccession rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-succession ;
+    rdfs:label "VersionSuccession" ;
+    sysml2:canonical "CoreLibrary::VersionSuccession" ;
+    rdfs:comment "SysML v2 connection def definition: 'VersionSuccession'" .
+
+uafsml:def-forecast rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-versionsuccession ;
+    rdfs:label "Forecast" ;
+    sysml2:canonical "CoreLibrary::Forecast" ;
+    rdfs:comment "SysML v2 connection def definition: 'Forecast'" .
+
 uafsml:def-measurementset rdf:type owl:Class ;
     rdfs:subClassOf sysml2:def-attributedefinition ;
     rdfs:label "MeasurementSet" ;
     sysml2:canonical "CoreLibrary::MeasurementSet" ;
     rdfs:comment "SysML v2 attribute def definition: 'MeasurementSet'" .
+
+uafsml:def-succession rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-propertyset ;
+    rdfs:label "Succession" ;
+    sysml2:canonical "CoreLibrary::Succession" ;
+    rdfs:comment "SysML v2 connection def definition: 'Succession'" .
 
 uafsml:def-statusindicators rdf:type owl:Class ;
     rdfs:subClassOf sysml2:def-attributedefinition ;
@@ -1457,6 +1937,90 @@ uafsml:pkg-informationmodel rdf:type owl:Class ;
     sysml2:canonical "CoreMetadata::InformationModel" ;
     rdfs:comment "Package 'InformationModel' nested within CoreMetadata" .
 
+uafsml:def-uafelementmetdata rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-metadatadefinition ;
+    rdfs:label "UAFELementmetdata" ;
+    sysml2:canonical "CoreMetadata::UAFELementmetdata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'UAFELementmetdata'" .
+
+uafsml:def-capabilitymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "CapabilityMetadata" ;
+    sysml2:canonical "CoreMetadata::CapabilityMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'CapabilityMetadata'" .
+
+uafsml:def-conditionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ConditionMetadata" ;
+    sysml2:canonical "CoreMetadata::ConditionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ConditionMetadata'" .
+
+uafsml:def-exhibitsmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ExhibitsMetadata" ;
+    sysml2:canonical "CoreMetadata::ExhibitsMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ExhibitsMetadata'" .
+
+uafsml:def-mapstocapabilitymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MapsToCapabilityMetadata" ;
+    sysml2:canonical "CoreMetadata::MapsToCapabilityMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MapsToCapabilityMetadata'" .
+
+uafsml:def-forecastmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ForecastMetadata" ;
+    sysml2:canonical "CoreMetadata::ForecastMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ForecastMetadata'" .
+
+uafsml:def-implementsmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ImplementsMetadata" ;
+    sysml2:canonical "CoreMetadata::ImplementsMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ImplementsMetadata'" .
+
+uafsml:def-measurementmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MeasurementMetadata" ;
+    sysml2:canonical "CoreMetadata::MeasurementMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MeasurementMetadata'" .
+
+uafsml:def-measurementsetmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MeasurementSetMetadata" ;
+    sysml2:canonical "CoreMetadata::MeasurementSetMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MeasurementSetMetadata'" .
+
+uafsml:def-initions rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-attributedefinition ;
+    rdfs:label "initions" ;
+    sysml2:canonical "CoreMetadata::initions" ;
+    rdfs:comment "SysML v2 attribute def definition: 'initions'" .
+
+uafsml:def-projectsuccessionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ProjectSuccessionMetadata" ;
+    sysml2:canonical "CoreMetadata::ProjectSuccessionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ProjectSuccessionMetadata'" .
+
+uafsml:def-securityrulemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SecurityRuleMetadata" ;
+    sysml2:canonical "CoreMetadata::SecurityRuleMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SecurityRuleMetadata'" .
+
+uafsml:def-sequencemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SequenceMetadata" ;
+    sysml2:canonical "CoreMetadata::SequenceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SequenceMetadata'" .
+
+uafsml:def-strategicrulemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "StrategicRuleMetadata" ;
+    sysml2:canonical "CoreMetadata::StrategicRuleMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'StrategicRuleMetadata'" .
+
 uafsml:lib-missionlibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "MissionLibrary" ;
@@ -1469,11 +2033,59 @@ uafsml:def-mission rdf:type owl:Class ;
     sysml2:canonical "MissionLibrary::Mission" ;
     rdfs:comment "SysML v2 part def definition: 'Mission'" .
 
+uafsml:def-processdefinesinitiative rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-propertyset ;
+    rdfs:label "ProcessDefinesInitiative" ;
+    sysml2:canonical "MissionLibrary::ProcessDefinesInitiative" ;
+    rdfs:comment "SysML v2 connection def definition: 'ProcessDefinesInitiative'" .
+
 uafsml:lib-missionmetadata rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "MissionMetadata" ;
     sysml2:canonical "MissionMetadata" ;
     rdfs:comment "Library package defined in MissionMetadata.sysml" .
+
+uafsml:def-missiontaskmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MissionTaskMetadata" ;
+    sysml2:canonical "MissionMetadata::MissionTaskMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MissionTaskMetadata'" .
+
+uafsml:def-missionthreadmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MissionThreadMetadata" ;
+    sysml2:canonical "MissionMetadata::MissionThreadMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MissionThreadMetadata'" .
+
+uafsml:def-missionengineeringthreadmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MissionEngineeringThreadMetadata" ;
+    sysml2:canonical "MissionMetadata::MissionEngineeringThreadMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MissionEngineeringThreadMetadata'" .
+
+uafsml:def-missionelementmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MissionElementMetadata" ;
+    sysml2:canonical "MissionMetadata::MissionElementMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MissionElementMetadata'" .
+
+uafsml:def-missionvignettemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MissionVignetteMetadata" ;
+    sysml2:canonical "MissionMetadata::MissionVignetteMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MissionVignetteMetadata'" .
+
+uafsml:def-missionscenariometadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MissionScenarioMetadata" ;
+    sysml2:canonical "MissionMetadata::MissionScenarioMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MissionScenarioMetadata'" .
+
+uafsml:def-definesmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "DefinesMetadata" ;
+    sysml2:canonical "MissionMetadata::DefinesMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'DefinesMetadata'" .
 
 uafsml:lib-mitigationlibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1486,6 +2098,24 @@ uafsml:lib-mitigationmetadata rdf:type owl:Class ;
     rdfs:label "MitigationMetadata" ;
     sysml2:canonical "MitigationMetadata" ;
     rdfs:comment "Library package defined in MitigationMetadata.sysml" .
+
+uafsml:def-riskmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "RiskMetadata" ;
+    sysml2:canonical "MitigationMetadata::RiskMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'RiskMetadata'" .
+
+uafsml:def-affectsmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "AffectsMetadata" ;
+    sysml2:canonical "MitigationMetadata::AffectsMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'AffectsMetadata'" .
+
+uafsml:def-mitigatesmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MitigatesMetadata" ;
+    sysml2:canonical "MitigationMetadata::MitigatesMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MitigatesMetadata'" .
 
 uafsml:lib-operationallibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1511,6 +2141,12 @@ uafsml:def-operationalconfiguration rdf:type owl:Class ;
     sysml2:canonical "OperationalLibrary::OperationalConfiguration" ;
     rdfs:comment "SysML v2 part def definition: 'OperationalConfiguration'" .
 
+uafsml:def-operationalconnector rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-agentconnector ;
+    rdfs:label "OperationalConnector" ;
+    sysml2:canonical "OperationalLibrary::OperationalConnector" ;
+    rdfs:comment "SysML v2 connection def definition: 'OperationalConnector'" .
+
 uafsml:def-operationalperformer rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-operationalasset ;
     rdfs:label "OperationalPerformer" ;
@@ -1529,6 +2165,84 @@ uafsml:lib-operationalmetadata rdf:type owl:Class ;
     sysml2:canonical "OperationalMetadata" ;
     rdfs:comment "Library package defined in OperationalMetadata.sysml" .
 
+uafsml:def-knownresourcemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "KnownResourceMetadata" ;
+    sysml2:canonical "OperationalMetadata::KnownResourceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'KnownResourceMetadata'" .
+
+uafsml:def-operationalactivitymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalActivityMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalActivityMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalActivityMetadata'" .
+
+uafsml:def-operationalconfigurationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalConfigurationMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalConfigurationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalConfigurationMetadata'" .
+
+uafsml:def-operationalconnectormetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalConnectorMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalConnectorMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalConnectorMetadata'" .
+
+uafsml:def-operationalexchangemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalExchangeMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalExchangeMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalExchangeMetadata'" .
+
+uafsml:def-operationalinformationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalInformationMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalInformationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalInformationMetadata'" .
+
+uafsml:def-operationalperformermetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalPerformerMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalPerformerMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalPerformerMetadata'" .
+
+uafsml:def-operationalcontextmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalContextMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalContextMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalContextMetadata'" .
+
+uafsml:def-operationalportmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalPortMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalPortMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalPortMetadata'" .
+
+uafsml:def-operationalrulemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalRuleMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalRuleMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalRuleMetadata'" .
+
+uafsml:def-operationalstatedescriptionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalStateDescriptionMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalStateDescriptionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalStateDescriptionMetadata'" .
+
+uafsml:def-operationalusecasemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalUseCaseMetadata" ;
+    sysml2:canonical "OperationalMetadata::OperationalUseCaseMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalUseCaseMetadata'" .
+
+uafsml:def-standardoperationalactivitymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "StandardOperationalActivityMetadata" ;
+    sysml2:canonical "OperationalMetadata::StandardOperationalActivityMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'StandardOperationalActivityMetadata'" .
+
 uafsml:lib-parameterslibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "ParametersLibrary" ;
@@ -1540,6 +2254,12 @@ uafsml:lib-parametersmetadata rdf:type owl:Class ;
     rdfs:label "ParametersMetadata" ;
     sysml2:canonical "ParametersMetadata" ;
     rdfs:comment "Library package defined in ParametersMetadata.sysml" .
+
+uafsml:def-locationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "LocationMetadata" ;
+    sysml2:canonical "ParametersMetadata::LocationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'LocationMetadata'" .
 
 uafsml:lib-personnellibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1577,6 +2297,78 @@ uafsml:lib-personnelmetadata rdf:type owl:Class ;
     sysml2:canonical "PersonnelMetadata" ;
     rdfs:comment "Library package defined in PersonnelMetadata.sysml" .
 
+uafsml:def-personmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "PersonMetadata" ;
+    sysml2:canonical "PersonnelMetadata::PersonMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'PersonMetadata'" .
+
+uafsml:def-possitionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "PossitionMetadata" ;
+    sysml2:canonical "PersonnelMetadata::PossitionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'PossitionMetadata'" .
+
+uafsml:def-organizationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OrganizationMetadata" ;
+    sysml2:canonical "PersonnelMetadata::OrganizationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OrganizationMetadata'" .
+
+uafsml:def-rolemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "RoleMetadata" ;
+    sysml2:canonical "PersonnelMetadata::RoleMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'RoleMetadata'" .
+
+uafsml:def-competencemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "CompetenceMetadata" ;
+    sysml2:canonical "PersonnelMetadata::CompetenceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'CompetenceMetadata'" .
+
+uafsml:def-fillspostmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "FillsPostMetadata" ;
+    sysml2:canonical "PersonnelMetadata::FillsPostMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'FillsPostMetadata'" .
+
+uafsml:def-responsibleformetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "responsibleForMetadata" ;
+    sysml2:canonical "PersonnelMetadata::responsibleForMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'responsibleForMetadata'" .
+
+uafsml:def-commandmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "CommandMetadata" ;
+    sysml2:canonical "PersonnelMetadata::CommandMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'CommandMetadata'" .
+
+uafsml:def-controlsmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ControlsMetadata" ;
+    sysml2:canonical "PersonnelMetadata::ControlsMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ControlsMetadata'" .
+
+uafsml:def-providescompetencemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ProvidesCompetenceMetadata" ;
+    sysml2:canonical "PersonnelMetadata::ProvidesCompetenceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ProvidesCompetenceMetadata'" .
+
+uafsml:def-requirescompetencemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "RequiresCompetenceMetadata" ;
+    sysml2:canonical "PersonnelMetadata::RequiresCompetenceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'RequiresCompetenceMetadata'" .
+
+uafsml:def-competencetoconductusagemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "CompetenceToConductUsageMetadata" ;
+    sysml2:canonical "PersonnelMetadata::CompetenceToConductUsageMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'CompetenceToConductUsageMetadata'" .
+
 uafsml:lib-projectslibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "ProjectsLibrary" ;
@@ -1589,11 +2381,23 @@ uafsml:def-project rdf:type owl:Class ;
     sysml2:canonical "ProjectsLibrary::Project" ;
     rdfs:comment "SysML v2 part def definition: 'Project'" .
 
+uafsml:def-projectsuccession rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-succession ;
+    rdfs:label "ProjectSuccession" ;
+    sysml2:canonical "ProjectsLibrary::ProjectSuccession" ;
+    rdfs:comment "SysML v2 connection def definition: 'ProjectSuccession'" .
+
 uafsml:lib-projectsmetadata rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "ProjectsMetadata" ;
     sysml2:canonical "ProjectsMetadata" ;
     rdfs:comment "Library package defined in ProjectsMetadata.sysml" .
+
+uafsml:def-projectmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ProjectMetadata" ;
+    sysml2:canonical "ProjectsMetadata::ProjectMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ProjectMetadata'" .
 
 uafsml:lib-resourceslibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1612,6 +2416,12 @@ uafsml:def-resourceperformer rdf:type owl:Class ;
     rdfs:label "ResourcePerformer" ;
     sysml2:canonical "ResourcesLibrary::ResourcePerformer" ;
     rdfs:comment "SysML v2 part def definition: 'ResourcePerformer'" .
+
+uafsml:def-resourceservice rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-resourceconfiguration ;
+    rdfs:label "ResourceService" ;
+    sysml2:canonical "ResourcesLibrary::ResourceService" ;
+    rdfs:comment "SysML v2 connection def definition: 'ResourceService'" .
 
 uafsml:def-humanresource rdf:type owl:Class ;
     rdfs:subClassOf uafsml:def-resourceasset ;
@@ -1715,11 +2525,143 @@ uafsml:def-resourceport rdf:type owl:Class ;
     sysml2:canonical "ResourcesLibrary::ResourcePort" ;
     rdfs:comment "SysML v2 port def definition: 'ResourcePort'" .
 
+uafsml:def-resourceconnector rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-agentconnector ;
+    rdfs:label "ResourceConnector" ;
+    sysml2:canonical "ResourcesLibrary::ResourceConnector" ;
+    rdfs:comment "SysML v2 connection def definition: 'ResourceConnector'" .
+
 uafsml:lib-resourcesmetadata rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "ResourcesMetadata" ;
     sysml2:canonical "ResourcesMetadata" ;
     rdfs:comment "Library package defined in ResourcesMetadata.sysml" .
+
+uafsml:def-resourcecontextmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceContextMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceContextMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceContextMetadata'" .
+
+uafsml:def-resourceservicemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceServiceMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceServiceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceServiceMetadata'" .
+
+uafsml:def-resourceconfigurationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceConfigurationMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceConfigurationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceConfigurationMetadata'" .
+
+uafsml:def-capabilityconfigurationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "CapabilityConfigurationMetadata" ;
+    sysml2:canonical "ResourcesMetadata::CapabilityConfigurationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'CapabilityConfigurationMetadata'" .
+
+uafsml:def-resourceperformermetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourcePerformerMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourcePerformerMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourcePerformerMetadata'" .
+
+uafsml:def-energymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "EnergyMetadata" ;
+    sysml2:canonical "ResourcesMetadata::EnergyMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'EnergyMetadata'" .
+
+uafsml:def-systemmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SystemMetadata" ;
+    sysml2:canonical "ResourcesMetadata::SystemMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SystemMetadata'" .
+
+uafsml:def-hardwaremetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "HardwareMetadata" ;
+    sysml2:canonical "ResourcesMetadata::HardwareMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'HardwareMetadata'" .
+
+uafsml:def-naturalresourcemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "NaturalResourceMetadata" ;
+    sysml2:canonical "ResourcesMetadata::NaturalResourceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'NaturalResourceMetadata'" .
+
+uafsml:def-softwaremetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SoftwareMetadata" ;
+    sysml2:canonical "ResourcesMetadata::SoftwareMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SoftwareMetadata'" .
+
+uafsml:def-technologymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "TechnologyMetadata" ;
+    sysml2:canonical "ResourcesMetadata::TechnologyMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'TechnologyMetadata'" .
+
+uafsml:def-resourceinformationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceInformationMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceInformationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceInformationMetadata'" .
+
+uafsml:def-resourceconnectormetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceConnectorMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceConnectorMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceConnectorMetadata'" .
+
+uafsml:def-resourceexchangemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceExchangeMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceExchangeMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceExchangeMetadata'" .
+
+uafsml:def-resourceactivitymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceActivityMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceActivityMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceActivityMetadata'" .
+
+uafsml:def-geopoliticalextentmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "GeoPoliticalExtentMetadata" ;
+    sysml2:canonical "ResourcesMetadata::GeoPoliticalExtentMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'GeoPoliticalExtentMetadata'" .
+
+uafsml:def-sitemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SiteMetadata" ;
+    sysml2:canonical "ResourcesMetadata::SiteMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SiteMetadata'" .
+
+uafsml:def-resourcesusecasemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourcesUseCaseMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourcesUseCaseMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourcesUseCaseMetadata'" .
+
+uafsml:def-resourceportmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourcePortMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourcePortMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourcePortMetadata'" .
+
+uafsml:def-resourcestatedescriptionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceStateDescriptionMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceStateDescriptionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceStateDescriptionMetadata'" .
+
+uafsml:def-resourcerulemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ResourceRuleMetadata" ;
+    sysml2:canonical "ResourcesMetadata::ResourceRuleMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ResourceRuleMetadata'" .
 
 uafsml:lib-securitylibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1739,11 +2681,47 @@ uafsml:lib-securitymetadata rdf:type owl:Class ;
     sysml2:canonical "SecurityMetadata" ;
     rdfs:comment "Library package defined in SecurityMetadata.sysml" .
 
+uafsml:def-securitycontrolmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SecurityControlMetadata" ;
+    sysml2:canonical "SecurityMetadata::SecurityControlMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SecurityControlMetadata'" .
+
+uafsml:def-enhancedsecuritycontrolmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "EnhancedSecurityControlMetadata" ;
+    sysml2:canonical "SecurityMetadata::EnhancedSecurityControlMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'EnhancedSecurityControlMetadata'" .
+
+uafsml:def-securitycontrolfamilymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SecurityControlFamilyMetadata" ;
+    sysml2:canonical "SecurityMetadata::SecurityControlFamilyMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SecurityControlFamilyMetadata'" .
+
+uafsml:def-securityriskmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SecurityRiskMetadata" ;
+    sysml2:canonical "SecurityMetadata::SecurityRiskMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SecurityRiskMetadata'" .
+
+uafsml:def-securityenclavemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "SecurityEnclaveMetadata" ;
+    sysml2:canonical "SecurityMetadata::SecurityEnclaveMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'SecurityEnclaveMetadata'" .
+
 uafsml:lib-serviceslibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "ServicesLibrary" ;
     sysml2:canonical "ServicesLibrary" ;
     rdfs:comment "Library package defined in ServicesLibrary.sysml" .
+
+uafsml:def-service rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-propertyset ;
+    rdfs:label "Service" ;
+    sysml2:canonical "ServicesLibrary::Service" ;
+    rdfs:comment "SysML v2 connection def definition: 'Service'" .
 
 uafsml:def-serviceagent rdf:type owl:Class ;
     rdfs:subClassOf sysml2:def-partdefinition ;
@@ -1757,11 +2735,59 @@ uafsml:def-serviceport rdf:type owl:Class ;
     sysml2:canonical "ServicesLibrary::ServicePort" ;
     rdfs:comment "SysML v2 port def definition: 'ServicePort'" .
 
+uafsml:def-serviceconnector rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-propertyset ;
+    rdfs:label "ServiceConnector" ;
+    sysml2:canonical "ServicesLibrary::ServiceConnector" ;
+    rdfs:comment "SysML v2 connection def definition: 'ServiceConnector'" .
+
 uafsml:lib-servicesmetadata rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
     rdfs:label "ServicesMetadata" ;
     sysml2:canonical "ServicesMetadata" ;
     rdfs:comment "Library package defined in ServicesMetadata.sysml" .
+
+uafsml:def-servicemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ServiceMetadata" ;
+    sysml2:canonical "ServicesMetadata::ServiceMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ServiceMetadata'" .
+
+uafsml:def-requiredservicelevelmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "RequiredServiceLevelMetadata" ;
+    sysml2:canonical "ServicesMetadata::RequiredServiceLevelMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'RequiredServiceLevelMetadata'" .
+
+uafsml:def-serviceagentmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ServiceAgentMetadata" ;
+    sysml2:canonical "ServicesMetadata::ServiceAgentMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ServiceAgentMetadata'" .
+
+uafsml:def-participantrolemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ParticipantRoleMetadata" ;
+    sysml2:canonical "ServicesMetadata::ParticipantRoleMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ParticipantRoleMetadata'" .
+
+uafsml:def-serviceexchangemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ServiceExchangeMetadata" ;
+    sysml2:canonical "ServicesMetadata::ServiceExchangeMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ServiceExchangeMetadata'" .
+
+uafsml:def-serviceportmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ServicePortMetadata" ;
+    sysml2:canonical "ServicesMetadata::ServicePortMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ServicePortMetadata'" .
+
+uafsml:def-servicefunctionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "serviceFunctionMetadata" ;
+    sysml2:canonical "ServicesMetadata::serviceFunctionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'serviceFunctionMetadata'" .
 
 uafsml:lib-standardslibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1774,6 +2800,30 @@ uafsml:lib-standardsmetadata rdf:type owl:Class ;
     rdfs:label "StandardsMetadata" ;
     sysml2:canonical "StandardsMetadata" ;
     rdfs:comment "Library package defined in StandardsMetadata.sysml" .
+
+uafsml:def-referenceartifactmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ReferenceArtifactMetadata" ;
+    sysml2:canonical "StandardsMetadata::ReferenceArtifactMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ReferenceArtifactMetadata'" .
+
+uafsml:def-protocolmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ProtocolMetadata" ;
+    sysml2:canonical "StandardsMetadata::ProtocolMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ProtocolMetadata'" .
+
+uafsml:def-protocolstackmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ProtocolStackMetadata" ;
+    sysml2:canonical "StandardsMetadata::ProtocolStackMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ProtocolStackMetadata'" .
+
+uafsml:def-doctrinemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "DoctrineMetadata" ;
+    sysml2:canonical "StandardsMetadata::DoctrineMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'DoctrineMetadata'" .
 
 uafsml:lib-strategiclibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1805,6 +2855,12 @@ uafsml:def-initiative rdf:type owl:Class ;
     sysml2:canonical "StrategicLibrary::Initiative" ;
     rdfs:comment "SysML v2 part def definition: 'Initiative'" .
 
+uafsml:def-initiativeconnector rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-agentconnector ;
+    rdfs:label "InitiativeConnector" ;
+    sysml2:canonical "StrategicLibrary::InitiativeConnector" ;
+    rdfs:comment "SysML v2 connection def definition: 'InitiativeConnector'" .
+
 uafsml:def-visionstatement rdf:type owl:Class ;
     rdfs:subClassOf sysml2:def-attributedefinition ;
     rdfs:label "VisionStatement" ;
@@ -1816,6 +2872,174 @@ uafsml:lib-strategicmetadata rdf:type owl:Class ;
     rdfs:label "StrategicMetadata" ;
     sysml2:canonical "StrategicMetadata" ;
     rdfs:comment "Library package defined in StrategicMetadata.sysml" .
+
+uafsml:def-absolutemilestonemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "AbsoluteMilestoneMetadata" ;
+    sysml2:canonical "StrategicMetadata::AbsoluteMilestoneMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'AbsoluteMilestoneMetadata'" .
+
+uafsml:def-challengemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ChallengeMetadata" ;
+    sysml2:canonical "StrategicMetadata::ChallengeMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ChallengeMetadata'" .
+
+uafsml:def-drivermetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "DriverMetadata" ;
+    sysml2:canonical "StrategicMetadata::DriverMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'DriverMetadata'" .
+
+uafsml:def-motivationalelementmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MotivationalElementMetadata" ;
+    sysml2:canonical "StrategicMetadata::MotivationalElementMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MotivationalElementMetadata'" .
+
+uafsml:def-enterprisemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "EnterpriseMetadata" ;
+    sysml2:canonical "StrategicMetadata::EnterpriseMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'EnterpriseMetadata'" .
+
+uafsml:def-portfoliometadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "PortfolioMetadata" ;
+    sysml2:canonical "StrategicMetadata::PortfolioMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'PortfolioMetadata'" .
+
+uafsml:def-enduringtaskmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "EnduringTaskMetadata" ;
+    sysml2:canonical "StrategicMetadata::EnduringTaskMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'EnduringTaskMetadata'" .
+
+uafsml:def-goalmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "GoalMetadata" ;
+    sysml2:canonical "StrategicMetadata::GoalMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'GoalMetadata'" .
+
+uafsml:def-desiredeffectmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "DesiredEffectMetadata" ;
+    sysml2:canonical "StrategicMetadata::DesiredEffectMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'DesiredEffectMetadata'" .
+
+uafsml:def-outcomemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OutcomeMetadata" ;
+    sysml2:canonical "StrategicMetadata::OutcomeMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OutcomeMetadata'" .
+
+uafsml:def-effectmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "EffectMetadata" ;
+    sysml2:canonical "StrategicMetadata::EffectMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'EffectMetadata'" .
+
+uafsml:def-impactsmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ImpactsMetadata" ;
+    sysml2:canonical "StrategicMetadata::ImpactsMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ImpactsMetadata'" .
+
+uafsml:def-enablesmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "EnablesMetadata" ;
+    sysml2:canonical "StrategicMetadata::EnablesMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'EnablesMetadata'" .
+
+uafsml:def-initiativestatedescriptionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "InitiativeStateDescriptionMetadata" ;
+    sysml2:canonical "StrategicMetadata::InitiativeStateDescriptionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'InitiativeStateDescriptionMetadata'" .
+
+uafsml:def-motivatesmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MotivatesMetadata" ;
+    sysml2:canonical "StrategicMetadata::MotivatesMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MotivatesMetadata'" .
+
+uafsml:def-presentsmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "PresentsMetadata" ;
+    sysml2:canonical "StrategicMetadata::PresentsMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'PresentsMetadata'" .
+
+uafsml:def-initiativeobjectivemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "InitiativeObjectiveMetadata" ;
+    sysml2:canonical "StrategicMetadata::InitiativeObjectiveMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'InitiativeObjectiveMetadata'" .
+
+uafsml:def-opportunitymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OpportunityMetadata" ;
+    sysml2:canonical "StrategicMetadata::OpportunityMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OpportunityMetadata'" .
+
+uafsml:def-relativemilestonemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "RelativeMilestoneMetadata" ;
+    sysml2:canonical "StrategicMetadata::RelativeMilestoneMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'RelativeMilestoneMetadata'" .
+
+uafsml:def-initiativeactivitymetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "InitiativeActivityMetadata" ;
+    sysml2:canonical "StrategicMetadata::InitiativeActivityMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'InitiativeActivityMetadata'" .
+
+uafsml:def-initiativeconnectormetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "InitiativeConnectorMetadata" ;
+    sysml2:canonical "StrategicMetadata::InitiativeConnectorMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'InitiativeConnectorMetadata'" .
+
+uafsml:def-strategiccontextmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "StrategicContextMetadata" ;
+    sysml2:canonical "StrategicMetadata::StrategicContextMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'StrategicContextMetadata'" .
+
+uafsml:def-initiativeexchangemetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "InitiativeExchangeMetadata" ;
+    sysml2:canonical "StrategicMetadata::InitiativeExchangeMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'InitiativeExchangeMetadata'" .
+
+uafsml:def-strategicinformationmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "StrategicInformationMetadata" ;
+    sysml2:canonical "StrategicMetadata::StrategicInformationMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'StrategicInformationMetadata'" .
+
+uafsml:def-valueitemmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ValueItemMetadata" ;
+    sysml2:canonical "StrategicMetadata::ValueItemMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ValueItemMetadata'" .
+
+uafsml:def-visionmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "VisionMetadata" ;
+    sysml2:canonical "StrategicMetadata::VisionMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'VisionMetadata'" .
+
+uafsml:def-visionstatementmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "VisionStatementMetadata" ;
+    sysml2:canonical "StrategicMetadata::VisionStatementMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'VisionStatementMetadata'" .
+
+uafsml:def-mapstogoalmetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "MapsToGoalMetadata" ;
+    sysml2:canonical "StrategicMetadata::MapsToGoalMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'MapsToGoalMetadata'" .
 
 uafsml:lib-summaryandoverviewlibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1829,11 +3053,53 @@ uafsml:def-architecturaldescription rdf:type owl:Class ;
     sysml2:canonical "SummaryAndOverviewLibrary::ArchitecturalDescription" ;
     rdfs:comment "SysML v2 viewpoint def definition: 'ArchitecturalDescription'" .
 
+uafsml:def-containment rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-connectiondefinition ;
+    rdfs:label "Containment" ;
+    sysml2:canonical "SummaryAndOverviewLibrary::Containment" ;
+    rdfs:comment "SysML v2 connection def definition: 'Containment'" .
+
+uafsml:def-agreement rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-connectiondefinition ;
+    rdfs:label "Agreement" ;
+    sysml2:canonical "SummaryAndOverviewLibrary::Agreement" ;
+    rdfs:comment "SysML v2 connection def definition: 'Agreement'" .
+
+uafsml:def-inclusion rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-connectiondefinition ;
+    rdfs:label "Inclusion" ;
+    sysml2:canonical "SummaryAndOverviewLibrary::Inclusion" ;
+    rdfs:comment "SysML v2 connection def definition: 'Inclusion'" .
+
 uafsml:def-architecture rdf:type owl:Class ;
     rdfs:subClassOf sysml2:def-partdefinition ;
     rdfs:label "Architecture" ;
     sysml2:canonical "SummaryAndOverviewLibrary::Architecture" ;
     rdfs:comment "SysML v2 part def definition: 'Architecture'" .
+
+uafsml:def-expression rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-connectiondefinition ;
+    rdfs:label "Expression" ;
+    sysml2:canonical "SummaryAndOverviewLibrary::Expression" ;
+    rdfs:comment "SysML v2 connection def definition: 'Expression'" .
+
+uafsml:def-to rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-connectiondefinition ;
+    rdfs:label "to" ;
+    sysml2:canonical "SummaryAndOverviewLibrary::to" ;
+    rdfs:comment "SysML v2 connection def definition: 'to'" .
+
+uafsml:def-uniformresourceindentifier rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-string ;
+    rdfs:label "UniformResourceIndentifier" ;
+    sysml2:canonical "SummaryAndOverviewLibrary::UniformResourceIndentifier" ;
+    rdfs:comment "SysML v2 attribute def definition: 'UniformResourceIndentifier'" .
+
+uafsml:def-uafelement rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-metadatadefinition ;
+    rdfs:label "UAFElement" ;
+    sysml2:canonical "SummaryAndOverviewLibrary::UAFElement" ;
+    rdfs:comment "SysML v2 metadata def definition: 'UAFElement'" .
 
 uafsml:lib-valuestreamlibrary rdf:type owl:Class ;
     rdfs:subClassOf uafsml:Definition ;
@@ -1852,3 +3118,21 @@ uafsml:lib-valuestreammetadata rdf:type owl:Class ;
     rdfs:label "ValueStreamMetadata" ;
     sysml2:canonical "ValueStreamMetadata" ;
     rdfs:comment "Library package defined in ValueStreamMetadata.sysml" .
+
+uafsml:def-valuestreammetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "ValueStreamMetadata" ;
+    sysml2:canonical "ValueStreamMetadata::ValueStreamMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'ValueStreamMetadata'" .
+
+uafsml:def-operationalvaluestreammetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "OperationalValueStreamMetadata" ;
+    sysml2:canonical "ValueStreamMetadata::OperationalValueStreamMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'OperationalValueStreamMetadata'" .
+
+uafsml:def-developmentvaluestreammetadata rdf:type owl:Class ;
+    rdfs:subClassOf uafsml:def-semanticmetadata ;
+    rdfs:label "DevelopmentValueStreamMetadata" ;
+    sysml2:canonical "ValueStreamMetadata::DevelopmentValueStreamMetadata" ;
+    rdfs:comment "SysML v2 metadata def definition: 'DevelopmentValueStreamMetadata'" .
