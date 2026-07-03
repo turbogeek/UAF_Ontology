@@ -1,0 +1,39 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix gufo: <http://purl.org/nemo/gufo#> .
+@prefix uaf: <http://purl.org/uaf/ontology#> .
+@prefix uafsml: <http://purl.org/uaf/uafsml#> .
+@prefix uaf2: <http://purl.org/uaf/uaf2#> .
+@prefix uaf_bridge: <http://purl.org/uaf/bridge#> .
+
+<http://purl.org/uaf/bridge> rdf:type owl:Ontology ;
+    owl:imports <http://purl.org/uaf/ontology> ,
+                <http://purl.org/uaf/uafsml> ;
+    rdfs:label "UAF 1.3 to UAFSML 2.0 Mapping Bridge Ontology" ;
+    rdfs:comment "Bridges UAF 1.3 DMM and UAFSML 2.0 (UAF for SysML v2) to enable coexistence and bidirectional translation." .
+
+# --- Semantic Equivalence Mappings ---
+
+uaf:OperationalPerformer owl:equivalentClass uafsml:def-operationalperformer .
+
+uaf:OperationalActivity owl:equivalentClass uafsml:def-operationalactivity .
+
+uaf:Resource owl:equivalentClass uafsml:def-resource .
+
+uaf:Capability owl:equivalentClass uafsml:def-capability .
+
+uaf:Message owl:equivalentClass uafsml:def-message .
+
+uaf:Schema owl:equivalentClass uafsml:def-schema .
+
+uaf:DesignEvent owl:equivalentClass uafsml:def-design-event .
+
+# --- Structural Translation Properties ---
+
+uaf_bridge:mappedToUAFSML rdf:type owl:ObjectProperty ;
+    rdfs:domain uaf:UML2_5Metamodel__Element ;
+    rdfs:range uafsml:Element ;
+    rdfs:label "mapped to UAFSML" ;
+    rdfs:comment "Relates a UAF 1.3 metamodel element to its corresponding UAFSML 2.0 SysML v2 element." .

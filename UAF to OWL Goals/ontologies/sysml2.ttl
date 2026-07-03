@@ -1,0 +1,336 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix gufo: <http://purl.org/nemo/gufo#> .
+@prefix sysml2: <http://omg.org/spec/SysML2#> .
+
+<http://omg.org/spec/SysML2> rdf:type owl:Ontology ;
+    owl:imports <http://purl.org/nemo/gufo> ;
+    rdfs:label "SysML v2 Standard Systems Library" ;
+    rdfs:comment "Normative OWL ontology representing the standard SysML v2 Standard Systems Library." .
+
+# --- Base Classes ---
+sysml2:Element rdf:type owl:Class ;
+    rdfs:subClassOf gufo:AbstractIndividual ;
+    rdfs:label "Element" .
+
+sysml2:Definition rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Element ;
+    rdfs:label "Definition" .
+
+sysml2:Usage rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Element ;
+    rdfs:label "Usage" .
+
+# --- Annotation Property ---
+sysml2:canonical rdf:type owl:AnnotationProperty ;
+    rdfs:label "canonical" ;
+    rdfs:comment "FQN path of the standard element." .
+
+
+sysml2:pkg-actions rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Actions" ;
+    sysml2:canonical "Actions" ;
+    rdfs:comment "Standard package Actions defined in Actions.sysml" .
+
+sysml2:def-action rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-performance ;
+    rdfs:label "Action" ;
+    sysml2:canonical "Actions::Action" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: Action" .
+
+sysml2:def-sendaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "SendAction" ;
+    sysml2:canonical "Actions::SendAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: SendAction" .
+
+sysml2:def-acceptmessageaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "AcceptMessageAction" ;
+    sysml2:canonical "Actions::AcceptMessageAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: AcceptMessageAction" .
+
+sysml2:def-acceptaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-acceptmessageaction ;
+    rdfs:label "AcceptAction" ;
+    sysml2:canonical "Actions::AcceptAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: AcceptAction" .
+
+sysml2:def-terminateaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "TerminateAction" ;
+    sysml2:canonical "Actions::TerminateAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: TerminateAction" .
+
+sysml2:def-controlaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "ControlAction" ;
+    sysml2:canonical "Actions::ControlAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: ControlAction" .
+
+sysml2:def-mergeaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-controlaction ;
+    rdfs:label "MergeAction" ;
+    sysml2:canonical "Actions::MergeAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: MergeAction" .
+
+sysml2:def-decisionaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-controlaction ;
+    rdfs:label "DecisionAction" ;
+    sysml2:canonical "Actions::DecisionAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: DecisionAction" .
+
+sysml2:def-joinaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-controlaction ;
+    rdfs:label "JoinAction" ;
+    sysml2:canonical "Actions::JoinAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: JoinAction" .
+
+sysml2:def-forkaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-controlaction ;
+    rdfs:label "ForkAction" ;
+    sysml2:canonical "Actions::ForkAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: ForkAction" .
+
+sysml2:def-transitionaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "TransitionAction" ;
+    sysml2:canonical "Actions::TransitionAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: TransitionAction" .
+
+sysml2:def-decisiontransitionaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-transitionaction ;
+    rdfs:label "DecisionTransitionAction" ;
+    sysml2:canonical "Actions::DecisionTransitionAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: DecisionTransitionAction" .
+
+sysml2:def-assignmentaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-featurewriteperformance ;
+    rdfs:label "AssignmentAction" ;
+    sysml2:canonical "Actions::AssignmentAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: AssignmentAction" .
+
+sysml2:def-ifthenaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "IfThenAction" ;
+    sysml2:canonical "Actions::IfThenAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: IfThenAction" .
+
+sysml2:def-ifthenelseaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-ifthenaction ;
+    rdfs:label "IfThenElseAction" ;
+    sysml2:canonical "Actions::IfThenElseAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: IfThenElseAction" .
+
+sysml2:def-loopaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "LoopAction" ;
+    sysml2:canonical "Actions::LoopAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: LoopAction" .
+
+sysml2:def-whileloopaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-loopaction ;
+    rdfs:label "WhileLoopAction" ;
+    sysml2:canonical "Actions::WhileLoopAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: WhileLoopAction" .
+
+sysml2:def-forloopaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-loopaction ;
+    rdfs:label "ForLoopAction" ;
+    sysml2:canonical "Actions::ForLoopAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: ForLoopAction" .
+
+sysml2:pkg-allocations rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Allocations" ;
+    sysml2:canonical "Allocations" ;
+    rdfs:comment "Standard package Allocations defined in Allocations.sysml" .
+
+sysml2:pkg-analysiscases rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "AnalysisCases" ;
+    sysml2:canonical "AnalysisCases" ;
+    rdfs:comment "Standard package AnalysisCases defined in AnalysisCases.sysml" .
+
+sysml2:pkg-attributes rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Attributes" ;
+    sysml2:canonical "Attributes" ;
+    rdfs:comment "Standard package Attributes defined in Attributes.sysml" .
+
+sysml2:pkg-calculations rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Calculations" ;
+    sysml2:canonical "Calculations" ;
+    rdfs:comment "Standard package Calculations defined in Calculations.sysml" .
+
+sysml2:pkg-cases rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Cases" ;
+    sysml2:canonical "Cases" ;
+    rdfs:comment "Standard package Cases defined in Cases.sysml" .
+
+sysml2:pkg-connections rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Connections" ;
+    sysml2:canonical "Connections" ;
+    rdfs:comment "Standard package Connections defined in Connections.sysml" .
+
+sysml2:def-connection rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-linkobject ;
+    rdfs:label "Connection" ;
+    sysml2:canonical "Connections::Connection" ;
+    rdfs:comment "Standard SysML v2 / KerML connection def: Connection" .
+
+sysml2:def-binaryconnection rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-binarylinkobject ;
+    rdfs:label "BinaryConnection" ;
+    sysml2:canonical "Connections::BinaryConnection" ;
+    rdfs:comment "Standard SysML v2 / KerML connection def: BinaryConnection" .
+
+sysml2:pkg-constraints rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Constraints" ;
+    sysml2:canonical "Constraints" ;
+    rdfs:comment "Standard package Constraints defined in Constraints.sysml" .
+
+sysml2:pkg-flows rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Flows" ;
+    sysml2:canonical "Flows" ;
+    rdfs:comment "Standard package Flows defined in Flows.sysml" .
+
+sysml2:def-messageaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-action ;
+    rdfs:label "MessageAction" ;
+    sysml2:canonical "Flows::MessageAction" ;
+    rdfs:comment "Standard SysML v2 / KerML flow def: MessageAction" .
+
+sysml2:def-message rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-messageaction ;
+    rdfs:label "Message" ;
+    sysml2:canonical "Flows::Message" ;
+    rdfs:comment "Standard SysML v2 / KerML flow def: Message" .
+
+sysml2:def-flow rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-message ;
+    rdfs:label "Flow" ;
+    sysml2:canonical "Flows::Flow" ;
+    rdfs:comment "Standard SysML v2 / KerML flow def: Flow" .
+
+sysml2:def-successionflow rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-flow ;
+    rdfs:label "SuccessionFlow" ;
+    sysml2:canonical "Flows::SuccessionFlow" ;
+    rdfs:comment "Standard SysML v2 / KerML flow def: SuccessionFlow" .
+
+sysml2:pkg-interfaces rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Interfaces" ;
+    sysml2:canonical "Interfaces" ;
+    rdfs:comment "Standard package Interfaces defined in Interfaces.sysml" .
+
+sysml2:pkg-items rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Items" ;
+    sysml2:canonical "Items" ;
+    rdfs:comment "Standard package Items defined in Items.sysml" .
+
+sysml2:def-touches rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-justoutsideof ;
+    rdfs:label "Touches" ;
+    sysml2:canonical "Items::Touches" ;
+    rdfs:comment "Standard SysML v2 / KerML connection def: Touches" .
+
+sysml2:pkg-metadata rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Metadata" ;
+    sysml2:canonical "Metadata" ;
+    rdfs:comment "Standard package Metadata defined in Metadata.sysml" .
+
+sysml2:pkg-parts rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Parts" ;
+    sysml2:canonical "Parts" ;
+    rdfs:comment "Standard package Parts defined in Parts.sysml" .
+
+sysml2:def-part rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-item ;
+    rdfs:label "Part" ;
+    sysml2:canonical "Parts::Part" ;
+    rdfs:comment "Standard SysML v2 / KerML part def: Part" .
+
+sysml2:pkg-ports rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Ports" ;
+    sysml2:canonical "Ports" ;
+    rdfs:comment "Standard package Ports defined in Ports.sysml" .
+
+sysml2:def-port rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-object ;
+    rdfs:label "Port" ;
+    sysml2:canonical "Ports::Port" ;
+    rdfs:comment "Standard SysML v2 / KerML port def: Port" .
+
+sysml2:pkg-requirements rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Requirements" ;
+    sysml2:canonical "Requirements" ;
+    rdfs:comment "Standard package Requirements defined in Requirements.sysml" .
+
+sysml2:pkg-standardviewdefinitions rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "StandardViewDefinitions" ;
+    sysml2:canonical "StandardViewDefinitions" ;
+    rdfs:comment "Standard package StandardViewDefinitions defined in StandardViewDefinitions.sysml" .
+
+sysml2:pkg-states rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "States" ;
+    sysml2:canonical "States" ;
+    rdfs:comment "Standard package States defined in States.sysml" .
+
+sysml2:def-statetransitionaction rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-transitionaction ;
+    rdfs:label "StateTransitionAction" ;
+    sysml2:canonical "States::StateTransitionAction" ;
+    rdfs:comment "Standard SysML v2 / KerML action def: StateTransitionAction" .
+
+sysml2:pkg-sysml rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "SysML" ;
+    sysml2:canonical "SysML" ;
+    rdfs:comment "Standard package SysML defined in SysML.sysml" .
+
+sysml2:pkg-usecases rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "UseCases" ;
+    sysml2:canonical "UseCases" ;
+    rdfs:comment "Standard package UseCases defined in UseCases.sysml" .
+
+sysml2:pkg-verificationcases rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "VerificationCases" ;
+    sysml2:canonical "VerificationCases" ;
+    rdfs:comment "Standard package VerificationCases defined in VerificationCases.sysml" .
+
+sysml2:pkg-views rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:Definition ;
+    rdfs:label "Views" ;
+    sysml2:canonical "Views" ;
+    rdfs:comment "Standard package Views defined in Views.sysml" .
+
+sysml2:def-view rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-part ;
+    rdfs:label "View" ;
+    sysml2:canonical "Views::View" ;
+    rdfs:comment "Standard SysML v2 / KerML view def: View" .
+
+sysml2:def-viewpointcheck rdf:type owl:Class ;
+    rdfs:subClassOf sysml2:def-requirementcheck ;
+    rdfs:label "ViewpointCheck" ;
+    sysml2:canonical "Views::ViewpointCheck" ;
+    rdfs:comment "Standard SysML v2 / KerML viewpoint def: ViewpointCheck" .

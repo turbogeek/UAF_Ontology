@@ -1,0 +1,246 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix gufo: <http://purl.org/nemo/gufo#> .
+@prefix kerml: <http://omg.org/spec/KerML#> .
+
+<http://omg.org/spec/KerML> rdf:type owl:Ontology ;
+    owl:imports <http://purl.org/nemo/gufo> ;
+    rdfs:label "KerML Standard Library" ;
+    rdfs:comment "Normative OWL ontology representing the standard KerML Standard Library." .
+
+# --- Base Classes ---
+kerml:Element rdf:type owl:Class ;
+    rdfs:subClassOf gufo:AbstractIndividual ;
+    rdfs:label "Element" .
+
+kerml:Definition rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Element ;
+    rdfs:label "Definition" .
+
+kerml:Usage rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Element ;
+    rdfs:label "Usage" .
+
+# --- Annotation Property ---
+kerml:canonical rdf:type owl:AnnotationProperty ;
+    rdfs:label "canonical" ;
+    rdfs:comment "FQN path of the standard element." .
+
+
+kerml:pkg-collections rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Collections" ;
+    kerml:canonical "Collections" ;
+    rdfs:comment "Standard package Collections defined in Collections.kerml" .
+
+kerml:pkg-scalarvalues rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "ScalarValues" ;
+    kerml:canonical "ScalarValues" ;
+    rdfs:comment "Standard package ScalarValues defined in ScalarValues.kerml" .
+
+kerml:pkg-vectorvalues rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "VectorValues" ;
+    kerml:canonical "VectorValues" ;
+    rdfs:comment "Standard package VectorValues defined in VectorValues.kerml" .
+
+kerml:pkg-basefunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "BaseFunctions" ;
+    kerml:canonical "BaseFunctions" ;
+    rdfs:comment "Standard package BaseFunctions defined in BaseFunctions.kerml" .
+
+kerml:pkg-booleanfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "BooleanFunctions" ;
+    kerml:canonical "BooleanFunctions" ;
+    rdfs:comment "Standard package BooleanFunctions defined in BooleanFunctions.kerml" .
+
+kerml:pkg-collectionfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "CollectionFunctions" ;
+    kerml:canonical "CollectionFunctions" ;
+    rdfs:comment "Standard package CollectionFunctions defined in CollectionFunctions.kerml" .
+
+kerml:pkg-complexfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "ComplexFunctions" ;
+    kerml:canonical "ComplexFunctions" ;
+    rdfs:comment "Standard package ComplexFunctions defined in ComplexFunctions.kerml" .
+
+kerml:pkg-controlfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "ControlFunctions" ;
+    kerml:canonical "ControlFunctions" ;
+    rdfs:comment "Standard package ControlFunctions defined in ControlFunctions.kerml" .
+
+kerml:pkg-datafunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "DataFunctions" ;
+    kerml:canonical "DataFunctions" ;
+    rdfs:comment "Standard package DataFunctions defined in DataFunctions.kerml" .
+
+kerml:pkg-integerfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "IntegerFunctions" ;
+    kerml:canonical "IntegerFunctions" ;
+    rdfs:comment "Standard package IntegerFunctions defined in IntegerFunctions.kerml" .
+
+kerml:pkg-naturalfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "NaturalFunctions" ;
+    kerml:canonical "NaturalFunctions" ;
+    rdfs:comment "Standard package NaturalFunctions defined in NaturalFunctions.kerml" .
+
+kerml:pkg-numericalfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "NumericalFunctions" ;
+    kerml:canonical "NumericalFunctions" ;
+    rdfs:comment "Standard package NumericalFunctions defined in NumericalFunctions.kerml" .
+
+kerml:pkg-occurrencefunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "OccurrenceFunctions" ;
+    kerml:canonical "OccurrenceFunctions" ;
+    rdfs:comment "Standard package OccurrenceFunctions defined in OccurrenceFunctions.kerml" .
+
+kerml:pkg-rationalfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "RationalFunctions" ;
+    kerml:canonical "RationalFunctions" ;
+    rdfs:comment "Standard package RationalFunctions defined in RationalFunctions.kerml" .
+
+kerml:pkg-realfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "RealFunctions" ;
+    kerml:canonical "RealFunctions" ;
+    rdfs:comment "Standard package RealFunctions defined in RealFunctions.kerml" .
+
+kerml:pkg-scalarfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "ScalarFunctions" ;
+    kerml:canonical "ScalarFunctions" ;
+    rdfs:comment "Standard package ScalarFunctions defined in ScalarFunctions.kerml" .
+
+kerml:pkg-sequencefunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "SequenceFunctions" ;
+    kerml:canonical "SequenceFunctions" ;
+    rdfs:comment "Standard package SequenceFunctions defined in SequenceFunctions.kerml" .
+
+kerml:pkg-stringfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "StringFunctions" ;
+    kerml:canonical "StringFunctions" ;
+    rdfs:comment "Standard package StringFunctions defined in StringFunctions.kerml" .
+
+kerml:pkg-trigfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "TrigFunctions" ;
+    kerml:canonical "TrigFunctions" ;
+    rdfs:comment "Standard package TrigFunctions defined in TrigFunctions.kerml" .
+
+kerml:pkg-vectorfunctions rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "VectorFunctions" ;
+    kerml:canonical "VectorFunctions" ;
+    rdfs:comment "Standard package VectorFunctions defined in VectorFunctions.kerml" .
+
+kerml:pkg-base rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Base" ;
+    kerml:canonical "Base" ;
+    rdfs:comment "Standard package Base defined in Base.kerml" .
+
+kerml:pkg-clocks rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Clocks" ;
+    kerml:canonical "Clocks" ;
+    rdfs:comment "Standard package Clocks defined in Clocks.kerml" .
+
+kerml:pkg-controlperformances rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "ControlPerformances" ;
+    kerml:canonical "ControlPerformances" ;
+    rdfs:comment "Standard package ControlPerformances defined in ControlPerformances.kerml" .
+
+kerml:pkg-featurereferencingperformances rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "FeatureReferencingPerformances" ;
+    kerml:canonical "FeatureReferencingPerformances" ;
+    rdfs:comment "Standard package FeatureReferencingPerformances defined in FeatureReferencingPerformances.kerml" .
+
+kerml:pkg-kerml rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "KerML" ;
+    kerml:canonical "KerML" ;
+    rdfs:comment "Standard package KerML defined in KerML.kerml" .
+
+kerml:pkg-links rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Links" ;
+    kerml:canonical "Links" ;
+    rdfs:comment "Standard package Links defined in Links.kerml" .
+
+kerml:pkg-metaobjects rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Metaobjects" ;
+    kerml:canonical "Metaobjects" ;
+    rdfs:comment "Standard package Metaobjects defined in Metaobjects.kerml" .
+
+kerml:pkg-objects rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Objects" ;
+    kerml:canonical "Objects" ;
+    rdfs:comment "Standard package Objects defined in Objects.kerml" .
+
+kerml:pkg-observation rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Observation" ;
+    kerml:canonical "Observation" ;
+    rdfs:comment "Standard package Observation defined in Observation.kerml" .
+
+kerml:pkg-occurrences rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Occurrences" ;
+    kerml:canonical "Occurrences" ;
+    rdfs:comment "Standard package Occurrences defined in Occurrences.kerml" .
+
+kerml:pkg-performances rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Performances" ;
+    kerml:canonical "Performances" ;
+    rdfs:comment "Standard package Performances defined in Performances.kerml" .
+
+kerml:pkg-spatialframes rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "SpatialFrames" ;
+    kerml:canonical "SpatialFrames" ;
+    rdfs:comment "Standard package SpatialFrames defined in SpatialFrames.kerml" .
+
+kerml:pkg-stateperformances rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "StatePerformances" ;
+    kerml:canonical "StatePerformances" ;
+    rdfs:comment "Standard package StatePerformances defined in StatePerformances.kerml" .
+
+kerml:pkg-transfers rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Transfers" ;
+    kerml:canonical "Transfers" ;
+    rdfs:comment "Standard package Transfers defined in Transfers.kerml" .
+
+kerml:pkg-transitionperformances rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "TransitionPerformances" ;
+    kerml:canonical "TransitionPerformances" ;
+    rdfs:comment "Standard package TransitionPerformances defined in TransitionPerformances.kerml" .
+
+kerml:pkg-triggers rdf:type owl:Class ;
+    rdfs:subClassOf kerml:Definition ;
+    rdfs:label "Triggers" ;
+    kerml:canonical "Triggers" ;
+    rdfs:comment "Standard package Triggers defined in Triggers.kerml" .
