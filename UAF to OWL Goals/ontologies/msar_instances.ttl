@@ -1,0 +1,1039 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix gufo: <http://purl.org/nemo/gufo#> .
+@prefix sysml2: <http://omg.org/spec/SysML2#> .
+@prefix uafsml: <http://purl.org/uaf/uafsml#> .
+@prefix msar: <http://purl.org/uaf/example/msar#> .
+
+<http://purl.org/uaf/example/msar> rdf:type owl:Ontology ;
+    owl:imports <http://purl.org/uaf/uafsml> ;
+    rdfs:label "MSAR UAFv2 Example Model Instances" ;
+    rdfs:comment "OWL NamedIndividuals representing the parsed MSAR SysML v2 user model." .
+
+
+msar:inst-storenewdistressinfoandpreparenewtrackinginfoandsendnewtrackingsig rdf:type owl:NamedIndividual , uafsml:def-operationalactivity ;
+    rdfs:label "StoreNewDistressInfoAndPrepareNewTrackingInfoAndSendNewTrackingSig" ;
+    sysml2:canonical "OperationalActionsDefinition::StoreNewDistressInfoAndPrepareNewTrackingInfoAndSendNewTrackingSig" ;
+    rdfs:comment "MSAR model individual representing SysML v2 action def definition: 'StoreNewDistressInfoAndPrepareNewTrackingInfoAndSendNewTrackingSig'" .
+
+msar:inst-checkforlossandpreparelossinfoifneeded rdf:type owl:NamedIndividual , uafsml:def-operationalactivity ;
+    rdfs:label "CheckForLossAndPrepareLossInfoIfNeeded" ;
+    sysml2:canonical "OperationalActionsDefinition::CheckForLossAndPrepareLossInfoIfNeeded" ;
+    rdfs:comment "MSAR model individual representing SysML v2 action def definition: 'CheckForLossAndPrepareLossInfoIfNeeded'" .
+
+msar:inst-checkifdistresscallassignedornewandsendupdateifnottobeignored rdf:type owl:NamedIndividual , uafsml:def-operationalactivity ;
+    rdfs:label "CheckIfDistressCallAssignedOrNewAndSendUpdateIfNotToBeIgnored" ;
+    sysml2:canonical "OperationalActionsDefinition::CheckIfDistressCallAssignedOrNewAndSendUpdateIfNotToBeIgnored" ;
+    rdfs:comment "MSAR model individual representing SysML v2 action def definition: 'CheckIfDistressCallAssignedOrNewAndSendUpdateIfNotToBeIgnored'" .
+
+msar:inst-removeandignoredunassigneddistressinfohenceforth rdf:type owl:NamedIndividual , uafsml:def-operationalactivity ;
+    rdfs:label "RemoveAndIgnoredUnassignedDistressInfoHenceforth" ;
+    sysml2:canonical "OperationalActionsDefinition::RemoveAndIgnoredUnassignedDistressInfoHenceforth" ;
+    rdfs:comment "MSAR model individual representing SysML v2 action def definition: 'RemoveAndIgnoredUnassignedDistressInfoHenceforth'" .
+
+msar:inst-assignsaropoerationidentitytodistressinfo rdf:type owl:NamedIndividual , uafsml:def-operationalactivity ;
+    rdfs:label "AssignSARopoerationIdentityToDistressInfo" ;
+    sysml2:canonical "OperationalActionsDefinition::AssignSARopoerationIdentityToDistressInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 action def definition: 'AssignSARopoerationIdentityToDistressInfo'" .
+
+msar:inst-removeconcludedsaroperationdistressinfo rdf:type owl:NamedIndividual , uafsml:def-operationalactivity ;
+    rdfs:label "RemoveConcludedSARoperationDistressInfo" ;
+    sysml2:canonical "OperationalActionsDefinition::RemoveConcludedSARoperationDistressInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 action def definition: 'RemoveConcludedSARoperationDistressInfo'" .
+
+msar:inst-removeabortedsaroperationdistressinfo rdf:type owl:NamedIndividual , uafsml:def-operationalactivity ;
+    rdfs:label "RemoveAbortedSARoperationDistressInfo" ;
+    sysml2:canonical "OperationalActionsDefinition::RemoveAbortedSARoperationDistressInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 action def definition: 'RemoveAbortedSARoperationDistressInfo'" .
+
+msar:inst-distressinformation rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DistressInformation" ;
+    sysml2:canonical "OperationalAttributesDefinition::DistressInformation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DistressInformation'" .
+
+msar:inst-saroperationrescuedata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationRescueData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationRescueData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationRescueData'" .
+
+msar:inst-saroperationrescuearr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationRescueArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationRescueArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationRescueArr'" .
+
+msar:inst-saroperationsearchdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationSearchData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationSearchData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationSearchData'" .
+
+msar:inst-saroperationsearcharr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationSearchArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationSearchArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationSearchArr'" .
+
+msar:inst-safeplacepatdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatData'" .
+
+msar:inst-safeplacepatarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatArr'" .
+
+msar:inst-safeplaceinformationdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceInformationData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceInformationData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceInformationData'" .
+
+msar:inst-safeplaceinfoarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceInfoArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceInfoArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceInfoArr'" .
+
+msar:inst-location rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "Location" ;
+    sysml2:canonical "OperationalAttributesDefinition::Location" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'Location'" .
+
+msar:inst-arearadius rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AreaRadius" ;
+    sysml2:canonical "OperationalAttributesDefinition::AreaRadius" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AreaRadius'" .
+
+msar:inst-date rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "Date" ;
+    sysml2:canonical "OperationalAttributesDefinition::Date" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'Date'" .
+
+msar:inst-clock rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "Clock" ;
+    sysml2:canonical "OperationalAttributesDefinition::Clock" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'Clock'" .
+
+msar:inst-patienttreatmentdataaths rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "PatientTreatmentDataAtHS" ;
+    sysml2:canonical "OperationalAttributesDefinition::PatientTreatmentDataAtHS" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'PatientTreatmentDataAtHS'" .
+
+msar:inst-healthservicesarpatientdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "HealthServiceSARPatientData" ;
+    sysml2:canonical "OperationalAttributesDefinition::HealthServiceSARPatientData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'HealthServiceSARPatientData'" .
+
+msar:inst-healthservicesarpatientarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "HealthServiceSARpatientArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::HealthServiceSARpatientArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'HealthServiceSARpatientArr'" .
+
+msar:inst-mntrdistressdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "MntrDistressData" ;
+    sysml2:canonical "OperationalAttributesDefinition::MntrDistressData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'MntrDistressData'" .
+
+msar:inst-mntrdistressarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "MntrDistressArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::MntrDistressArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'MntrDistressArr'" .
+
+msar:inst-saroperationtrackinginfodata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationTrackingInfoData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationTrackingInfoData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationTrackingInfoData'" .
+
+msar:inst-saroperationtrackinginfoarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationTrackingInfoArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationTrackingInfoArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationTrackingInfoArr'" .
+
+msar:inst-newtrackinginfodata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "NewTrackingInfoData" ;
+    sysml2:canonical "OperationalAttributesDefinition::NewTrackingInfoData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'NewTrackingInfoData'" .
+
+msar:inst-newtrackinginfoarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "NewTrackingInfoArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::NewTrackingInfoArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'NewTrackingInfoArr'" .
+
+msar:inst-requestforresources rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RequestForResources" ;
+    sysml2:canonical "OperationalAttributesDefinition::RequestForResources" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RequestForResources'" .
+
+msar:inst-searcharea rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchArea" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchArea" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchArea'" .
+
+msar:inst-tasking rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "Tasking" ;
+    sysml2:canonical "OperationalAttributesDefinition::Tasking" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'Tasking'" .
+
+msar:inst-distress rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "Distress" ;
+    sysml2:canonical "OperationalAttributesDefinition::Distress" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'Distress'" .
+
+msar:inst-simpledistress rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SimpleDistress" ;
+    sysml2:canonical "OperationalAttributesDefinition::SimpleDistress" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SimpleDistress'" .
+
+msar:inst-liferaftdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "LifeRaftData" ;
+    sysml2:canonical "OperationalAttributesDefinition::LifeRaftData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'LifeRaftData'" .
+
+msar:inst-liferaftarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "LifeRaftArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::LifeRaftArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'LifeRaftArr'" .
+
+msar:inst-majordistress rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "MajorDistress" ;
+    sysml2:canonical "OperationalAttributesDefinition::MajorDistress" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'MajorDistress'" .
+
+msar:inst-liferaftdistress rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "LifeRaftDistress" ;
+    sysml2:canonical "OperationalAttributesDefinition::LifeRaftDistress" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'LifeRaftDistress'" .
+
+msar:inst-personinwaterdistress rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "PersonInWaterDistress" ;
+    sysml2:canonical "OperationalAttributesDefinition::PersonInWaterDistress" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'PersonInWaterDistress'" .
+
+msar:inst-searchidarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchIdArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchIdArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchIdArr'" .
+
+msar:inst-rescueidarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueIdArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueIdArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueIdArr'" .
+
+msar:inst-response rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "Response" ;
+    sysml2:canonical "OperationalAttributesDefinition::Response" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'Response'" .
+
+msar:inst-taskingack rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "TaskingAck" ;
+    sysml2:canonical "OperationalAttributesDefinition::TaskingAck" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'TaskingAck'" .
+
+msar:inst-abortrescue rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AbortRescue" ;
+    sysml2:canonical "OperationalAttributesDefinition::AbortRescue" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AbortRescue'" .
+
+msar:inst-abortsearch rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AbortSearch" ;
+    sysml2:canonical "OperationalAttributesDefinition::AbortSearch" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AbortSearch'" .
+
+msar:inst-taskingnack rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "TaskingNack" ;
+    sysml2:canonical "OperationalAttributesDefinition::TaskingNack" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'TaskingNack'" .
+
+msar:inst-rescuestatusdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueStatusData" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueStatusData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueStatusData'" .
+
+msar:inst-searchstatusdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchStatusData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchStatusData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchStatusData'" .
+
+msar:inst-rescueddata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescuedData" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescuedData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescuedData'" .
+
+msar:inst-rescuedarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescuedArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescuedArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescuedArr'" .
+
+msar:inst-warningorder rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WarningOrder" ;
+    sysml2:canonical "OperationalAttributesDefinition::WarningOrder" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WarningOrder'" .
+
+msar:inst-rescueaborted rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueAborted" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueAborted" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueAborted'" .
+
+msar:inst-searchaborted rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchAborted" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchAborted" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchAborted'" .
+
+msar:inst-rescuecomplete rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueComplete" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueComplete" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueComplete'" .
+
+msar:inst-searchcomplete rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchComplete" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchComplete" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchComplete'" .
+
+msar:inst-distressedpartytrackingupdate rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DistressedPartyTrackingUpdate" ;
+    sysml2:canonical "OperationalAttributesDefinition::DistressedPartyTrackingUpdate" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DistressedPartyTrackingUpdate'" .
+
+msar:inst-newtrackinginfo rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "NewTrackingInfo" ;
+    sysml2:canonical "OperationalAttributesDefinition::NewTrackingInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'NewTrackingInfo'" .
+
+msar:inst-rescueavailable rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueAvailable" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueAvailable" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueAvailable'" .
+
+msar:inst-searchavailable rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchAvailable" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchAvailable" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchAvailable'" .
+
+msar:inst-youhavebeenfound rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "YouHaveBeenFound" ;
+    sysml2:canonical "OperationalAttributesDefinition::YouHaveBeenFound" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'YouHaveBeenFound'" .
+
+msar:inst-boardrescuevessel rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "BoardRescueVessel" ;
+    sysml2:canonical "OperationalAttributesDefinition::BoardRescueVessel" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'BoardRescueVessel'" .
+
+msar:inst-rescueunavailable rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueUnavailable" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueUnavailable" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueUnavailable'" .
+
+msar:inst-searchunavailable rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchUnavailable" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchUnavailable" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchUnavailable'" .
+
+msar:inst-saroperationaborted rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationAborted" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationAborted" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationAborted'" .
+
+msar:inst-updatedtrackinginfo rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "UpdatedTrackingInfo" ;
+    sysml2:canonical "OperationalAttributesDefinition::UpdatedTrackingInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'UpdatedTrackingInfo'" .
+
+msar:inst-assignedsaroperation rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AssignedSARoperation" ;
+    sysml2:canonical "OperationalAttributesDefinition::AssignedSARoperation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AssignedSARoperation'" .
+
+msar:inst-geographicalposition rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "GeographicalPosition" ;
+    sysml2:canonical "OperationalAttributesDefinition::GeographicalPosition" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'GeographicalPosition'" .
+
+msar:inst-saroperationcomplete rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SARoperationComplete" ;
+    sysml2:canonical "OperationalAttributesDefinition::SARoperationComplete" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SARoperationComplete'" .
+
+msar:inst-patientarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "PatientArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::PatientArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'PatientArr'" .
+
+msar:inst-distressedpartyarrival rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DistressedPartyArrival" ;
+    sysml2:canonical "OperationalAttributesDefinition::DistressedPartyArrival" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DistressedPartyArrival'" .
+
+msar:inst-disregardthisdistresscall rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DisregardThisDistressCall" ;
+    sysml2:canonical "OperationalAttributesDefinition::DisregardThisDistressCall" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DisregardThisDistressCall'" .
+
+msar:inst-additionalrescueresourcerequest rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AdditionalRescueResourceRequest" ;
+    sysml2:canonical "OperationalAttributesDefinition::AdditionalRescueResourceRequest" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AdditionalRescueResourceRequest'" .
+
+msar:inst-additionalsearchresourcerequest rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AdditionalSearchResourceRequest" ;
+    sysml2:canonical "OperationalAttributesDefinition::AdditionalSearchResourceRequest" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AdditionalSearchResourceRequest'" .
+
+msar:inst-distresssignalfortrackinginfolost rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DistressSignalForTrackingInfoLost" ;
+    sysml2:canonical "OperationalAttributesDefinition::DistressSignalForTrackingInfoLost" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DistressSignalForTrackingInfoLost'" .
+
+msar:inst-rescueresourceassignedtooperation rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueResourceAssignedToOperation" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueResourceAssignedToOperation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueResourceAssignedToOperation'" .
+
+msar:inst-searchresourceassignedtooperation rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchResourceAssignedToOperation" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchResourceAssignedToOperation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchResourceAssignedToOperation'" .
+
+msar:inst-additionalrescueresourcerequestack rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AdditionalRescueResourceRequestAck" ;
+    sysml2:canonical "OperationalAttributesDefinition::AdditionalRescueResourceRequestAck" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AdditionalRescueResourceRequestAck'" .
+
+msar:inst-additionalsearchresourcerequestack rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AdditionalSearchResourceRequestAck" ;
+    sysml2:canonical "OperationalAttributesDefinition::AdditionalSearchResourceRequestAck" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AdditionalSearchResourceRequestAck'" .
+
+msar:inst-rescueresourceremovedfromoperation rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RescueResourceRemovedFromOperation" ;
+    sysml2:canonical "OperationalAttributesDefinition::RescueResourceRemovedFromOperation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RescueResourceRemovedFromOperation'" .
+
+msar:inst-searchresourceremovedfromoperation rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SearchResourceRemovedFromOperation" ;
+    sysml2:canonical "OperationalAttributesDefinition::SearchResourceRemovedFromOperation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SearchResourceRemovedFromOperation'" .
+
+msar:inst-additionalrescueresourcerequestnack rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AdditionalRescueResourceRequestNack" ;
+    sysml2:canonical "OperationalAttributesDefinition::AdditionalRescueResourceRequestNack" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AdditionalRescueResourceRequestNack'" .
+
+msar:inst-additionalsearchresourcerequestnack rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "AdditionalSearchResourceRequestNack" ;
+    sysml2:canonical "OperationalAttributesDefinition::AdditionalSearchResourceRequestNack" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'AdditionalSearchResourceRequestNack'" .
+
+msar:inst-distressedpersonsdeliveredtosafeplace rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DistressedPersonsDeliveredToSafePlace" ;
+    sysml2:canonical "OperationalAttributesDefinition::DistressedPersonsDeliveredToSafePlace" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DistressedPersonsDeliveredToSafePlace'" .
+
+msar:inst-startsafeplaceestablishment rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "StartSafePlaceEstablishment" ;
+    sysml2:canonical "OperationalAttributesDefinition::StartSafePlaceEstablishment" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'StartSafePlaceEstablishment'" .
+
+msar:inst-safeplacepatienttransportdispatched rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatientTransportDispatched" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatientTransportDispatched" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatientTransportDispatched'" .
+
+msar:inst-safeplacepatienttransportarrival rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatientTransportArrival" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatientTransportArrival" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatientTransportArrival'" .
+
+msar:inst-safeplacemedicalstatus rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceMedicalStatus" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceMedicalStatus" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceMedicalStatus'" .
+
+msar:inst-safeplaceoperational rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceOperational" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceOperational" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceOperational'" .
+
+msar:inst-safeplacepatienttransportrequest rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatientTransportRequest" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatientTransportRequest" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatientTransportRequest'" .
+
+msar:inst-safeplacepatientdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatientData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatientData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatientData'" .
+
+msar:inst-safeplacepatientarr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatientArr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatientArr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatientArr'" .
+
+msar:inst-safeplacerescuedpersontreatmentdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceRescuedPersonTreatmentData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceRescuedPersonTreatmentData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceRescuedPersonTreatmentData'" .
+
+msar:inst-safeplacepatienttransportarrivalaths rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatientTransportArrivalAtHs" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatientTransportArrivalAtHs" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatientTransportArrivalAtHs'" .
+
+msar:inst-safeplaceestatblishmentreq rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceEstatblishmentReq" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceEstatblishmentReq" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceEstatblishmentReq'" .
+
+msar:inst-safeplaceestablished rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceEstablished" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceEstablished" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceEstablished'" .
+
+msar:inst-healthservicerescuedpersonhandlingdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "HealthServiceRescuedPersonHandlingData" ;
+    sysml2:canonical "OperationalAttributesDefinition::HealthServiceRescuedPersonHandlingData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'HealthServiceRescuedPersonHandlingData'" .
+
+msar:inst-saroperationinitiated rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SAROperationInitiated" ;
+    sysml2:canonical "OperationalAttributesDefinition::SAROperationInitiated" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SAROperationInitiated'" .
+
+msar:inst-safeplacedisestablishmentreq rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceDisestablishmentReq" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceDisestablishmentReq" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceDisestablishmentReq'" .
+
+msar:inst-safeplacedisestablished rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceDisestablished" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceDisestablished" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceDisestablished'" .
+
+msar:inst-startsafeplacedisestablishment rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "StartSafePlaceDisestablishment" ;
+    sysml2:canonical "OperationalAttributesDefinition::StartSafePlaceDisestablishment" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'StartSafePlaceDisestablishment'" .
+
+msar:inst-transportedsafeplacepatienthandedovertohs rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "TransportedSafePlacePatientHandedOverToHS" ;
+    sysml2:canonical "OperationalAttributesDefinition::TransportedSafePlacePatientHandedOverToHS" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'TransportedSafePlacePatientHandedOverToHS'" .
+
+msar:inst-commonoperationalpictureinfo rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "CommonOperationalPictureInfo" ;
+    sysml2:canonical "OperationalAttributesDefinition::CommonOperationalPictureInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'CommonOperationalPictureInfo'" .
+
+msar:inst-distressedpartyfoundbysearch rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DistressedPartyFoundBySearch" ;
+    sysml2:canonical "OperationalAttributesDefinition::DistressedPartyFoundBySearch" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DistressedPartyFoundBySearch'" .
+
+msar:inst-distressedpartyisonboardrescue rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DistressedPartyIsOnboardRescue" ;
+    sysml2:canonical "OperationalAttributesDefinition::DistressedPartyIsOnboardRescue" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DistressedPartyIsOnboardRescue'" .
+
+msar:inst-optimizedcommonoperationalpictureinfo rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "OptimizedCommonOperationalPictureInfo" ;
+    sysml2:canonical "OperationalAttributesDefinition::OptimizedCommonOperationalPictureInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'OptimizedCommonOperationalPictureInfo'" .
+
+msar:inst-optimizedcommonoperationalpictureinfoforecast rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "OptimizedCommonOperationalPictureInfoForecast" ;
+    sysml2:canonical "OperationalAttributesDefinition::OptimizedCommonOperationalPictureInfoForecast" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'OptimizedCommonOperationalPictureInfoForecast'" .
+
+msar:inst-safeplacepatienttreatmentdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlacePatientTreatmentData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlacePatientTreatmentData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlacePatientTreatmentData'" .
+
+msar:inst-safeplacenotestablished rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SafePlaceNotEstablished" ;
+    sysml2:canonical "OperationalAttributesDefinition::SafePlaceNotEstablished" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SafePlaceNotEstablished'" .
+
+msar:inst-dpaffectedbysea rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DpAffectedBySea" ;
+    sysml2:canonical "OperationalAttributesDefinition::DpAffectedBySea" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DpAffectedBySea'" .
+
+msar:inst-dpaffectedbywhtr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DpAffectedByWhtr" ;
+    sysml2:canonical "OperationalAttributesDefinition::DpAffectedByWhtr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DpAffectedByWhtr'" .
+
+msar:inst-snaffectedbysea rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SnAffectedBySea" ;
+    sysml2:canonical "OperationalAttributesDefinition::SnAffectedBySea" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SnAffectedBySea'" .
+
+msar:inst-snaffectedbywhtr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SnAffectedByWhtr" ;
+    sysml2:canonical "OperationalAttributesDefinition::SnAffectedByWhtr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SnAffectedByWhtr'" .
+
+msar:inst-rnaffectedbysea rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RnAffectedBySea" ;
+    sysml2:canonical "OperationalAttributesDefinition::RnAffectedBySea" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RnAffectedBySea'" .
+
+msar:inst-rnaffectedbywhtr rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "RnAffectedByWhtr" ;
+    sysml2:canonical "OperationalAttributesDefinition::RnAffectedByWhtr" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'RnAffectedByWhtr'" .
+
+msar:inst-seadpdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SeaDpData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SeaDpData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SeaDpData'" .
+
+msar:inst-seadpinfluence rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SeaDpInfluence" ;
+    sysml2:canonical "OperationalAttributesDefinition::SeaDpInfluence" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SeaDpInfluence'" .
+
+msar:inst-seainfo rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SeaInfo" ;
+    sysml2:canonical "OperationalAttributesDefinition::SeaInfo" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SeaInfo'" .
+
+msar:inst-searscrdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SeaRscrData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SeaRscrData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SeaRscrData'" .
+
+msar:inst-searscrinfluence rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SeaRscrInfluence" ;
+    sysml2:canonical "OperationalAttributesDefinition::SeaRscrInfluence" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SeaRscrInfluence'" .
+
+msar:inst-seasrchrdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SeaSrchrData" ;
+    sysml2:canonical "OperationalAttributesDefinition::SeaSrchrData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SeaSrchrData'" .
+
+msar:inst-seasrchrinfluence rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "SeaSrchrInfluence" ;
+    sysml2:canonical "OperationalAttributesDefinition::SeaSrchrInfluence" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'SeaSrchrInfluence'" .
+
+msar:inst-whtrdpdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WhtrDpData" ;
+    sysml2:canonical "OperationalAttributesDefinition::WhtrDpData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WhtrDpData'" .
+
+msar:inst-whtrdpinfluence rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WhtrDpInfluence" ;
+    sysml2:canonical "OperationalAttributesDefinition::WhtrDpInfluence" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WhtrDpInfluence'" .
+
+msar:inst-whtrinfornmation rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WhtrInfornmation" ;
+    sysml2:canonical "OperationalAttributesDefinition::WhtrInfornmation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WhtrInfornmation'" .
+
+msar:inst-whtrrscrdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WhtrRscrData" ;
+    sysml2:canonical "OperationalAttributesDefinition::WhtrRscrData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WhtrRscrData'" .
+
+msar:inst-whtrrscrinfluence rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WhtrRscrInfluence" ;
+    sysml2:canonical "OperationalAttributesDefinition::WhtrRscrInfluence" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WhtrRscrInfluence'" .
+
+msar:inst-whtrsrchrdata rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WhtrSrchrData" ;
+    sysml2:canonical "OperationalAttributesDefinition::WhtrSrchrData" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WhtrSrchrData'" .
+
+msar:inst-whtrsrchrinfluence rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "WhtrSrchrInfluence" ;
+    sysml2:canonical "OperationalAttributesDefinition::WhtrSrchrInfluence" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'WhtrSrchrInfluence'" .
+
+msar:inst-position rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "Position" ;
+    sysml2:canonical "OperationalAttributesDefinition::Position" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'Position'" .
+
+msar:inst-detailedwhtrreq rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DetailedWhtrReq" ;
+    sysml2:canonical "OperationalAttributesDefinition::DetailedWhtrReq" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DetailedWhtrReq'" .
+
+msar:inst-detailedwhtrresp rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DetailedWhtrResp" ;
+    sysml2:canonical "OperationalAttributesDefinition::DetailedWhtrResp" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DetailedWhtrResp'" .
+
+msar:inst-detailedseareq rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DetailedSeaReq" ;
+    sysml2:canonical "OperationalAttributesDefinition::DetailedSeaReq" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DetailedSeaReq'" .
+
+msar:inst-detailedsearesp rdf:type owl:NamedIndividual , sysml2:def-attributedefinition ;
+    rdfs:label "DetailedSeaResp" ;
+    sysml2:canonical "OperationalAttributesDefinition::DetailedSeaResp" ;
+    rdfs:comment "MSAR model individual representing SysML v2 attribute def definition: 'DetailedSeaResp'" .
+
+msar:inst-distressedperson rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "DistressedPerson" ;
+    sysml2:canonical "OperationalPartsDefinition::DistressedPerson" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'DistressedPerson'" .
+
+msar:inst-rescued_person rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Rescued_person" ;
+    sysml2:canonical "OperationalPartsDefinition::Rescued_person" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Rescued_person'" .
+
+msar:inst-safeplacematerielandpersonell rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "SafePlaceMaterielAndPersonell" ;
+    sysml2:canonical "OperationalPartsDefinition::SafePlaceMaterielAndPersonell" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'SafePlaceMaterielAndPersonell'" .
+
+msar:inst-medicaltransportwithrescuedpersonmedicalpersonellandequipment rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "MedicalTransportWithRescuedPersonMedicalPersonellAndEquipment" ;
+    sysml2:canonical "OperationalPartsDefinition::MedicalTransportWithRescuedPersonMedicalPersonellAndEquipment" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'MedicalTransportWithRescuedPersonMedicalPersonellAndEquipment'" .
+
+msar:inst-search_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Search_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::Search_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Search_ph1'" .
+
+msar:inst-rescue_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Rescue_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::Rescue_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Rescue_ph1'" .
+
+msar:inst-temporary_safe_place_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Temporary_safe_place_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::Temporary_safe_place_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Temporary_safe_place_ph1'" .
+
+msar:inst-health_service_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Health_service_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::Health_service_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Health_service_ph1'" .
+
+msar:inst-msar_monitor rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "MSAR_monitor" ;
+    sysml2:canonical "OperationalPartsDefinition::MSAR_monitor" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'MSAR_monitor'" .
+
+msar:inst-sar_tactical_c2_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "SAR_tactical_C2_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::SAR_tactical_C2_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'SAR_tactical_C2_ph1'" .
+
+msar:inst-sea_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Sea_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::Sea_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Sea_ph1'" .
+
+msar:inst-weather_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Weather_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::Weather_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Weather_ph1'" .
+
+msar:inst-sar_asset_controller_ph1 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "SAR_asset_controller_ph1" ;
+    sysml2:canonical "OperationalPartsDefinition::SAR_asset_controller_ph1" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'SAR_asset_controller_ph1'" .
+
+msar:inst-distressed_party rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Distressed_party" ;
+    sysml2:canonical "OperationalPartsDefinition::Distressed_party" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Distressed_party'" .
+
+msar:inst-msar_ph1_operation rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "MSAR_ph1_operation" ;
+    sysml2:canonical "OperationalPartsDefinition::MSAR_ph1_operation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'MSAR_ph1_operation'" .
+
+msar:inst-search_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Search_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::Search_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Search_ph2'" .
+
+msar:inst-rescue_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Rescue_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::Rescue_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Rescue_ph2'" .
+
+msar:inst-sar_tactical_c2_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "SAR_tactical_C2_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::SAR_tactical_C2_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'SAR_tactical_C2_ph2'" .
+
+msar:inst-temporary_safe_place_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Temporary_safe_place_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::Temporary_safe_place_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Temporary_safe_place_ph2'" .
+
+msar:inst-health_service_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Health_service_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::Health_service_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Health_service_ph2'" .
+
+msar:inst-weather_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Weather_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::Weather_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Weather_ph2'" .
+
+msar:inst-sea_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Sea_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::Sea_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Sea_ph2'" .
+
+msar:inst-medical_transport_service rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Medical_transport_service" ;
+    sysml2:canonical "OperationalPartsDefinition::Medical_transport_service" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Medical_transport_service'" .
+
+msar:inst-safeplace_setupandremoval_service rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "SafePlace_setupAndRemoval_service" ;
+    sysml2:canonical "OperationalPartsDefinition::SafePlace_setupAndRemoval_service" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'SafePlace_setupAndRemoval_service'" .
+
+msar:inst-common_operational_picture_service rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "Common_operational_picture_service" ;
+    sysml2:canonical "OperationalPartsDefinition::Common_operational_picture_service" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'Common_operational_picture_service'" .
+
+msar:inst-sar_asset_controller_ph2 rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "SAR_asset_controller_ph2" ;
+    sysml2:canonical "OperationalPartsDefinition::SAR_asset_controller_ph2" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'SAR_asset_controller_ph2'" .
+
+msar:inst-msar_ph2_operation rdf:type owl:NamedIndividual , uafsml:def-operationalperformer ;
+    rdfs:label "MSAR_ph2_operation" ;
+    sysml2:canonical "OperationalPartsDefinition::MSAR_ph2_operation" ;
+    rdfs:comment "MSAR model individual representing SysML v2 part def definition: 'MSAR_ph2_operation'" .
+
+msar:inst-opdpmntrif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpDpMntrIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpDpMntrIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpDpMntrIF'" .
+
+msar:inst-opdprnif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpDpRnIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpDpRnIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpDpRnIF'" .
+
+msar:inst-opdpsnif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpDpSnIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpDpSnIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpDpSnIF'" .
+
+msar:inst-ophsenvif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpHsEnvIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpHsEnvIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpHsEnvIF'" .
+
+msar:inst-opmntrstcif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpMntrStcIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpMntrStcIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpMntrStcIF'" .
+
+msar:inst-ophsspph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpHsSpPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpHsSpPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpHsSpPh1IF'" .
+
+msar:inst-oprnspph1lif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpRnSpPh1lIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpRnSpPh1lIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpRnSpPh1lIF'" .
+
+msar:inst-opsacrnph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSacRnPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSacRnPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSacRnPh1IF'" .
+
+msar:inst-opsacsnph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSacSnPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSacSnPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSacSnPh1IF'" .
+
+msar:inst-opsnrnph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSnRnPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSnRnPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSnRnPh1IF'" .
+
+msar:inst-opsnsnoutph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSnSnOutPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSnSnOutPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSnSnOutPh1IF'" .
+
+msar:inst-opsnsninph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSnSnInPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSnSnInPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSnSnInPh1IF'" .
+
+msar:inst-opstchsif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcHsIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcHsIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcHsIF'" .
+
+msar:inst-opstcrnph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcRnPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcRnPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcRnPh1IF'" .
+
+msar:inst-opstcsacph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcSacPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcSacPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcSacPh1IF'" .
+
+msar:inst-opstcsnph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcSnPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcSnPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcSnPh1IF'" .
+
+msar:inst-opstcspph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcSpPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcSpPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcSpPh1IF'" .
+
+msar:inst-opseadpif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSeaDpIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSeaDpIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSeaDpIF'" .
+
+msar:inst-opsearnif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSeaRnIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSeaRnIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSeaRnIF'" .
+
+msar:inst-opseasnif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSeaSnIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSeaSnIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSeaSnIF'" .
+
+msar:inst-opseastcif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSeaStcIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSeaStcIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSeaStcIF'" .
+
+msar:inst-opwhtrdpif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpWhtrDpIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpWhtrDpIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpWhtrDpIF'" .
+
+msar:inst-opwhtrrnif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpWhtrRnIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpWhtrRnIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpWhtrRnIF'" .
+
+msar:inst-opwhtrsnif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpWhtrSnIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpWhtrSnIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpWhtrSnIF'" .
+
+msar:inst-opwhtrstcif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpWhtrStcIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpWhtrStcIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpWhtrStcIF'" .
+
+msar:inst-oprnrnoutph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpRnRnOutPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpRnRnOutPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpRnRnOutPh1IF'" .
+
+msar:inst-oprnrninph1if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpRnRnInPh1IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpRnRnInPh1IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpRnRnInPh1IF'" .
+
+msar:inst-opwhtrcopsrvcif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpWhtrCopSrvcIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpWhtrCopSrvcIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpWhtrCopSrvcIF'" .
+
+msar:inst-opseacopsrvcif rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSeaCopSrvcIF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSeaCopSrvcIF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSeaCopSrvcIF'" .
+
+msar:inst-opspsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSpSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSpSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSpSrvcPh2IF'" .
+
+msar:inst-opmedtrsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpMedTrSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpMedTrSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpMedTrSrvcPh2IF'" .
+
+msar:inst-opcopsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpCopSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpCopSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpCopSrvcPh2IF'" .
+
+msar:inst-oprncopsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpRnCopSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpRnCopSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpRnCopSrvcPh2IF'" .
+
+msar:inst-opsncopsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSnCopSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSnCopSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSnCopSrvcPh2IF'" .
+
+msar:inst-opstccopsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcCopSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcCopSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcCopSrvcPh2IF'" .
+
+msar:inst-opsaccopsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSacCopSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSacCopSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSacCopSrvcPh2IF'" .
+
+msar:inst-opstcspsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcSpSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcSpSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcSpSrvcPh2IF'" .
+
+msar:inst-opspspsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSpSpSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSpSpSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSpSpSrvcPh2IF'" .
+
+msar:inst-ophspattrsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpHsPatTrSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpHsPatTrSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpHsPatTrSrvcPh2IF'" .
+
+msar:inst-oppattrsrvcph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpPatTrSrvcPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpPatTrSrvcPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpPatTrSrvcPh2IF'" .
+
+msar:inst-opsacrnph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSacRnPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSacRnPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSacRnPh2IF'" .
+
+msar:inst-opsacsnph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpSacSnPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpSacSnPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpSacSnPh2IF'" .
+
+msar:inst-opstcsacph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcSacPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcSacPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcSacPh2IF'" .
+
+msar:inst-ophsspph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpHsSpPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpHsSpPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpHsSpPh2IF'" .
+
+msar:inst-opstchsph2if rdf:type owl:NamedIndividual , sysml2:def-portdefinition ;
+    rdfs:label "OpStcHsPh2IF" ;
+    sysml2:canonical "OperationlPortsDefinition::OpStcHsPh2IF" ;
+    rdfs:comment "MSAR model individual representing SysML v2 port def definition: 'OpStcHsPh2IF'" .
