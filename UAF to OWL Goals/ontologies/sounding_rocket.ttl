@@ -1,0 +1,172 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix uafsml: <http://purl.org/uaf/uafsml#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix bmm: <http://www.omg.org/spec/BMM/> .
+@prefix sumo: <http://www.ontologyportal.org/SUMO.owl#> .
+@prefix sr: <http://purl.org/uaf/example/sounding_rocket#> .
+
+<http://purl.org/uaf/example/sounding_rocket> rdf:type owl:Ontology ;
+    owl:imports <http://purl.org/uaf/bridge> ;
+    rdfs:label "Three-Stage Sounding Rocket Systems Engineering & Enterprise Model" ;
+    rdfs:comment "A complete UAFSML model instance representing a 3-stage sounding rocket with payload variants and support enterprise structures." .
+
+# =========================================================================
+# 1. Payload Definition Classes
+# =========================================================================
+
+sr:WeatherPayload rdf:type owl:Class ;
+    rdfs:label "Weather Payload" ;
+    rdfs:subClassOf sumo:Device , uafsml:Usage ;
+    rdfs:comment "Payload instrument suite for measuring atmospheric pressure, wind, and humidity." .
+
+sr:SolarWeatherSensor rdf:type owl:Class ;
+    rdfs:label "Solar Weather Sensor" ;
+    rdfs:subClassOf sumo:Device , uafsml:Usage ;
+    rdfs:comment "Payload instrument for monitoring solar radiation, magnetosphere, and ionosphere disturbances." .
+
+sr:AtmosphericChemicalAnalyzer rdf:type owl:Class ;
+    rdfs:label "Atmospheric Chemical Analyzer" ;
+    rdfs:subClassOf sumo:Device , uafsml:Usage ;
+    rdfs:comment "Spectrometer payload for analyzing ozone concentration and trace gases in the upper atmosphere." .
+
+# =========================================================================
+# 2. Sounding Rocket Physical Architecture (SysML v2 Usages / Containment)
+# =========================================================================
+
+# The main rocket system
+sr:inst-sounding_rocket rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Sounding Rocket System" ;
+    rdfs:comment "Three-stage modular research rocket." ;
+    rdf:type sumo:Vehicle ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket" .
+
+# Stage 1 Booster (Solid Fuel Propulsion)
+sr:inst-stage_1_booster rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Stage 1 Solid Booster" ;
+    rdfs:comment "First-stage high-thrust solid rocket booster for initial lift-off." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket::Stage1Booster" .
+
+# Stage 2 Mid-Stage (Liquid Fuel Propulsion)
+sr:inst-stage_2_mid_stage rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Stage 2 Mid-Stage" ;
+    rdfs:comment "Second-stage liquid propellent mid-stage." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket::Stage2MidStage" .
+
+# Stage 3 Upper-Stage (Cold Gas Attitude Control + Booster)
+sr:inst-stage_3_upper_stage rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Stage 3 Upper-Stage" ;
+    rdfs:comment "Third-stage upper rocket body for final orbit/apogee alignment." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket::Stage3UpperStage" .
+
+# Payload Section
+sr:inst-payload_section rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Payload Nose Cone" ;
+    rdfs:comment "Aero-fairing payload section housing sensors." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket::PayloadSection" .
+
+# Recovery Parachute
+sr:inst-recovery_parachute rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Recovery Parachute System" ;
+    rdfs:comment "Barometric dual-deployment parachute recovery system." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket::RecoverySystem" .
+
+# Active Weather Payload individual
+sr:inst-active_weather_payload rdf:type owl:NamedIndividual , sr:WeatherPayload ;
+    rdfs:label "Active Atmospheric Weather Sensor" ;
+    rdfs:comment "The deployed weather sensor payload." ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket::PayloadSection::WeatherPayload" .
+
+# Staging composition linkages (contains)
+sr:inst-sounding_rocket sr:contains sr:inst-stage_1_booster .
+sr:inst-sounding_rocket sr:contains sr:inst-stage_2_mid_stage .
+sr:inst-sounding_rocket sr:contains sr:inst-stage_3_upper_stage .
+sr:inst-sounding_rocket sr:contains sr:inst-payload_section .
+sr:inst-sounding_rocket sr:contains sr:inst-recovery_parachute .
+sr:inst-payload_section sr:contains sr:inst-active_weather_payload .
+
+sr:contains rdf:type owl:ObjectProperty ;
+    rdfs:label "contains" .
+
+# =========================================================================
+# 3. Ground & Communications Systems Mappings
+# =========================================================================
+
+sr:inst-ground_telemetry_station rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Ground Telemetry Control Station" ;
+    rdfs:comment "Base operations ground station for data collection and tracking." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "SoundingRocketModel::GroundStation" .
+
+sr:inst-rocket_telemetry_transmitter rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "S-Band Telemetry Transmitter" ;
+    rdfs:comment "High-altitude radio telemetry transmitter." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "SoundingRocketModel::SoundingRocket::TelemetryTransmitter" .
+
+# Downlink association
+sr:inst-rocket_telemetry_transmitter sr:connectedTo sr:inst-ground_telemetry_station .
+
+sr:connectedTo rdf:type owl:ObjectProperty ;
+    rdfs:label "connected to" .
+
+# =========================================================================
+# 4. Enterprise Architecture & Personnel Hierarchy (W3C ORG)
+# =========================================================================
+
+sr:org-rocket_enterprise rdf:type owl:NamedIndividual , org:Organization ;
+    rdfs:label "Sounding Rocket Aerospace Enterprise" ;
+    rdfs:comment "Corporate entity responsible for design, launch, and quality auditing." .
+
+sr:org-design_division rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
+    rdfs:label "Design Division" ;
+    org:subOrganizationOf sr:org-rocket_enterprise .
+
+sr:org-manufacturing_division rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
+    rdfs:label "Propulsion Manufacturing Team" ;
+    org:subOrganizationOf sr:org-rocket_enterprise .
+
+sr:org-quality_assurance_division rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
+    rdfs:label "Quality Assurance Department" ;
+    org:subOrganizationOf sr:org-rocket_enterprise .
+
+sr:org-quality_control_division rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
+    rdfs:label "Quality Control Inspectors" ;
+    org:subOrganizationOf sr:org-quality_assurance_division .
+
+sr:org-ground_systems_crew rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
+    rdfs:label "Ground Operations & Launch Crew" ;
+    org:subOrganizationOf sr:org-rocket_enterprise .
+
+# Personnel post assignments
+sr:post-lead_aerospace_architect rdf:type owl:NamedIndividual , org:Post ;
+    rdfs:label "Lead Systems Architect" ;
+    org:postIn sr:org-design_division .
+
+sr:post-qa_manager rdf:type owl:NamedIndividual , org:Post ;
+    rdfs:label "QA Compliance Director" ;
+    org:postIn sr:org-quality_assurance_division .
+
+# =========================================================================
+# 5. Strategic Mission Goals (OMG BMM)
+# =========================================================================
+
+sr:goal-orbit_insertion rdf:type owl:NamedIndividual , bmm:Goal ;
+    rdfs:label "Goal: Complete Stage Separation & High-Altitude Apogee" ;
+    rdfs:comment "Target apogee of 150km for scientific observation." ;
+    bmm:channelsEffortsTowards sr:inst-sounding_rocket .
+
+sr:policy-iso9001_compliance rdf:type owl:NamedIndividual , bmm:BusinessPolicy ;
+    rdfs:label "Quality Standard: ISO 9001:2015" ;
+    rdfs:comment "Standard quality management guidelines governing booster manufacturing." ;
+    bmm:governs sr:org-quality_assurance_division .
+
+bmm:governs rdf:type owl:ObjectProperty ;
+    rdfs:label "governs" .

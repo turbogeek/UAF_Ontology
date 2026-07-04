@@ -1,0 +1,156 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix uafsml: <http://purl.org/uaf/uafsml#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix bmm: <http://www.omg.org/spec/BMM/> .
+@prefix sumo: <http://www.ontologyportal.org/SUMO.owl#> .
+@prefix battinfo: <https://w3id.org/emmo/domain/battery#> .
+@prefix ic: <http://purl.org/uaf/example/insulin_cooler#> .
+
+<http://purl.org/uaf/example/insulin_cooler> rdf:type owl:Ontology ;
+    owl:imports <http://purl.org/uaf/bridge> ;
+    rdfs:label "Medical Insulin Pump Cooler Systems Engineering & Enterprise Model" ;
+    rdfs:comment "A complete UAFSML model instance representing an on-body active refrigeration cooler attachment for insulin pumps, with associated app and medical governance." .
+
+# =========================================================================
+# 1. Medical Device Classification (MDO Ontology Stubs)
+# =========================================================================
+
+ic:MedicalDevice rdf:type owl:Class ;
+    rdfs:label "Medical Device" ;
+    rdfs:subClassOf sumo:Device ;
+    rdfs:comment "A device intended for medical purposes." .
+
+ic:ClassIIMedicalDevice rdf:type owl:Class ;
+    rdfs:label "Class II Medical Device" ;
+    rdfs:subClassOf ic:MedicalDevice ;
+    rdfs:comment "Devices requiring special controls to ensure safety and effectiveness (e.g., insulin pump attachments)." .
+
+# =========================================================================
+# 2. Insulin Cooler Hardware Architecture (SysML v2 Usages / Containment)
+# =========================================================================
+
+# The main cooler attachment
+ic:inst-insulin_cooler rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Insulin Pump Cooler Attachment" ;
+    rdfs:comment "On-body active refrigeration sleeve designed to securely house the OmniPod pod." ;
+    rdf:type ic:ClassIIMedicalDevice ;
+    uafsml:canonical "InsulinCoolerModel::InsulinPumpCooler" .
+
+# Solid-State Refrigerator (Peltier module)
+ic:inst-solid_state_refrigerator rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Solid-State Peltier Cooler" ;
+    rdfs:comment "Integrated thermoelectric cooling module." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "InsulinCoolerModel::InsulinPumpCooler::PeltierCooler" .
+
+# Exchangeable Battery Pack (Qi-Wireless Charging)
+ic:inst-exchangeable_battery_pack rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Exchangeable Battery Pack" ;
+    rdfs:comment "Rechargeable battery pack supporting Qi-inductive wireless charging." ;
+    rdf:type battinfo:Battery ;
+    uafsml:canonical "InsulinCoolerModel::InsulinPumpCooler::WirelessBattery" .
+
+# OmniPod Mechanical Latch
+ic:inst-omnipod_mechanical_latch rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Secure OmniPod Latch" ;
+    rdfs:comment "Mechanical clamp securing the cooler directly to the insulin reservoir casing of the OmniPod." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "InsulinCoolerModel::InsulinPumpCooler::OmnipodLatch" .
+
+# Containment linkages
+ic:inst-insulin_cooler ic:contains ic:inst-solid_state_refrigerator .
+ic:inst-insulin_cooler ic:contains ic:inst-exchangeable_battery_pack .
+ic:inst-insulin_cooler ic:contains ic:inst-omnipod_mechanical_latch .
+
+ic:contains rdf:type owl:ObjectProperty ;
+    rdfs:label "contains" .
+
+# =========================================================================
+# 3. Companion Phone Application Architecture (UAFSML Software)
+# =========================================================================
+
+# The mobile app
+ic:inst-phone_app rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Insulin Cooler Companion App" ;
+    rdfs:comment "Android and iOS mobile application for user alarms and device configuration." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "InsulinCoolerModel::PhoneApp" .
+
+# Alarm Manager subcomponent
+ic:inst-alarm_manager rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Temp Alarm Manager" ;
+    rdfs:comment "Monitors heat thresholds and sends notifications to user and family." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "InsulinCoolerModel::PhoneApp::AlarmManager" .
+
+# User Login Gateway
+ic:inst-user_login_gateway rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Secure Login Gateway" ;
+    rdfs:comment "Handles secure authentication for customer profiles." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "InsulinCoolerModel::PhoneApp::LoginGateway" .
+
+# Family Monitor Module
+ic:inst-family_monitor_module rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Family Monitoring Sync" ;
+    rdfs:comment "Cloud synchronization module allowing caretakers to track battery and temp levels remotely." ;
+    rdf:type sumo:Device ;
+    uafsml:canonical "InsulinCoolerModel::PhoneApp::FamilyMonitor" .
+
+# App containment
+ic:inst-phone_app ic:contains ic:inst-alarm_manager .
+ic:inst-phone_app ic:contains ic:inst-user_login_gateway .
+ic:inst-phone_app ic:contains ic:inst-family_monitor_module .
+
+# Device to App communication (connected to)
+ic:inst-insulin_cooler ic:connectedTo ic:inst-phone_app .
+
+ic:connectedTo rdf:type owl:ObjectProperty ;
+    rdfs:label "connected to" .
+
+# =========================================================================
+# 4. Medical Governance & Regulatory Compliance (W3C ORG)
+# =========================================================================
+
+ic:org-fda_governance_board rdf:type owl:NamedIndividual , org:Organization ;
+    rdfs:label "Food and Drug Administration (FDA) Review Board" ;
+    rdfs:comment "Federal agency governing approval of Class II medical device modifications." .
+
+ic:org-insurance_review_panel rdf:type owl:NamedIndividual , org:Organization ;
+    rdfs:label "Healthcare Insurance Coverage Panel" ;
+    rdfs:comment "Evaluates clinical efficacy to approve device insurance reimbursement." .
+
+ic:org-manufacturer_qa_compliance rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
+    rdfs:label "Manufacturer QA Compliance Team" ;
+    rdfs:comment "In-house engineering team managing compliance audits and validation logs." .
+
+# =========================================================================
+# 5. Business Goals, Insurance Eligibility & Green Standards (OMG BMM)
+# =========================================================================
+
+# Primary goal: Prevent insulin spoilage (reduces waste in hot tubs / showers / hot weather)
+ic:goal-prevent_insulin_spoilage rdf:type owl:NamedIndividual , bmm:Goal ;
+    rdfs:label "Goal: Prevent Insulin Spoilage" ;
+    rdfs:comment "Maintain insulin temperature between 2-8°C during external ambient heat exposure (hot weather/tub/shower)." ;
+    bmm:channelsEffortsTowards ic:inst-insulin_cooler .
+
+# Business Goal: Affordable consumer pricing
+ic:goal-affordability rdf:type owl:NamedIndividual , bmm:Goal ;
+    rdfs:label "Goal: Target Consumer Affordability" ;
+    rdfs:comment "Keep manufacturing costs low to ensure an affordable retail price point." ;
+    bmm:channelsEffortsTowards ic:inst-insulin_cooler .
+
+# Policy: Qualify for insurance reimbursement coverage
+ic:policy-medical_device_insurance_coverage rdf:type owl:NamedIndividual , bmm:BusinessPolicy ;
+    rdfs:label "Policy: Insurance Reimbursement Eligibility" ;
+    rdfs:comment "Deliver documented clinical safety audits to qualify the cooler for medical insurance coverage." ;
+    bmm:governs ic:org-manufacturer_qa_compliance .
+
+# Policy: Environmental recyclability standards
+ic:policy-environmental_recyclability rdf:type owl:NamedIndividual , bmm:BusinessPolicy ;
+    rdfs:label "Policy: Green Manufacturing & Recyclability" ;
+    rdfs:comment "Utilize recyclable thermoplastic compounds and modular, extractable electronics to meet EPA standards." ;
+    bmm:governs ic:org-manufacturer_qa_compliance .
