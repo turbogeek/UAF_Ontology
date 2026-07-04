@@ -1,0 +1,43 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix bmm: <http://www.omg.org/spec/BMM/> .
+
+<http://www.omg.org/spec/BMM> rdf:type owl:Ontology ;
+    rdfs:label "OMG Business Motivation Model (BMM) Core" ;
+    rdfs:comment "A lightweight local subset of BMM concepts for strategy, goals, vision, and tactics." .
+
+bmm:Vision rdf:type owl:Class ;
+    rdfs:label "Vision" .
+
+bmm:Mission rdf:type owl:Class ;
+    rdfs:label "Mission" .
+
+bmm:DesiredState rdf:type owl:Class ;
+    rdfs:label "Desired State" .
+
+bmm:Goal rdf:type owl:Class ;
+    rdfs:label "Goal" ;
+    rdfs:subClassOf bmm:DesiredState .
+
+bmm:Objective rdf:type owl:Class ;
+    rdfs:label "Objective" ;
+    rdfs:subClassOf bmm:DesiredState .
+
+bmm:CourseOfAction rdf:type owl:Class ;
+    rdfs:label "Course of Action" .
+
+bmm:Strategy rdf:type owl:Class ;
+    rdfs:label "Strategy" ;
+    rdfs:subClassOf bmm:CourseOfAction .
+
+bmm:Tactic rdf:type owl:Class ;
+    rdfs:label "Tactic" ;
+    rdfs:subClassOf bmm:CourseOfAction .
+
+bmm:Influencer rdf:type owl:Class ;
+    rdfs:label "Influencer" .
+
+bmm:BusinessPolicy rdf:type owl:Class ;
+    rdfs:label "Business Policy" .

@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+
+<http://www.w3.org/ns/org> rdf:type owl:Ontology ;
+    rdfs:label "W3C Organizational Ontology (ORG) Core" ;
+    rdfs:comment "A lightweight local subset of W3C ORG concepts for enterprise modeling and verification." .
+
+org:Organization rdf:type owl:Class ;
+    rdfs:label "Organization" .
+
+org:OrganizationalUnit rdf:type owl:Class ;
+    rdfs:label "Organizational Unit" ;
+    rdfs:subClassOf org:Organization .
+
+org:Post rdf:type owl:Class ;
+    rdfs:label "Post" ;
+    rdfs:comment "A position of employment or seat within an organization." .
+
+org:Role rdf:type owl:Class ;
+    rdfs:label "Role" ;
+    rdfs:comment "A set of responsibilities or activities assigned to a post or person." .
+
+org:Membership rdf:type owl:Class ;
+    rdfs:label "Membership" ;
+    rdfs:comment "An association linking a person to an organization in a specific role." .
