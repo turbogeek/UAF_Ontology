@@ -1,0 +1,102 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix uafsml: <http://purl.org/uaf/uafsml#> .
+@prefix uafv2: <http://purl.org/uaf/example/uafv2#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix bmm: <http://www.omg.org/spec/BMM/> .
+@prefix sumo: <http://www.ontologyportal.org/SUMO.owl#> .
+@prefix emmo: <https://w3id.org/emmo#> .
+@prefix battinfo: <https://w3id.org/emmo/domain/battery#> .
+@prefix ev: <http://purl.org/uaf/example/ev_power#> .
+
+<http://purl.org/uaf/example/ev_power> rdf:type owl:Ontology ;
+    owl:imports <http://purl.org/uaf/bridge> ;
+    rdfs:label "EV Power Subsystem Model to EMMO/BattINFO Mapping Bridge" ;
+    rdfs:comment "Draft Turtle mapping demonstrating how a SysML v2 EV power subsystem model aligns to EMMO BattINFO, W3C ORG, and OMG BMM." .
+
+# =========================================================================
+# 1. EMMO / BattINFO Vocabulary Stub (For Offline Reasoning Validation)
+# =========================================================================
+
+emmo:Item rdf:type owl:Class ;
+    rdfs:label "EMMO Item" .
+
+emmo:Product rdf:type owl:Class ;
+    rdfs:label "EMMO Product" ;
+    rdfs:subClassOf emmo:Item .
+
+emmo:Device rdf:type owl:Class ;
+    rdfs:label "EMMO Device" ;
+    rdfs:subClassOf emmo:Product .
+
+battinfo:ElectrochemicalCell rdf:type owl:Class ;
+    rdfs:label "Electrochemical Cell" ;
+    rdfs:subClassOf emmo:Device .
+
+battinfo:Battery rdf:type owl:Class ;
+    rdfs:label "Battery" ;
+    rdfs:subClassOf emmo:Device .
+
+battinfo:BatteryCell rdf:type owl:Class ;
+    rdfs:label "Battery Cell" ;
+    rdfs:subClassOf battinfo:Battery , battinfo:ElectrochemicalCell .
+
+battinfo:BatteryModule rdf:type owl:Class ;
+    rdfs:label "Battery Module" ;
+    rdfs:subClassOf battinfo:Battery .
+
+battinfo:BatteryPack rdf:type owl:Class ;
+    rdfs:label "Battery Pack" ;
+    rdfs:subClassOf battinfo:Battery .
+
+# =========================================================================
+# 2. SysML v2 EV Power Subsystem Individuals (Model Instances)
+# =========================================================================
+
+# The EV Battery Pack block/individual
+ev:inst-ev_battery_pack rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "EV Battery Pack" ;
+    rdfs:comment "SysML v2 model instance representing the main high-voltage electric vehicle battery pack." ;
+    rdf:type battinfo:BatteryPack ;
+    uafsml:canonical "EVModel::PowerSubsystem::BatteryPack" .
+
+# A Battery Module component inside the Pack
+ev:inst-battery_module_1 rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Battery Module 1" ;
+    rdfs:comment "SysML v2 module instance containing 12 series-connected cell groups." ;
+    rdf:type battinfo:BatteryModule ;
+    uafsml:canonical "EVModel::PowerSubsystem::BatteryPack::Module1" .
+
+# An individual Battery Cell inside the Module
+ev:inst-battery_cell_1a rdf:type owl:NamedIndividual , uafsml:Usage ;
+    rdfs:label "Battery Cell 1A" ;
+    rdfs:comment "SysML v2 individual cell instance (Lithium Iron Phosphate chemistries)." ;
+    rdf:type battinfo:BatteryCell ;
+    uafsml:canonical "EVModel::PowerSubsystem::BatteryPack::Module1::Cell1A" .
+
+# Composition Relationships (SysML v2 hasPart/contains)
+ev:inst-ev_battery_pack ev:contains ev:inst-battery_module_1 .
+ev:inst-battery_module_1 ev:contains ev:inst-battery_cell_1a .
+
+# Custom property mapping
+ev:contains rdf:type owl:ObjectProperty ;
+    rdfs:label "contains" ;
+    rdfs:comment "Generic composition property." .
+
+# =========================================================================
+# 3. Strategy & Organizational Alignment (BMM & W3C ORG Mappings)
+# =========================================================================
+
+# Strategic Goal for Battery Thermal Safety (OMG BMM Mapping)
+ev:goal-battery_safety rdf:type owl:NamedIndividual , bmm:Goal ;
+    rdfs:label "Goal: Battery Safety & Thermal Stabilization" ;
+    rdfs:comment "Enterprise safety goal targeting prevent of thermal runaway." ;
+    bmm:channelsEffortsTowards ev:inst-ev_battery_pack .
+
+# Engineering Team responsible (W3C ORG Mapping)
+ev:org-ev_battery_team rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
+    rdfs:label "EV Battery Engineering Team" ;
+    rdfs:comment "Engineering division responsible for design and validation of the battery pack." ;
+    org:hasUnit ev:inst-ev_battery_pack .
