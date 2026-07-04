@@ -1,43 +1,457 @@
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix : <http://www.semanticweb.org/ontologies/bmm#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix bmm: <http://www.omg.org/spec/BMM/> .
 
-<http://www.omg.org/spec/BMM> rdf:type owl:Ontology ;
-    rdfs:label "OMG Business Motivation Model (BMM) Core" ;
-    rdfs:comment "A lightweight local subset of BMM concepts for strategy, goals, vision, and tactics." .
+dcterms:created a owl:AnnotationProperty .
 
-bmm:Vision rdf:type owl:Class ;
-    rdfs:label "Vision" .
+dcterms:creator a owl:AnnotationProperty .
 
-bmm:Mission rdf:type owl:Class ;
-    rdfs:label "Mission" .
+dcterms:description a owl:AnnotationProperty .
 
-bmm:DesiredState rdf:type owl:Class ;
-    rdfs:label "Desired State" .
+dcterms:hasVersion a owl:AnnotationProperty .
 
-bmm:Goal rdf:type owl:Class ;
-    rdfs:label "Goal" ;
-    rdfs:subClassOf bmm:DesiredState .
+dcterms:title a owl:AnnotationProperty .
 
-bmm:Objective rdf:type owl:Class ;
-    rdfs:label "Objective" ;
-    rdfs:subClassOf bmm:DesiredState .
+<http://www.semanticweb.org/ontologies/bmm> a owl:Ontology ;
+    rdfs:label "The Business Motivation Model Ontology" ;
+    dcterms:created "2017-10-20"^^rdfs:Literal ;
+    dcterms:description "This ontology describe the main element of the Business Motivation Model (BMM), which describes a scheme or structure for developing, communicating, and managing business plans in an organized manner. Specifically, the Business Motivation Model does all of the following: Identifies factors that motivate the establishing of business plans; Identifies and defines the elements of business plans; Indicates how all these factors and elements inter-relate." ;
+    dcterms:hasVersion 1.0 ;
+    dcterms:title "The Business Motivation Model Ontology" .
 
-bmm:CourseOfAction rdf:type owl:Class ;
-    rdfs:label "Course of Action" .
+:Assumption a owl:Class ;
+    rdfs:label "Assumption"@en ;
+    dcterms:description "Internal Influencer that is taken for granted or without proof."@en ;
+    rdfs:comment "A thing that is accepted as true or as certain to happen, without proof."@en ;
+    rdfs:subClassOf :InternalInfluencer .
 
-bmm:Strategy rdf:type owl:Class ;
-    rdfs:label "Strategy" ;
-    rdfs:subClassOf bmm:CourseOfAction .
+:Competitor a owl:Class ;
+    rdfs:label "Competitor"@en ;
+    dcterms:description "External Influencer that is a rival enterprise in a struggle for advantage over the subject enterprise."@en ;
+    rdfs:comment "An organization or country that is engaged in commercial or economic competition with others."@en ;
+    rdfs:subClassOf :ExternalInfluencer .
 
-bmm:Tactic rdf:type owl:Class ;
-    rdfs:label "Tactic" ;
-    rdfs:subClassOf bmm:CourseOfAction .
+:CorporateValue a owl:Class ;
+    rdfs:label "Corporate Value"@en ;
+    dcterms:description "Internal Influencer that is an ideal, custom, or institution that an enterprise promotes or agrees with. It may be positive or negative, depending on point of view."@en ;
+    rdfs:subClassOf :InternalInfluencer .
 
-bmm:Influencer rdf:type owl:Class ;
-    rdfs:label "Influencer" .
+:Customer a owl:Class ;
+    rdfs:label "Customer"@en ;
+    dcterms:description "External Influencer that is a role played by an individual or enterprise that has investigated, ordered, received, or paid for products or services from the subject enterprise."@en ;
+    rdfs:comment "A person or organization that buys goods or services from a shop or business."@en ;
+    rdfs:subClassOf :ExternalInfluencer .
 
-bmm:BusinessPolicy rdf:type owl:Class ;
-    rdfs:label "Business Policy" .
+:Environment a owl:Class ;
+    rdfs:label "Environment"@en ;
+    dcterms:description "External Influencer that is the aggregate of surrounding conditions or Influencers affecting the existence or development of an enterprise."@en ;
+    rdfs:subClassOf :ExternalInfluencer .
+
+:Habit a owl:Class ;
+    rdfs:label "Habit"@en ;
+    dcterms:description "Internal Influencer that is a customary practice or use."@en ;
+    rdfs:comment "A settled or regular tendency or practice, especially one that is hard to give up."@en ;
+    rdfs:subClassOf :InternalInfluencer .
+
+:Infrastructure a owl:Class ;
+    rdfs:label "Infrastructure"@en ;
+    dcterms:description "Internal Influencer that is the basic physical and organizational structures and facilities needed for the operation of the enterprise."@en ;
+    rdfs:comment "The basic physical and organizational structures and facilities (e.g., buildings, roads, power supplies) needed for the operation of a society or enterprise."@en ;
+    rdfs:subClassOf :InternalInfluencer .
+
+:Issue a owl:Class ;
+    rdfs:label "Issue"@en ;
+    dcterms:description "Internal Influencer that is a point in question or a matter that is in dispute as between contending partners"@en ;
+    rdfs:comment "An important topic or problem for debate or discussion."@en ;
+    rdfs:subClassOf :InternalInfluencer .
+
+:ManagementPrerogative a owl:Class ;
+    rdfs:label "Management Prerogative"@en ;
+    dcterms:description "Internal Influencer that is a right or privilege exercised by virtue of ownership or position in an enterprise."@en ;
+    rdfs:comment "A right or privilege exclusive to a particular individual or class."@en ;
+    rdfs:subClassOf :InternalInfluencer .
+
+:Partner a owl:Class ;
+    rdfs:label "Partner"@en ;
+    dcterms:description "External Influencer that is an enterprise that shares risks and profit with the subject enterprise (or is associated with the subject enterprise to share risks and profit) because this is mutually beneficial."@en ;
+    rdfs:comment "A person who takes part in an undertaking with another or others, especially in a business or firm with shared risks and profits."@en ;
+    rdfs:subClassOf :ExternalInfluencer .
+
+:PotentialReward a owl:Class ;
+    rdfs:label "Potential Reward" ;
+    dcterms:description "A Potential Reward is a potential impact that indicates the probability of gain." ;
+    rdfs:comment "Some Potential Rewards are expressible as formulae, for example: Probability of gain, Potential gain, and Unit of measure." ;
+    rdfs:subClassOf :PotentialImpact .
+
+:Resource a owl:Class ;
+    rdfs:label "Resource"@en ;
+    dcterms:description "Internal Influencer that is the quality or availability of resources."@en ;
+    rdfs:subClassOf :InternalInfluencer .
+
+:Risk a owl:Class ;
+    rdfs:label "Risk" ;
+    dcterms:description "A Risk is a potential impact that indicates the possibility of loss, injury, disadvantage, or destruction." ;
+    rdfs:comment "Some Risks are expressible as formulae: Probability of loss, Potential loss, Unit-of-measure." ;
+    rdfs:subClassOf :PotentialImpact .
+
+:Supplier a owl:Class ;
+    rdfs:label "Supplier"@en ;
+    dcterms:description "External Influencer that is a role played by an individual or enterprise that can furnish or provide products or services to the subject enterprise."@en ;
+    rdfs:subClassOf :ExternalInfluencer .
+
+:Technology a owl:Class ;
+    rdfs:label "Technology"@en ;
+    dcterms:description "External Influencer that is caused by developments in and limitations of technology."@en ;
+    rdfs:comment "There may be prerequisites for use of technology; there may be enterprise activity that technology enables or restricts."@en ;
+    rdfs:subClassOf :ExternalInfluencer .
+
+:achieves a owl:ObjectProperty ;
+    rdfs:domain :Tactic ;
+    rdfs:range :Objective ;
+    rdfs:subPropertyOf :channelsEffortsTowards .
+
+:action a owl:DatatypeProperty ;
+    rdfs:domain :Mission ;
+    rdfs:range rdfs:Literal .
+
+:affectsAchievementOf a owl:ObjectProperty ;
+    rdfs:domain :Assessment ;
+    rdfs:range :End .
+
+:affectsEmploymentOf a owl:ObjectProperty ;
+    rdfs:domain :Assessment ;
+    rdfs:range :Means .
+
+:defines a owl:ObjectProperty ;
+    rdfs:domain :BusinessPlan ;
+    rdfs:range :Concept ;
+    owl:inverseOf :elementOf .
+
+:effectsEnforcementLevelOf a owl:ObjectProperty ;
+    rdfs:domain :Tactic ;
+    rdfs:range :BusinessRule .
+
+:governs a owl:ObjectProperty ;
+    rdfs:domain :Directive ;
+    rdfs:range :CourseOfAction .
+
+:hasEffectOn a owl:ObjectProperty ;
+    rdfs:domain :Influencer ;
+    rdfs:range :End,
+        :Means .
+
+:implements a owl:ObjectProperty ;
+    rdfs:domain :Tactic ;
+    rdfs:range :Strategy .
+
+:includes a owl:ObjectProperty ;
+    rdfs:domain :DesiredResult ;
+    rdfs:range :DesiredResult .
+
+:isDerivedFrom a owl:ObjectProperty ;
+    rdfs:domain :BusinessRule ;
+    rdfs:range :BusinessPolicy .
+
+:isFormulatedBasedOn a owl:ObjectProperty ;
+    rdfs:domain :CourseOfAction ;
+    rdfs:range :Directive .
+
+:isImpactedBy a owl:ObjectProperty ;
+    rdfs:comment "The potential impacts of influencers on an end are expressed in assessments."@en ;
+    rdfs:domain :End,
+        :Means ;
+    rdfs:range :Influencer .
+
+:isPlanedByMeansOf a owl:ObjectProperty ;
+    rdfs:domain :Mission ;
+    rdfs:range :Strategy .
+
+:manager a owl:DatatypeProperty ;
+    rdfs:domain :Directive ;
+    rdfs:range rdfs:Literal .
+
+:market a owl:DatatypeProperty ;
+    rdfs:domain :Mission ;
+    rdfs:range rdfs:Literal .
+
+:measure a owl:DatatypeProperty ;
+    rdfs:domain :Objective ;
+    rdfs:range rdfs:Literal .
+
+:organizationUnit a owl:DatatypeProperty ;
+    rdfs:domain :Assessment,
+        :End ;
+    rdfs:range rdfs:Literal .
+
+:providesImpetusFor a owl:ObjectProperty ;
+    rdfs:domain :Assessment,
+        :PotentialImpact ;
+    rdfs:range :Directive .
+
+:quantifies a owl:ObjectProperty ;
+    rdfs:domain :Objective ;
+    rdfs:range :Goal .
+
+:result a owl:DatatypeProperty ;
+    rdfs:domain :Mission ;
+    rdfs:range rdfs:Literal .
+
+:sourceOf a owl:ObjectProperty ;
+    rdfs:domain :Directive ;
+    rdfs:range :CourseOfAction .
+
+:stakeholder a owl:DatatypeProperty ;
+    rdfs:domain :DesiredResult ;
+    rdfs:range rdfs:Literal .
+
+:supports a owl:ObjectProperty ;
+    rdfs:domain :Strategy ;
+    rdfs:range :Goal ;
+    rdfs:subPropertyOf :channelsEffortsTowards .
+
+:supportsAchievementOf a owl:ObjectProperty ;
+    rdfs:domain :Directive ;
+    rdfs:range :DesiredResult .
+
+:timeTargeted a owl:DatatypeProperty ;
+    rdfs:domain :Objective ;
+    rdfs:range rdfs:Literal .
+
+:type a owl:DatatypeProperty ;
+    rdfs:domain :Influencer ;
+    rdfs:range rdfs:Literal .
+
+:uses a owl:ObjectProperty ;
+    dcterms:description "Assessments can also use other assessments."@en ;
+    rdfs:domain :Assessment ;
+    rdfs:range :Assessment .
+
+:validity a owl:DatatypeProperty ;
+    rdfs:domain :Tactic ;
+    rdfs:range rdfs:Literal .
+
+:BusinessPolicy a owl:Class ;
+    rdfs:label "Business Policy"@en ;
+    dcterms:description "A Business Policy is concerned with directly controlling, influencing, or regulating the actions of an enterprise and the people in it and that is not directly enforceable."@en ;
+    rdfs:comment "A Business Policy is a kind of Directive. The purpose of a business policy is to govern or guide the enterprise. The formulation of a business policy is under an enterprise’s control by a party authorized to manage, control, or regulate the enterprise, by selection from alternatives in response to a combination of assessments. Compared to a business rule, a business policy tends to be less structured, less discrete, less atomic, less compliant with standard business vocabulary, less formally articulated."@en ;
+    rdfs:subClassOf :Directive .
+
+:Regulation a owl:Class ;
+    rdfs:label "Regulation"@en ;
+    dcterms:description "External Influencer that is an order prescribed by an authority such as a government body or the management of an enterprise."@en ;
+    rdfs:comment "A rule or element of guidance made and maintained by an authority."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :actsAs ],
+        :ExternalInfluencer .
+
+:actsAs a owl:ObjectProperty ;
+    rdfs:domain :Directive ;
+    rdfs:range :Regulation .
+
+:amplifies a owl:FunctionalProperty,
+        owl:ObjectProperty ;
+    rdfs:domain :Goal ;
+    rdfs:range :Vision .
+
+:creationDate a owl:DatatypeProperty ;
+    rdfs:domain :Assessment,
+        :BusinessPlan,
+        :End ;
+    rdfs:range rdfs:Literal .
+
+:creator a owl:DatatypeProperty ;
+    rdfs:domain :Assessment,
+        :BusinessPlan,
+        :CourseOfAction,
+        :End ;
+    rdfs:range rdfs:Literal .
+
+:description a owl:DatatypeProperty ;
+    rdfs:domain :Concept ;
+    rdfs:range rdfs:Literal .
+
+:elementOf a owl:ObjectProperty ;
+    rdfs:domain :Concept ;
+    rdfs:range :BusinessPlan .
+
+:expressesImpactOf a owl:ObjectProperty ;
+    rdfs:comment "Each assessment expresses impact of at least one influencer on at least one end or at least one means."@en ;
+    rdfs:domain :Assessment ;
+    rdfs:range :Influencer .
+
+:identifier a owl:DatatypeProperty ;
+    rdfs:domain :Concept ;
+    rdfs:range rdfs:Literal .
+
+:identifies a owl:ObjectProperty ;
+    rdfs:domain :Assessment ;
+    rdfs:range :PotentialImpact .
+
+:isJudgmentOf a owl:ObjectProperty ;
+    rdfs:domain :Assessment ;
+    rdfs:range :Influencer .
+
+:makesOperative a owl:FunctionalProperty,
+        owl:ObjectProperty ;
+    rdfs:domain :Mission ;
+    rdfs:range :Vision .
+
+:BusinessRule a owl:Class ;
+    rdfs:label "Business Rule"@en ;
+    dcterms:description "A business rule is a directive that is practicable."@en ;
+    rdfs:comment "A Business Rule is a kind of Directive. Practicable means that a person who understands a directive could observe a relevant situation (including his or her own behavior) and recognize directly whether or not the business was complying with that directive. A rule is a claim of obligation or necessity. A business rule is highly structured, discrete, atomic, carefully expressed in terms of standard vocabulary."@en ;
+    rdfs:subClassOf :Directive .
+
+:Vision a owl:Class ;
+    rdfs:label "Vision"@en ;
+    dcterms:description "A Vision is about the future state of the enterprise, without regard to how it is to be achieved."@en ;
+    rdfs:comment "A Vision is a kind of End."@en ;
+    rdfs:subClassOf :End .
+
+:channelsEffortsTowards a owl:ObjectProperty ;
+    rdfs:domain :CourseOfAction ;
+    rdfs:range :DesiredResult .
+
+:title a owl:DatatypeProperty ;
+    rdfs:domain :BusinessPlan,
+        :Concept ;
+    rdfs:range rdfs:Literal .
+
+:Goal a owl:Class,
+        owl:FunctionalProperty ;
+    rdfs:label "Goal"@en ;
+    dcterms:description "A Goal is a state or condition of the enterprise to be brought about or sustained through appropriate means."@en ;
+    rdfs:comment "A Goal is a kind of Desired Result. Compared to an objective, a goal tends to be: ongoing; qualitative (rather than quantitative); general (rather than specific); longer term."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :amplifies ],
+        :DesiredResult .
+
+:Strategy a owl:Class ;
+    rdfs:label "Strategy"@en ;
+    dcterms:description "A Strategy is an element of a plan devised through the science and art of business leadership exercised to ensure the most advantageous conditions."@en ;
+    rdfs:comment "A Strategy is a type of Course of Action. Compared to a tactic, a strategy tends to be longer term and broader in scope."@en ;
+    rdfs:subClassOf :CourseOfAction .
+
+:Objective a owl:Class ;
+    rdfs:label "Objective"@en ;
+    dcterms:description "An objective is a specific time-targeted, measurable, attainable target that an enterprise seeks to meet in order to achieve its goals."@en ;
+    rdfs:comment "An Objective is a kind of Desired Result. Compared to a goal, an objective is: short-term; not continuing beyond its time frame (although such time frames can be cyclical - monthly, quarterly, etc.)."@en ;
+    rdfs:subClassOf :DesiredResult .
+
+:PotentialImpact a owl:Class ;
+    rdfs:label "Potential Impact" ;
+    dcterms:description "Evaluation that quantifies or qualifies an assessment in specific terms, types, or dimensions." ;
+    rdfs:comment "Categories of potential impact include: potential reward and risk." ;
+    rdfs:subClassOf :Concept .
+
+:Tactic a owl:Class ;
+    rdfs:label "Tactic"@en ;
+    dcterms:description "A Tactic is a device or expedient to be employed as part of a strategy."@en ;
+    rdfs:comment "Compared to a strategy, a tactic tends to be shorter term and narrower in scope."@en ;
+    rdfs:subClassOf :CourseOfAction .
+
+:BusinessPlan a owl:Class ;
+    rdfs:label "Business Plan" ;
+    dcterms:description "A business plan is a formal statement of business goals, reasons they are attainable, and plans for reaching them. It may also contain background information about the organization or team attempting to reach those goals (source: Wikipedia)." ;
+    rdfs:comment "The Business Motivation Model contains a set of built-in concepts that define the elements of business plans."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :creator ],
+        [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :title ],
+        [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :creationDate ] .
+
+:Mission a owl:Class,
+        owl:FunctionalProperty ;
+    rdfs:label "Mission"@en ;
+    dcterms:description "A mission is the ongoing operational activity of an enterprise."@en ;
+    rdfs:comment "Mission is a kind of Means"@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :makesOperative ],
+        :Means .
+
+:Means a owl:Class ;
+    rdfs:label "Means"@en ;
+    dcterms:description "A Means is a device, capability, regime, technique, restriction, agency, instrument, or method that may be called upon, activated, or enforced to achieve ends."@en ;
+    rdfs:comment "A Means is a main Concept. Categories of Means include: Course of Action, Directive and Mission."@en ;
+    rdfs:subClassOf :Concept .
+
+:CourseOfAction a owl:Class ;
+    rdfs:label "Course of Action"@en ;
+    dcterms:description "A course of action is an approach or plan for configuring some aspect of the enterprise involving things, processes, locations, people, timing, or motivation undertaken to achieve ends."@en ;
+    rdfs:comment "A Course of Action is a kind of Means. Categories of Course of Action include Strategy and Tactic."@en ;
+    rdfs:subClassOf :Means .
+
+:DesiredResult a owl:Class ;
+    rdfs:label "Desired Result"@en ;
+    dcterms:description "Desired Results state or target that the enterprise intends to maintain or sustain."@en ;
+    rdfs:comment "A Desired Result is a kind of End. Categories of Desired Result are Goal and Objective."@en ;
+    rdfs:subClassOf :End .
+
+:ExternalInfluencer a owl:Class ;
+    rdfs:label "External Influencer"@en ;
+    dcterms:description "Influencer outside an enterprise’s organizational boundaries that can impact its employment of means or achievement of ends"@en ;
+    rdfs:comment "Categories of external influencer include: technology, supplier, regulation, partner, environment, customer and competitor."@en ;
+    rdfs:subClassOf :Influencer .
+
+:Influencer a owl:Class ;
+    rdfs:label "Influencer" ;
+    dcterms:description "An Influencer is something that has the capability of producing an effect without apparent exertion of tangible force or direct exercise of command, and often without deliberate effort or intent."@en ;
+    rdfs:comment "Categories of influencer include: external influencer and internal influencer."@en ;
+    rdfs:subClassOf :Concept .
+
+:InternalInfluencer a owl:Class ;
+    rdfs:label "Internal Influencer"@en ;
+    dcterms:description "Influencer from within an enterprise that can impact its employment of means or achievement of ends."@en ;
+    rdfs:comment "Categories of internal influencer might include: assumption, corporate value, habit, infrastructure, issue, management prerogative and resource."@en ;
+    rdfs:subClassOf :Influencer .
+
+:End a owl:Class ;
+    rdfs:label "End"@en ;
+    dcterms:description "An End is something that is to be accomplished."@en ;
+    rdfs:comment "An End is a main Concept. Categories of End include Vision and Desired Result."@en ;
+    rdfs:subClassOf :Concept .
+
+:Directive a owl:Class ;
+    rdfs:label "Directive"@en ;
+    dcterms:description "A Directive defines or constrains some aspect of an enterprise."@en ;
+    rdfs:comment "A Directive is a kind of Means. Categories of directive include business policy and business rule. A directive is intended to assert business structure or to control or influence the behavior of the enterprise."@en ;
+    rdfs:subClassOf :Means .
+
+:Concept a owl:Class ;
+    rdfs:label "Concept"@en ;
+    dcterms:description "The Concepts define the elements of a business plan."@en ;
+    rdfs:comment "The main concepts of the business plans are its Ends and Means. Each concept has only two basic attributes: identifier and text description."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :identifier ],
+        [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :description ],
+        [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :title ] .
+
+:Assessment a owl:Class ;
+    rdfs:label "Assessment"@en ;
+    dcterms:description "An Assessment is a judgment that an influencer affects the employment of means and/or the achievement of ends."@en ;
+    rdfs:comment "Categories of Assessment include: Opportunity, Strength, Threat and Weakness. An assessment expresses a logical connection between influencers and the ends or means of the business plans."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :identifies ],
+        [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :isJudgmentOf ],
+        [ a owl:Restriction ;
+            owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty :expressesImpactOf ],
+        :Concept .
+
