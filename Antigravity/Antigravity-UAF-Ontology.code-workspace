@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "../../UAFv2-Samples"
+		},
+		{
+			"path": "../../MBSE-AI-Lab"
 		}
 	]
 }

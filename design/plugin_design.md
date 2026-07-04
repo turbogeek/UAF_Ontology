@@ -196,4 +196,93 @@ public class SemanticValidationTestHarness extends MagicDrawTestCase {
 
 This test harness is fully integrated into the plugin's Continuous Integration (CI) configuration, enabling human architects and LLM coding assistants to query validation health and run automatic lint checks via a simple command line interface.
 
+---
+
+## 7. Enterprise Development Standards & Core Architecture Principles
+
+To maintain high maintainability, code quality, and robustness inside CATIA Magic, the plugin must adhere to the following software engineering standards:
+
+### 7.1. CATIA Magic / Cameo OpenAPI Best Practices
+*   **Transaction Safety via Sessions:** Any write operation modifying model elements, stereotypes, or properties must be wrapped in an explicit Cameo session. Transactions must follow this exact safe wrapper structure:
+    ```java
+    SessionManager.getInstance().createSession(project, "Map Semantic Concept");
+    try {
+        // Perform model modifications
+        SessionManager.getInstance().closeSession(project);
+    } catch (Exception e) {
+        SessionManager.getInstance().cancelSession(project);
+        Log.error("Failed to apply semantic mapping to model element", e);
+    }
+    ```
+*   **Headless vs. Headful Duality:** The core extraction, parsing, and validation logic must be fully independent of the GUI. It must check `Application.getInstance().isHeadless()` and avoid launching any JavaFX or Swing frames if running in a command line CI/CD test environment.
+
+### 7.2. UI/UX Thread Safety and Bridging
+*   **JavaFX and Swing Thread Separation:** Cameo runs on the Swing Event Dispatch Thread (EDT), while the plugin sidebar utilizes JavaFX. 
+    *   Any UI-modifying code for Swing components must be delegated using `javax.swing.SwingUtilities.invokeLater()`.
+    *   Any UI-modifying code for JavaFX components (e.g. updating the SBVR view or search results) must be delegated using `javafx.application.Platform.runLater()`.
+*   **Non-Blocking UI (Asynchronous Auditing):** Long-running reasoner audits or remote BioPortal API searches must run on separate background worker threads (using Java `SwingWorker` or JavaFX `Task`), displaying a progress spinner to ensure Cameo’s GUI remains fully responsive.
+
+### 7.3. Core Clean Code Principles
+*   **KISS (Keep It Simple, Stupid):** Do not build custom UI frameworks or heavy state stores. Leverage standard native Cameo frames, simple properties files, and basic JSON payloads.
+*   **SOLID Principles:**
+    *   *Single Responsibility (SRP):* Separate the RDF traversal engine (`SemanticRDFExporter`) from the reasoner execution engine (`HermitValidationEngine`).
+    *   *Open-Closed (OCP):* Enable loading new domain ontologies dynamically by registering URI namespaces in config files without recompiling the parser classes.
+    *   *Interface Segregation (ISP):* Define specialized small interfaces for exporter variants (e.g. `UMLModelExporter` vs. `KerMLModelExporter`).
+*   **Separation of Concerns (SoC):** Model extraction (EMF), semantic alignment logic, and remote API networking must reside in distinct Java packages.
+*   **Comment the "Why":** Comments must not restate what the code is doing. Instead, code comments must explain the engineering rationale, design decisions, dependency constraints, or specific UAF Grid/Requirements alignment:
+    ```java
+    // Under high ambient temperatures in hot showers/tubs (up to 40C), Peltier
+    // efficiency drops. We enforce this holding range constraint to satisfy IC-REQ-001.
+    if (ambientTemperature > 40.0) {
+        triggerThermalAlarmBoundary();
+    }
+    ```
+
+---
+
+## 8. Security, Portability & Error Hardening
+
+### 8.1. Platform Independence & Portability
+*   **No Hard-coded Paths:** The code must not contain hard-coded drive letters, absolute directories, or OS-specific separators. Paths must be resolved dynamically relative to Cameo's installation folder:
+    ```java
+    // CORRECT: Resolving paths portably using Paths API and System Properties
+    Path configPath = Paths.get(System.getProperty("user.home"), ".gemini", "config", "plugin.properties");
+    ```
+*   **Path Separator Independence:** Use `File.separator` or Java's `Paths` library rather than hard-coded `/` or `\\`.
+
+### 8.2. Secrets and Credentials Security
+*   **No Hard-coded Secrets:** Absolutely no passwords, API tokens (such as BioPortal keys), or triplestore endpoints may be written in the code.
+*   **Configuration Injection:** Fetch credentials dynamically from a system environment variable (`System.getenv("BIOPORTAL_API_KEY")`) or an encrypted local properties file excluded from git source control.
+
+### 8.3. Strict Input Sanitization
+*   **RDF/Turtle Injection Protection:** Sanitize element names, labels, and property values before writing them out as triples. Strip out characters that could break RDF/XML formats or cause Turtle syntax errors (e.g., quotes, unescaped backslashes, XML special characters `<>&`).
+
+### 8.4. Robust Exception Handling & Graceful Degradation
+*   **Strict Error Boundaries:** Wrap all external network calls and reasoner invocations in global try-catch blocks to prevent Cameo desktop crashes.
+*   **MD Logger Integration:** Catch and log all errors using Cameo's official logging facility:
+    ```java
+    import com.nomagic.utils.Log;
+    ...
+    Log.error("Reasoner execution encountered an exception during consistency check", e);
+    ```
+*   **Graceful Degradation:** If the remote BioPortal registry is offline, the plugin must gracefully degrade to use cached local OWL files, informing the user via an overlay warning instead of throwing unhandled exceptions.
+
+---
+
+## 9. Quality Assurance & Code Review Protocols
+
+Before merging any change, the reviewer must check the code against the following rigorous pre-merge checklist:
+
+### Pre-Merge Code Review Checklist
+
+- [ ] **Transaction Safety:** Are all model modification operations wrapped inside a `SessionManager` try-catch-cancel block?
+- [ ] **Thread Delegation:** Are JavaFX elements updated on the JavaFX thread (`Platform.runLater`) and Swing elements updated on the EDT (`SwingUtilities.invokeLater`)?
+- [ ] **Platform Independence:** Are there any hard-coded absolute paths, drive letters, or system-specific separators?
+- [ ] **Secrets Extraction:** Are there any hard-coded passwords, tokens, or local server endpoints in the source code?
+- [ ] **Input Sanitization:** Are all names and values parsed from EMF sanitized before being exported to the Turtle/RDF graph?
+- [ ] **Logging & Error Boundaries:** Do all external API calls have try-catch blocks that log errors to MagicDraw's `Log` class?
+- [ ] **Requirements Tracing:** Are all newly added modules mapped to at least one testable requirement (e.g. `PLG-REQ-X`) via JavaDoc annotation?
+- [ ] **TDD Validation:** Has a corresponding JUnit test case been written, executed, and passed under the headless test harness?
+
+
 
