@@ -1,0 +1,56 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix uafsml: <http://purl.org/uaf/uafsml#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix sr: <http://purl.org/uaf/example/sounding_rocket#> .
+@prefix ic: <http://purl.org/uaf/example/insulin_cooler#> .
+@prefix gov: <http://purl.org/uaf/governance/shapes#> .
+
+<http://purl.org/uaf/governance/shapes> rdf:type owl:Ontology ;
+    rdfs:label "UAF Enterprise Architecture Traceability & Governance Shapes" ;
+    rdfs:comment "SHACL shapes validating UAF Grid alignment, requirement satisfiability, capability refinement, and standard compliance." .
+
+# =========================================================================
+# 1. Shape: Enforce Requirement Satisfiability
+# =========================================================================
+gov:RequirementSatisfiabilityShape rdf:type sh:NodeShape ;
+    sh:targetClass uafsml:Requirement ;
+    
+    # Verify the requirement is targeted by a satisfies property
+    sh:property [
+        sh:path [ sh:alternativePath ( [ sh:inversePath sr:satisfies ] [ sh:inversePath ic:satisfies ] ) ] ;
+        sh:minCount 1 ;
+        sh:message "Governance Error: Every system requirement must be satisfied by at least one physical component / resource usage." ;
+    ] .
+
+# =========================================================================
+# 2. Shape: Enforce Capability Refinement
+# =========================================================================
+gov:CapabilityRefinementShape rdf:type sh:NodeShape ;
+    sh:targetClass uafsml:Usage ;
+    
+    # Target capabilities specifically based on local subclass profiles
+    sh:targetSubjectsOf sr:refines , ic:refines ;
+    
+    # Enforce that the capability is referenced by at least one refining requirement
+    sh:property [
+        sh:path [ sh:alternativePath ( [ sh:inversePath sr:refines ] [ sh:inversePath ic:refines ] ) ] ;
+        sh:minCount 1 ;
+        sh:message "Governance Error: Strategic capabilities must be refined by at least one formal system requirement." ;
+    ] .
+
+# =========================================================================
+# 3. Shape: Enforce Quality Standards Compliance
+# =========================================================================
+gov:StandardsComplianceShape rdf:type sh:NodeShape ;
+    sh:targetClass org:OrganizationalUnit ;
+    
+    # Target organizational units involved in quality or compliance
+    sh:property [
+        sh:path [ sh:alternativePath ( sr:conformsTo ic:conformsTo ) ] ;
+        sh:minCount 1 ;
+        sh:message "Governance Error: Compliance/Manufacturing organizational units must have a defined standards conformance mapping (e.g. ISO 9001, FDA 21 CFR)." ;
+    ] .

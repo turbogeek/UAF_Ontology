@@ -15,7 +15,84 @@
     rdfs:comment "A complete UAFSML model instance representing an on-body active refrigeration cooler attachment for insulin pumps, with associated app and medical governance." .
 
 # =========================================================================
-# 1. Medical Device Classification (MDO Ontology Stubs)
+# 1. Strategic Viewpoint (UAF Strategic Domain / St)
+# =========================================================================
+
+# Strategic Capability (St-Tx)
+ic:ActiveInsulinPreservationCapability rdf:type owl:Class ;
+    rdfs:label "Active Insulin Preservation Capability" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "The strategic capability to actively maintain insulin within clinical thermal boundaries under high ambient temperatures (e.g. hot tubs, showers, hot weather)." .
+
+# Measure of Effectiveness / Strategic Constraint (St-Ct)
+ic:TemperatureHoldDurationMoE rdf:type owl:Class ;
+    rdfs:label "Temperature Hold Duration MoE" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "Constraint defining the target holding duration of at least 12 hours active cooling." .
+
+# =========================================================================
+# 2. Operational Viewpoint (UAF Operational Domain / Op)
+# =========================================================================
+
+# Operational Performers (Op-Tx)
+ic:PatientRole rdf:type owl:Class ;
+    rdfs:label "Diabetic Patient" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "The primary patient user wearing the pump and cooler." .
+
+ic:CaretakerRole rdf:type owl:Class ;
+    rdfs:label "Caretaker / Parent" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "Remote monitor role responsible for viewing patient alerts." .
+
+# Operational Activity (Op-Pr)
+ic:MonitorSystemHealth rdf:type owl:Class ;
+    rdfs:label "Monitor System Health" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "Operational activity representing the active tracking of battery charge and temperature thresholds." .
+
+# =========================================================================
+# 3. Resources Viewpoint (UAF Resources Domain / Rs)
+# =========================================================================
+
+# Resource Taxonomy (Rs-Tx)
+ic:PeltierCoolerHardware rdf:type owl:Class ;
+    rdfs:label "Peltier Thermoelectric Module" ;
+    rdfs:subClassOf sumo:Device ;
+    rdfs:comment "Active solid-state refrigeration hardware utilizing the Peltier effect." .
+
+# =========================================================================
+# 4. Standards Viewpoint (UAF Standards Domain / Sd)
+# =========================================================================
+
+# Standard Definition (Sd-Tx)
+ic:FDA-21CFR-MedicalDeviceStandard rdf:type owl:Class ;
+    rdfs:label "FDA 21 CFR Part 820 Standard" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "US Federal code of regulations governing medical device quality system regulations (QSR) for Class II devices." .
+
+# =========================================================================
+# 5. Requirements Viewpoint (UAF Requirements / Req)
+# =========================================================================
+
+ic:req-temp_control rdf:type owl:NamedIndividual , uafsml:Requirement ;
+    rdfs:label "Requirement: Temperature Boundary Control" ;
+    rdfs:comment "The refrigeration sleeve must maintain the insulin reservoir temperature between 2-8°C under external ambient heat exposure up to 40°C." ;
+    uafsml:id "IC-REQ-001" ;
+    ic:refines ic:ActiveInsulinPreservationCapability .
+
+ic:req-battery_life rdf:type owl:NamedIndividual , uafsml:Requirement ;
+    rdfs:label "Requirement: Active Battery Life" ;
+    rdfs:comment "The exchangeable battery pack must support continuous active cooling operation for at least 12 hours on a single charge." ;
+    uafsml:id "IC-REQ-002" .
+
+ic:req-attachment_integrity rdf:type owl:NamedIndividual , uafsml:Requirement ;
+    rdfs:label "Requirement: Waterproof Attachment Integrity" ;
+    rdfs:comment "The mechanical latch and casing must maintain a secure waterproof attachment (IPX8) during hot tub or hot shower immersion." ;
+    uafsml:id "IC-REQ-003" .
+
+# =========================================================================
+# 6. Medical Device Classification (MDO Ontology Stubs)
 # =========================================================================
 
 ic:MedicalDevice rdf:type owl:Class ;
@@ -29,21 +106,24 @@ ic:ClassIIMedicalDevice rdf:type owl:Class ;
     rdfs:comment "Devices requiring special controls to ensure safety and effectiveness (e.g., insulin pump attachments)." .
 
 # =========================================================================
-# 2. Insulin Cooler Hardware Architecture (SysML v2 Usages / Containment)
+# 7. Insulin Cooler Hardware Architecture & Actual Instances (UAF Actual / Ac)
 # =========================================================================
 
-# The main cooler attachment
+# The main cooler attachment (Ac-Sr)
 ic:inst-insulin_cooler rdf:type owl:NamedIndividual , uafsml:Usage ;
     rdfs:label "Insulin Pump Cooler Attachment" ;
     rdfs:comment "On-body active refrigeration sleeve designed to securely house the OmniPod pod." ;
     rdf:type ic:ClassIIMedicalDevice ;
-    uafsml:canonical "InsulinCoolerModel::InsulinPumpCooler" .
+    uafsml:canonical "InsulinCoolerModel::InsulinPumpCooler" ;
+    ic:satisfies ic:req-temp_control ;
+    ic:satisfies ic:req-battery_life ;
+    ic:satisfies ic:req-attachment_integrity .
 
 # Solid-State Refrigerator (Peltier module)
 ic:inst-solid_state_refrigerator rdf:type owl:NamedIndividual , uafsml:Usage ;
     rdfs:label "Solid-State Peltier Cooler" ;
     rdfs:comment "Integrated thermoelectric cooling module." ;
-    rdf:type sumo:Device ;
+    rdf:type sumo:Device , ic:PeltierCoolerHardware ;
     uafsml:canonical "InsulinCoolerModel::InsulinPumpCooler::PeltierCooler" .
 
 # Exchangeable Battery Pack (Qi-Wireless Charging)
@@ -69,7 +149,7 @@ ic:contains rdf:type owl:ObjectProperty ;
     rdfs:label "contains" .
 
 # =========================================================================
-# 3. Companion Phone Application Architecture (UAFSML Software)
+# 8. Companion Phone Application Architecture (UAFSML Software)
 # =========================================================================
 
 # The mobile app
@@ -97,7 +177,7 @@ ic:inst-user_login_gateway rdf:type owl:NamedIndividual , uafsml:Usage ;
 ic:inst-family_monitor_module rdf:type owl:NamedIndividual , uafsml:Usage ;
     rdfs:label "Family Monitoring Sync" ;
     rdfs:comment "Cloud synchronization module allowing caretakers to track battery and temp levels remotely." ;
-    rdf:type sumo:Device ;
+    rdf:type sumo:Device , ic:CaretakerRole ;
     uafsml:canonical "InsulinCoolerModel::PhoneApp::FamilyMonitor" .
 
 # App containment
@@ -112,7 +192,7 @@ ic:connectedTo rdf:type owl:ObjectProperty ;
     rdfs:label "connected to" .
 
 # =========================================================================
-# 4. Medical Governance & Regulatory Compliance (W3C ORG)
+# 9. Medical Governance & Regulatory Compliance (W3C ORG)
 # =========================================================================
 
 ic:org-fda_governance_board rdf:type owl:NamedIndividual , org:Organization ;
@@ -125,10 +205,11 @@ ic:org-insurance_review_panel rdf:type owl:NamedIndividual , org:Organization ;
 
 ic:org-manufacturer_qa_compliance rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
     rdfs:label "Manufacturer QA Compliance Team" ;
-    rdfs:comment "In-house engineering team managing compliance audits and validation logs." .
+    rdfs:comment "In-house engineering team managing compliance audits and validation logs." ;
+    ic:conformsTo ic:FDA-21CFR-MedicalDeviceStandard .
 
 # =========================================================================
-# 5. Business Goals, Insurance Eligibility & Green Standards (OMG BMM)
+# 10. Business Goals, Insurance Eligibility & Green Standards (OMG BMM)
 # =========================================================================
 
 # Primary goal: Prevent insulin spoilage (reduces waste in hot tubs / showers / hot weather)
@@ -154,3 +235,19 @@ ic:policy-environmental_recyclability rdf:type owl:NamedIndividual , bmm:Busines
     rdfs:label "Policy: Green Manufacturing & Recyclability" ;
     rdfs:comment "Utilize recyclable thermoplastic compounds and modular, extractable electronics to meet EPA standards." ;
     bmm:governs ic:org-manufacturer_qa_compliance .
+
+# =========================================================================
+# 11. Traceability Properties
+# =========================================================================
+
+ic:satisfies rdf:type owl:ObjectProperty ;
+    rdfs:label "satisfies" .
+
+ic:refines rdf:type owl:ObjectProperty ;
+    rdfs:label "refines" .
+
+ic:conformsTo rdf:type owl:ObjectProperty ;
+    rdfs:label "conforms to" .
+
+bmm:governs rdf:type owl:ObjectProperty ;
+    rdfs:label "governs" .

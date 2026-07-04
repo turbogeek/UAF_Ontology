@@ -14,7 +14,74 @@
     rdfs:comment "A complete UAFSML model instance representing a 3-stage sounding rocket with payload variants and support enterprise structures." .
 
 # =========================================================================
-# 1. Payload Definition Classes
+# 1. Strategic Viewpoint (UAF Strategic Domain / St)
+# =========================================================================
+
+# Strategic Capability (St-Tx)
+sr:HighAltitudeResearchCapability rdf:type owl:Class ;
+    rdfs:label "High Altitude Atmospheric Research Capability" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "The strategic capability to perform measurements and scientific sampling in the mesosphere and lower thermosphere (80-150km)." .
+
+# Measure of Effectiveness / Strategic Constraint (St-Ct)
+sr:ApogeeTargetMoE rdf:type owl:Class ;
+    rdfs:label "Target Apogee MoE" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "Constraint defining the target apogee threshold of at least 150km." .
+
+# =========================================================================
+# 2. Operational Viewpoint (UAF Operational Domain / Op)
+# =========================================================================
+
+# Operational Performer (Op-Tx)
+sr:TelemetryReceiverRole rdf:type owl:Class ;
+    rdfs:label "Telemetry Ground Operator" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "Logical operational role responsible for monitoring ground telemetry signals." .
+
+# Operational Activity (Op-Pr)
+sr:ProcessTelemetryData rdf:type owl:Class ;
+    rdfs:label "Process Ascent Telemetry" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "Operational activity representing the real-time decoding, logging, and plotting of downlinked data." .
+
+# =========================================================================
+# 3. Resources Viewpoint (UAF Resources Domain / Rs)
+# =========================================================================
+
+# Resource Taxonomy (Rs-Tx)
+sr:SolidRocketMotor rdf:type owl:Class ;
+    rdfs:label "Solid Rocket Motor Class" ;
+    rdfs:subClassOf sumo:Device ;
+    rdfs:comment "High-thrust ammonium perchlorate composite propellant booster class." .
+
+# =========================================================================
+# 4. Standards Viewpoint (UAF Standards Domain / Sd)
+# =========================================================================
+
+# Standard Definition (Sd-Tx)
+sr:ISO-9001-ManufacturingStandard rdf:type owl:Class ;
+    rdfs:label "ISO 9001 Quality Standard" ;
+    rdfs:subClassOf uafsml:Usage ;
+    rdfs:comment "International standard for quality management systems governing booster manufacturing processes." .
+
+# =========================================================================
+# 5. Requirements Viewpoint (UAF Requirements / Req)
+# =========================================================================
+
+sr:req-payload_mass rdf:type owl:NamedIndividual , uafsml:Requirement ;
+    rdfs:label "Requirement: Minimum Payload Capacity" ;
+    rdfs:comment "The sounding rocket propulsion system must be capable of lifting a payload mass of at least 15kg to apogee." ;
+    uafsml:id "SR-REQ-001" .
+
+sr:req-apogee rdf:type owl:NamedIndividual , uafsml:Requirement ;
+    rdfs:label "Requirement: Target Apogee Altitude" ;
+    rdfs:comment "The vehicle must achieve a minimum apogee altitude of 150km under nominal weather conditions." ;
+    uafsml:id "SR-REQ-002" ;
+    sr:refines sr:HighAltitudeResearchCapability .
+
+# =========================================================================
+# 6. Payload Definition Classes
 # =========================================================================
 
 sr:WeatherPayload rdf:type owl:Class ;
@@ -33,21 +100,23 @@ sr:AtmosphericChemicalAnalyzer rdf:type owl:Class ;
     rdfs:comment "Spectrometer payload for analyzing ozone concentration and trace gases in the upper atmosphere." .
 
 # =========================================================================
-# 2. Sounding Rocket Physical Architecture (SysML v2 Usages / Containment)
+# 7. Sounding Rocket Physical Architecture & Actual Instances (UAF Actual / Ac)
 # =========================================================================
 
-# The main rocket system
+# The main rocket system (Ac-Sr)
 sr:inst-sounding_rocket rdf:type owl:NamedIndividual , uafsml:Usage ;
     rdfs:label "Sounding Rocket System" ;
     rdfs:comment "Three-stage modular research rocket." ;
     rdf:type sumo:Vehicle ;
-    uafsml:canonical "SoundingRocketModel::SoundingRocket" .
+    uafsml:canonical "SoundingRocketModel::SoundingRocket" ;
+    sr:satisfies sr:req-apogee ;
+    sr:satisfies sr:req-payload_mass .
 
 # Stage 1 Booster (Solid Fuel Propulsion)
 sr:inst-stage_1_booster rdf:type owl:NamedIndividual , uafsml:Usage ;
     rdfs:label "Stage 1 Solid Booster" ;
     rdfs:comment "First-stage high-thrust solid rocket booster for initial lift-off." ;
-    rdf:type sumo:Device ;
+    rdf:type sumo:Device , sr:SolidRocketMotor ;
     uafsml:canonical "SoundingRocketModel::SoundingRocket::Stage1Booster" .
 
 # Stage 2 Mid-Stage (Liquid Fuel Propulsion)
@@ -96,13 +165,13 @@ sr:contains rdf:type owl:ObjectProperty ;
     rdfs:label "contains" .
 
 # =========================================================================
-# 3. Ground & Communications Systems Mappings
+# 8. Ground & Communications Systems Mappings
 # =========================================================================
 
 sr:inst-ground_telemetry_station rdf:type owl:NamedIndividual , uafsml:Usage ;
     rdfs:label "Ground Telemetry Control Station" ;
     rdfs:comment "Base operations ground station for data collection and tracking." ;
-    rdf:type sumo:Device ;
+    rdf:type sumo:Device , sr:TelemetryReceiverRole ;
     uafsml:canonical "SoundingRocketModel::GroundStation" .
 
 sr:inst-rocket_telemetry_transmitter rdf:type owl:NamedIndividual , uafsml:Usage ;
@@ -118,7 +187,7 @@ sr:connectedTo rdf:type owl:ObjectProperty ;
     rdfs:label "connected to" .
 
 # =========================================================================
-# 4. Enterprise Architecture & Personnel Hierarchy (W3C ORG)
+# 9. Enterprise Architecture & Personnel Hierarchy (W3C ORG)
 # =========================================================================
 
 sr:org-rocket_enterprise rdf:type owl:NamedIndividual , org:Organization ;
@@ -131,7 +200,8 @@ sr:org-design_division rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
 
 sr:org-manufacturing_division rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
     rdfs:label "Propulsion Manufacturing Team" ;
-    org:subOrganizationOf sr:org-rocket_enterprise .
+    org:subOrganizationOf sr:org-rocket_enterprise ;
+    sr:conformsTo sr:ISO-9001-ManufacturingStandard .
 
 sr:org-quality_assurance_division rdf:type owl:NamedIndividual , org:OrganizationalUnit ;
     rdfs:label "Quality Assurance Department" ;
@@ -155,7 +225,7 @@ sr:post-qa_manager rdf:type owl:NamedIndividual , org:Post ;
     org:postIn sr:org-quality_assurance_division .
 
 # =========================================================================
-# 5. Strategic Mission Goals (OMG BMM)
+# 10. Strategic Mission Goals (OMG BMM)
 # =========================================================================
 
 sr:goal-orbit_insertion rdf:type owl:NamedIndividual , bmm:Goal ;
@@ -167,6 +237,19 @@ sr:policy-iso9001_compliance rdf:type owl:NamedIndividual , bmm:BusinessPolicy ;
     rdfs:label "Quality Standard: ISO 9001:2015" ;
     rdfs:comment "Standard quality management guidelines governing booster manufacturing." ;
     bmm:governs sr:org-quality_assurance_division .
+
+# =========================================================================
+# 11. Traceability Properties
+# =========================================================================
+
+sr:satisfies rdf:type owl:ObjectProperty ;
+    rdfs:label "satisfies" .
+
+sr:refines rdf:type owl:ObjectProperty ;
+    rdfs:label "refines" .
+
+sr:conformsTo rdf:type owl:ObjectProperty ;
+    rdfs:label "conforms to" .
 
 bmm:governs rdf:type owl:ObjectProperty ;
     rdfs:label "governs" .
