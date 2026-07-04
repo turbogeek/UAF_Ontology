@@ -284,5 +284,93 @@ Before merging any change, the reviewer must check the code against the followin
 - [ ] **Requirements Tracing:** Are all newly added modules mapped to at least one testable requirement (e.g. `PLG-REQ-X`) via JavaDoc annotation?
 - [ ] **TDD Validation:** Has a corresponding JUnit test case been written, executed, and passed under the headless test harness?
 
+---
+
+## 10. SBVR Translation Test Cases & Transaction Validation
+
+### 10.1. SBVR Mapping Test Cases
+The plugin’s SBVR generation engine must pass a suite of test assertions mapping UML/SysML structures to exact Structured English strings:
+
+```java
+@Test
+public void testSBVRGenerationAssertions() {
+    SBVREngine engine = new SBVREngine();
+
+    // Test Case 1: Simple Instantiation Mapping
+    String sbvr1 = engine.generateSBVR("http://purl.org/uaf/example/ev_power#inst-ev_battery_pack", "battinfo:BatteryPack", null, null);
+    assertEquals("Instance: HighVoltageBatteryPack is a BatteryPack.", stripHtml(sbvr1));
+
+    // Test Case 2: Composition Linkage
+    String sbvr2 = engine.generateSBVR("http://purl.org/uaf/example/ev_power#inst-ev_battery_pack", "battinfo:BatteryPack", "contains", "BatteryModule1");
+    assertTrue(stripHtml(sbvr2).contains("Instance: HighVoltageBatteryPack contains BatteryModule1."));
+
+    // Test Case 3: UML Owned Post Mapping
+    String sbvr3 = engine.generateSBVR("sr:post-lead_aerospace_architect", "org:Post", "owned by", "sr:org-design_division");
+    assertTrue(stripHtml(sbvr3).contains("Instance: Lead Systems Architect is a Post owned by Design Division."));
+}
+```
+
+### 10.2. Undo/Redo Transaction Verification
+To ensure seamless integration with Cameo’s desktop command framework, the plugin must respect user commands and editing sessions:
+*   **Command Stack Integration:** All changes made by the plugin to stereotype tags or property values must be committed using MagicDraw's `com.nomagic.magicdraw.commands.Command` framework. This places the semantic mapping operation directly on Cameo’s Undo/Redo stack.
+*   **Transaction Rollback Consistency:** If a transaction fails or is aborted via `SessionManager.getInstance().cancelSession(project)`, the model must be rolled back completely. No partial property updates may be registered in the undo/redo history, avoiding state corruption in the modeling canvas.
+
+---
+
+## 11. Static Code Analysis & Java 12 Language Best Practices
+
+### 11.1. Static Code Analysis (Java Linting)
+Every build must execute static analysis to enforce style, safety, and performance constraints:
+*   **Checkstyle:** Google Style Check rules modified to allow MagicDraw naming patterns (e.g. `com.nomagic` package structures).
+*   **PMD:** Enforces clean syntax, banning unused variables, duplicate literals, and empty catch blocks.
+*   **SpotBugs:** Searches for potential bugs, null pointer exceptions, and concurrent thread access conflicts.
+*   **JUnit Coverage:** Code coverage for core parsing and semantic mappings must achieve a minimum threshold of **95%**.
+
+### 11.2. Java 12 Best Practices
+The plugin codebase uses Java 12 features to maintain clean, performant, and modern structures:
+*   **Switch Expressions:** Used in the EMF-to-RDF parser to return mappings cleanly without risk of fall-through errors:
+    ```java
+    String ontologyNamespace = switch (elementStereotype) {
+        case "ActualOrganization", "ActualPost" -> "http://www.w3.org/ns/org#";
+        case "Goal", "BusinessPolicy"          -> "http://www.omg.org/spec/BMM/";
+        case "Vehicle", "Device"                -> "http://www.ontologyportal.org/SUMO.owl#";
+        default                                 -> "http://purl.org/uaf/ontology#";
+    };
+    ```
+*   **Compact Number Formatting:** Used in telemetry and requirement description panels to render large values (e.g. formatting target apogee meters to `150 km` or battery capacity to `80 kWh` for user display) using `NumberFormat.getCompactNumberInstance()`.
+*   **Teeing Collectors:** Used to count extracted model elements and validation issues simultaneously in a single stream pass:
+    ```java
+    AuditSummary summary = modelElementsStream.collect(
+        Collectors.teeing(
+            Collectors.counting(),
+            Collectors.filtering(el -> el.hasValidationIssues(), Collectors.toList()),
+            (count, issuesList) -> new AuditSummary(count, issuesList)
+        )
+    );
+    ```
+
+---
+
+## 12. User Interface, Stereotype Tagging, and Integrated Help Systems
+
+### 12.1. Plugin Project Activation Workflow
+*   **Profile Dependency:** The semantic alignment capabilities are packaged as a model library profile: `UAF Semantic Alignment Profile.mdzip`.
+*   **Project Property Enablement:** Users activate the plugin for their specific project by toggling the custom Project Property `Enable Semantic Mappings = True` in Cameo's File → Project Properties dialog. 
+*   **Stereotype Application:** When enabled, the plugin automatically registers a custom UML Stereotype `«SemanticAlignment»` from the profile library.
+
+### 12.2. Stereotype Tagged Values Storage
+To maintain semantic bindings directly inside the project's native file structure (MDZIP):
+*   The `«SemanticAlignment»` stereotype defines a Tagged Value property: `mappedConceptURI` (string).
+*   When an architect maps a component (e.g. a battery cell) using the plugin sidebar, the plugin:
+    1.  Applies the `«SemanticAlignment»` stereotype to the selected UML element.
+    2.  Writes the target concept IRI (e.g. `https://w3id.org/emmo/domain/battery#BatteryCell`) to the `mappedConceptURI` tagged value.
+*   **Interoperability:** The RDF Exporter reads this tagged value to construct owl:Individual instantiation triples during the model translation process.
+
+### 12.3. Integrated Contextual Help System
+To guide modelers through complex UAF grid structures and medical/propulsion standards:
+*   **Contextual Help Panel:** A dedicated split-pane at the bottom of the plugin sidebar. When a user selects a UAF grid cell element, it renders an embedded Markdown file explaining the cell definitions, recommended parent concepts, and validation constraints.
+*   **Hover Verification Dialogs:** Hovering over a validation issue (e.g. an unmapped requirement or a capability gap) opens a non-modal tooltip describing the relevant OMG BMM target goal, or medical regulatory rules (e.g. FDA 21 CFR compliance requirements), suggesting corrective mappings.
+
+
 
 
