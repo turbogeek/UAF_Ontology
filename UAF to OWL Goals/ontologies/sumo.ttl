@@ -1,0 +1,80 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sumo: <http://www.ontologyportal.org/SUMO.owl#> .
+
+<http://www.ontologyportal.org/SUMO.owl> rdf:type owl:Ontology ;
+    rdfs:label "Suggested Upper Merged Ontology (SUMO) Core" ;
+    rdfs:comment "A lightweight local subset of core SUMO concepts and taxiomatic hierarchies for reasoning and verification." .
+
+# --- Physical Object Taxonomy ---
+
+sumo:Physical rdf:type owl:Class ;
+    rdfs:label "Physical" .
+
+sumo:Object rdf:type owl:Class ;
+    rdfs:label "Object" ;
+    rdfs:subClassOf sumo:Physical .
+
+sumo:Artifact rdf:type owl:Class ;
+    rdfs:label "Artifact" ;
+    rdfs:subClassOf sumo:Object .
+
+sumo:Device rdf:type owl:Class ;
+    rdfs:label "Device" ;
+    rdfs:subClassOf sumo:Artifact .
+
+sumo:TransportationDevice rdf:type owl:Class ;
+    rdfs:label "Transportation Device" ;
+    rdfs:subClassOf sumo:Device .
+
+sumo:Vehicle rdf:type owl:Class ;
+    rdfs:label "Vehicle" ;
+    rdfs:subClassOf sumo:TransportationDevice .
+
+sumo:AirVehicle rdf:type owl:Class ;
+    rdfs:label "Air Vehicle" ;
+    rdfs:subClassOf sumo:Vehicle .
+
+sumo:Aircraft rdf:type owl:Class ;
+    rdfs:label "Aircraft" ;
+    rdfs:subClassOf sumo:AirVehicle .
+
+# --- Personnel & Cognitive Agents ---
+
+sumo:Agent rdf:type owl:Class ;
+    rdfs:label "Agent" .
+
+sumo:CognitiveAgent rdf:type owl:Class ;
+    rdfs:label "Cognitive Agent" ;
+    rdfs:subClassOf sumo:Agent .
+
+sumo:Human rdf:type owl:Class ;
+    rdfs:label "Human" ;
+    rdfs:subClassOf sumo:CognitiveAgent .
+
+sumo:Organization rdf:type owl:Class ;
+    rdfs:label "Organization" ;
+    rdfs:subClassOf sumo:CognitiveAgent .
+
+sumo:Position rdf:type owl:Class ;
+    rdfs:label "Position" ;
+    rdfs:comment "A job or post within an organization." .
+
+# --- Strategy & Plans ---
+
+sumo:Abstract rdf:type owl:Class ;
+    rdfs:label "Abstract" .
+
+sumo:Proposition rdf:type owl:Class ;
+    rdfs:label "Proposition" ;
+    rdfs:subClassOf sumo:Abstract .
+
+sumo:Plan rdf:type owl:Class ;
+    rdfs:label "Plan" ;
+    rdfs:subClassOf sumo:Proposition .
+
+sumo:Goal rdf:type owl:Class ;
+    rdfs:label "Goal" ;
+    rdfs:subClassOf sumo:Proposition .

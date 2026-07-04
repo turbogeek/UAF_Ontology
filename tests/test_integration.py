@@ -15,6 +15,7 @@ class TestEcosystemIntegration(unittest.TestCase):
         g.parse(str(ontologies_dir / "uafsml_ontology.ttl"), format="turtle")
         g.parse(str(ontologies_dir / "uaf_ontology.ttl"), format="turtle")
         g.parse(str(ontologies_dir / "uaf_bridge.ttl"), format="turtle")
+        g.parse(str(ontologies_dir / "sumo.ttl"), format="turtle")
         g.parse(str(ontologies_dir / "uafv2_instances.ttl"), format="turtle")
         
         # Strip imports so owlready2 doesn't try to query online

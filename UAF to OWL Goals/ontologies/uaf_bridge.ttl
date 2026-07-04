@@ -8,10 +8,12 @@
 @prefix uaf2: <http://purl.org/uaf/uaf2#> .
 @prefix uaf_bridge: <http://purl.org/uaf/bridge#> .
 @prefix uafv2: <http://purl.org/uaf/example/uafv2#> .
+@prefix sumo: <http://www.ontologyportal.org/SUMO.owl#> .
 
 <http://purl.org/uaf/bridge> rdf:type owl:Ontology ;
     owl:imports <http://purl.org/uaf/ontology> ,
-                <http://purl.org/uaf/uafsml> ;
+                <http://purl.org/uaf/uafsml> ,
+                <http://www.ontologyportal.org/SUMO.owl> ;
     rdfs:label "UAF 1.3 to UAFSML 2.0 Mapping Bridge Ontology" ;
     rdfs:comment "Bridges UAF 1.3 DMM and UAFSML 2.0 (UAF for SysML v2) to enable coexistence and bidirectional translation." .
 
