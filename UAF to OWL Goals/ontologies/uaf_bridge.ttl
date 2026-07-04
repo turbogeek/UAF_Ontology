@@ -7,6 +7,7 @@
 @prefix uafsml: <http://purl.org/uaf/uafsml#> .
 @prefix uaf2: <http://purl.org/uaf/uaf2#> .
 @prefix uaf_bridge: <http://purl.org/uaf/bridge#> .
+@prefix uafv2: <http://purl.org/uaf/example/uafv2#> .
 
 <http://purl.org/uaf/bridge> rdf:type owl:Ontology ;
     owl:imports <http://purl.org/uaf/ontology> ,
@@ -37,3 +38,23 @@ uaf_bridge:mappedToUAFSML rdf:type owl:ObjectProperty ;
     rdfs:range uafsml:Element ;
     rdfs:label "mapped to UAFSML" ;
     rdfs:comment "Relates a UAF 1.3 metamodel element to its corresponding UAFSML 2.0 SysML v2 element." .
+
+# --- Upper Ontology (SUMO) Semantic Enrichment ---
+
+uafv2:inst-aircraft rdf:type <http://www.ontologyportal.org/SUMO.owl#Aircraft> .
+
+<http://www.ontologyportal.org/SUMO.owl#Aircraft> rdf:type owl:Class ;
+    rdfs:label "Aircraft" ;
+    rdfs:subClassOf <http://www.ontologyportal.org/SUMO.owl#AirVehicle> .
+
+<http://www.ontologyportal.org/SUMO.owl#AirVehicle> rdf:type owl:Class ;
+    rdfs:label "Air Vehicle" ;
+    rdfs:subClassOf <http://www.ontologyportal.org/SUMO.owl#Vehicle> .
+
+<http://www.ontologyportal.org/SUMO.owl#Vehicle> rdf:type owl:Class ;
+    rdfs:label "Vehicle" ;
+    rdfs:subClassOf <http://www.ontologyportal.org/SUMO.owl#TransportationDevice> .
+
+<http://www.ontologyportal.org/SUMO.owl#TransportationDevice> rdf:type owl:Class ;
+    rdfs:label "Transportation Device" .
+
