@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CATIA Magic / Cameo Semantic Integration Plugin Mockup</title>
+  <style>
+    :root {
+      --bg-dark: #0f0f1a;
+      --bg-sidebar: rgba(26, 26, 46, 0.9);
+      --border-color: rgba(58, 58, 94, 0.4);
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #4E79A7;
+      --accent-hover: #35628c;
+      --term-green: #2ecc71;
+      --verb-blue: #3498db;
+      --kw-orange: #e67e22;
+      --name-teal: #1abc9c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* Left Cameo Workspace Mockup */
+    #cameo-workspace {
+      flex: 1;
+      height: 100%;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    #cameo-header {
+      background: #151525;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #cameo-header h1 {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+
+    #canvas-area {
+      flex: 1;
+      background: radial-gradient(circle, #1a1a2e 10%, #0f0f1a 90%);
+      position: relative;
+      overflow: auto;
+      padding: 40px;
+    }
+
+    /* Simulated Diagram Nodes */
+    .cameo-node {
+      background: rgba(30, 41, 59, 0.85);
+      border: 2px solid #4E79A7;
+      border-radius: 8px;
+      padding: 15px;
+      width: 220px;
+      position: absolute;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cameo-node:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(78, 121, 167, 0.4);
+      border-color: #6a95c2;
+    }
+
+    .cameo-node.active {
+      border-color: var(--term-green);
+      box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
+    }
+
+    .node-type {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .node-name {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .node-props {
+      font-size: 11px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 5px;
+      color: var(--text-muted);
+    }
+
+    /* Plugin Right Sidebar (Glassmorphism) */
+    #plugin-sidebar {
+      width: 420px;
+      height: 100%;
+      background: var(--bg-sidebar);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border-color);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    }
+
+    .panel-header {
+      background: rgba(15, 15, 26, 0.9);
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h2 {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Styled SBVR Section */
+    #sbvr-display {
+      background: #09090e;
+      border: 1px dashed var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    .term { color: var(--term-green); text-decoration: underline; cursor: pointer; }
+    .verb { color: var(--verb-blue); font-style: italic; }
+    .kw { color: var(--kw-orange); font-weight: bold; }
+    .name { color: var(--name-teal); text-decoration: underline double; cursor: pointer; }
+
+    /* Concept Search/Mapping Box */
+    .search-box {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(15, 15, 26, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .autocomplete-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #11111f;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      z-index: 100;
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .autocomplete-item {
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .autocomplete-item:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Validation Audit Status */
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .badge-success { color: var(--term-green); }
+    .badge-warning { color: var(--kw-orange); }
+
+    .validation-logs {
+      font-family: monospace;
+      font-size: 11px;
+      background: #09090e;
+      padding: 10px;
+      border-radius: 6px;
+      max-height: 100px;
+      overflow-y: auto;
+      color: #94a3b8;
+    }
+
+    .audit-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .audit-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Floating Status Indicator */
+    #sysml-version {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(15, 15, 26, 0.8);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--text-muted);
+      backdrop-filter: blur(5px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cameo Workspace (Left) -->
+  <div id="cameo-workspace">
+    <div id="cameo-header">
+      <h1>CATIA Magic / Cameo Systems Modeler Mockup Workspace</h1>
+      <div style="font-size: 11px; color: var(--text-muted);">Project: EV_Power_Model.mdzip</div>
+    </div>
+    
+    <div id="canvas-area">
+      <!-- Battery Pack Node -->
+      <div class="cameo-node active" style="top: 80px; left: 80px;" onclick="selectNode('battery-pack')">
+        <div class="node-type">Block [EMMO::BatteryPack]</div>
+        <div class="node-name">HighVoltageBatteryPack</div>
+        <div class="node-props">
+          voltage: 400V<br>
+          capacity: 80kWh
+        </div>
+      </div>
+
+      <!-- Battery Module Node -->
+      <div class="cameo-node" style="top: 280px; left: 160px;" onclick="selectNode('battery-module')">
+        <div class="node-type">Block [EMMO::BatteryModule]</div>
+        <div class="node-name">BatteryModule1</div>
+        <div class="node-props">
+          cellCount: 12<br>
+          mass: 15kg
+        </div>
+      </div>
+
+      <!-- Battery Cell Node -->
+      <div class="cameo-node" style="top: 180px; left: 450px;" onclick="selectNode('battery-cell')">
+        <div class="node-type">Block [EMMO::BatteryCell]</div>
+        <div class="node-name">BatteryCell1A</div>
+        <div class="node-props">
+          chemistry: Li-Sulfur<br>
+          nominalVoltage: 3.7V
+        </div>
+      </div>
+
+      <!-- Arrow indicator of composition (contains) -->
+      <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+        <defs>
+          <marker id="diamond" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+            <path d="M 5 0 L 10 5 L 5 10 L 0 5 Z" fill="#4E79A7" />
+          </marker>
+        </defs>
+        <!-- Line Pack to Module -->
+        <line x1="190" y1="210" x2="270" y2="280" stroke="#4E79A7" stroke-width="2" marker-start="url(#diamond)" />
+        <!-- Line Module to Cell -->
+        <line x1="380" y1="310" x2="450" y2="230" stroke="#4E79A7" stroke-width="2" marker-start="url(#diamond)" />
+      </svg>
+    </div>
+
+    <div id="sysml-version">SysML v2 Execution Engine Active (Profile: UAFSML 2.0)</div>
+  </div>
+
+  <!-- Plugin Sidebar (Right Panel) -->
+  <div id="plugin-sidebar">
+    <div class="panel-header">
+      <h2>
+        <svg width="16" height="16" fill="var(--accent)" viewBox="0 0 16 16">
+          <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0L4.83 7.7H1.5c-1.5 0-2.1 1.9-.9 2.7l2.7 2.0-1.0 3.3c-.4 1.4 1.2 2.5 2.4 1.7l2.8-2.1 2.8 2.1c1.2.8 2.8-.3 2.4-1.7l-1.0-3.3 2.7-2.0c1.2-.8.6-2.7-.9-2.7H11.17l-1.765-6.65z"/>
+        </svg>
+        UAF / SysML Semantic Plugin
+      </h2>
+      <div style="font-size: 10px; padding: 2px 6px; background: rgba(78, 121, 167, 0.3); border-radius: 4px; color: #a5c7f0;">v2.1</div>
+    </div>
+
+    <div class="panel-body">
+      <!-- Section 1: Selected Element Metadata -->
+      <div class="card">
+        <div class="card-title">Selected Model Element</div>
+        <div>
+          <h3 id="selected-name" style="font-size: 16px; font-weight: bold; color: white;">HighVoltageBatteryPack</h3>
+          <p id="selected-type" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Metaclass: Block | Canonical: EVModel::PowerSubsystem::BatteryPack</p>
+        </div>
+      </div>
+
+      <!-- Section 2: Styled SBVR Panel -->
+      <div class="card">
+        <div class="card-title">SBVR Structured English</div>
+        <div id="sbvr-display">
+          <span class="kw">Instance:</span> <span class="name" onclick="selectNode('battery-pack')">HighVoltageBatteryPack</span> <span class="kw">is a</span> <span class="term">EMMO::BatteryPack</span>.
+        </div>
+      </div>
+
+      <!-- Section 3: Concept Lookup & Alignment Search -->
+      <div class="card">
+        <div class="card-title">Search & Align Ontologies</div>
+        <div class="search-box">
+          <input type="text" class="search-input" id="ontology-search" placeholder="Type to search EMMO, BMM, ORG..." oninput="handleSearch(this.value)">
+          <div class="autocomplete-results" id="search-results"></div>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted);">Current Alignment: <span id="current-mapping-text" style="color: var(--term-green); font-weight: bold;">EMMO::BatteryPack</span></div>
+      </div>
+
+      <!-- Section 4: Audit & SHACL Validation Dashboard -->
+      <div class="card">
+        <div class="card-title">Governance Auditing & Reasoning</div>
+        <div class="status-badge">
+          <span>Reasoning Status:</span>
+          <span id="audit-status" class="badge-success">● Consistent</span>
+        </div>
+        <div class="validation-logs" id="audit-logs">
+* Running HermiT DL Reasoner...
+* HermiT took 0.84 seconds.
+* Reasoning completed: 0 errors, 0 disjointness conflicts.
+* SHACL Shapes validation: PASS.
+        </div>
+        <button class="audit-btn" onclick="runValidation()">Run Semantic Audit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const nodeData = {
+      'battery-pack': {
+        name: 'HighVoltageBatteryPack',
+        meta: 'Metaclass: Block | Canonical: EVModel::PowerSubsystem::BatteryPack',
+        sbvr: '<span class="kw">Instance:</span> <span class="name" onclick="selectNode(\'battery-pack\')">HighVoltageBatteryPack</span> <span class="kw">is a</span> <span class="term" onclick="selectNode(\'battery-pack\')">EMMO::BatteryPack</span>.<br><span class="kw">Instance:</span> <span class="name" onclick="selectNode(\'battery-pack\')">HighVoltageBatteryPack</span> <span class="verb">contains</span> <span class="name" onclick="selectNode(\'battery-module\')">BatteryModule1</span>.',
+        mapping: 'EMMO::BatteryPack'
+      },
+      'battery-module': {
+        name: 'BatteryModule1',
+        meta: 'Metaclass: Block | Canonical: EVModel::PowerSubsystem::BatteryPack::Module1',
+        sbvr: '<span class="kw">Instance:</span> <span class="name" onclick="selectNode(\'battery-module\')">BatteryModule1</span> <span class="kw">is a</span> <span class="term" onclick="selectNode(\'battery-module\')">EMMO::BatteryModule</span>.<br><span class="kw">Instance:</span> <span class="name" onclick="selectNode(\'battery-module\')">BatteryModule1</span> <span class="verb">contains</span> <span class="name" onclick="selectNode(\'battery-cell\')">BatteryCell1A</span> (owned by <span class="name" onclick="selectNode(\'battery-pack\')">HighVoltageBatteryPack</span>).',
+        mapping: 'EMMO::BatteryModule'
+      },
+      'battery-cell': {
+        name: 'BatteryCell1A',
+        meta: 'Metaclass: Block | Canonical: EVModel::PowerSubsystem::BatteryPack::Module1::Cell1A',
+        sbvr: '<span class="kw">Instance:</span> <span class="name" onclick="selectNode(\'battery-cell\')">BatteryCell1A</span> <span class="kw">is a</span> <span class="term" onclick="selectNode(\'battery-cell\')">EMMO::BatteryCell</span> (owned by <span class="name" onclick="selectNode(\'battery-module\')">BatteryModule1</span>).',
+        mapping: 'EMMO::BatteryCell'
+      }
+    };
+
+    const searchableTerms = [
+      "EMMO::BatteryCell", "EMMO::BatteryModule", "EMMO::BatteryPack", "EMMO::ElectrochemicalCell",
+      "ORG::Organization", "ORG::OrganizationalUnit", "ORG::Post", "ORG::Role",
+      "BMM::Goal", "BMM::Objective", "BMM::Strategy", "BMM::Tactic",
+      "SUMO::LandVehicle", "SUMO::AirVehicle", "SUMO::MilitaryUnit"
+    ];
+
+    function selectNode(nodeId) {
+      // Toggle diagram active state
+      document.querySelectorAll('.cameo-node').forEach(node => node.classList.remove('active'));
+      const activeNodeIndex = nodeId === 'battery-pack' ? 0 : nodeId === 'battery-module' ? 1 : 2;
+      document.querySelectorAll('.cameo-node')[activeNodeIndex].classList.add('active');
+
+      // Update plugin sidebar content
+      const data = nodeData[nodeId];
+      document.getElementById('selected-name').innerText = data.name;
+      document.getElementById('selected-type').innerText = data.meta;
+      document.getElementById('sbvr-display').innerHTML = data.sbvr;
+      document.getElementById('current-mapping-text').innerText = data.mapping;
+      document.getElementById('ontology-search').value = data.mapping;
+    }
+
+    function handleSearch(val) {
+      const resultsDiv = document.getElementById('search-results');
+      resultsDiv.innerHTML = '';
+      if (!val) {
+        resultsDiv.style.display = 'none';
+        return;
+      }
+      const filtered = searchableTerms.filter(t => t.toLowerCase().includes(val.toLowerCase()));
+      if (filtered.length > 0) {
+        filtered.forEach(term => {
+          const div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          div.innerText = term;
+          div.onclick = () => {
+            document.getElementById('ontology-search').value = term;
+            document.getElementById('current-mapping-text').innerText = term;
+            resultsDiv.style.display = 'none';
+            // Update mapping in simulated data
+            const activeNode = document.querySelector('.cameo-node.active');
+            let key = 'battery-pack';
+            if (activeNode.innerText.includes('BatteryModule1')) key = 'battery-module';
+            else if (activeNode.innerText.includes('BatteryCell1A')) key = 'battery-cell';
+            nodeData[key].mapping = term;
+          };
+          resultsDiv.appendChild(div);
+        });
+        resultsDiv.style.display = 'block';
+      } else {
+        resultsDiv.style.display = 'none';
+      }
+    }
+
+    function runValidation() {
+      const btn = document.querySelector('.audit-btn');
+      const statusBadge = document.getElementById('audit-status');
+      const logs = document.getElementById('audit-logs');
+
+      btn.innerText = "Auditing Model...";
+      statusBadge.innerHTML = '<span style="color: var(--kw-orange);">● Auditing...</span>';
+      logs.innerHTML = "* Initializing audit pipeline...\n* Serializing model elements to RDF/OWL...\n* Running HermiT DL Reasoner...";
+
+      setTimeout(() => {
+        btn.innerText = "Run Semantic Audit";
+        statusBadge.innerHTML = '● Consistent';
+        statusBadge.className = 'badge-success';
+        logs.innerHTML = "* Running HermiT DL Reasoner...\n* HermiT took 1.12 seconds.\n* Reasoning completed: 0 errors, 0 disjointness conflicts.\n* SHACL Shapes validation: PASS.\n* Mappings are logically sound.";
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
