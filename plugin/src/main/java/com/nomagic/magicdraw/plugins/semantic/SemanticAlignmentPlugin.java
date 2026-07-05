@@ -9,6 +9,8 @@ import com.nomagic.magicdraw.plugins.semantic.align.StereotypeRouter;
 import com.nomagic.magicdraw.plugins.semantic.align.SuggestionRanker;
 import com.nomagic.magicdraw.plugins.semantic.commands.TransactionWrapper;
 import com.nomagic.magicdraw.plugins.semantic.metadata.StereotypeManager;
+import com.nomagic.magicdraw.plugins.semantic.rest.SemanticRestService;
+import com.nomagic.magicdraw.plugins.semantic.view.OntologyViewPanel;
 import com.nomagic.magicdraw.ui.ProjectWindowsManager;
 import com.nomagic.magicdraw.ui.WindowComponentInfo;
 import com.nomagic.magicdraw.ui.browser.Browser;
@@ -66,12 +68,23 @@ public class SemanticAlignmentPlugin extends Plugin {
 
     // Built once on a background thread at init; null until the catalog is loaded.
     private static volatile SuggestionRanker suggestionRanker;
+    private static volatile org.apache.jena.rdf.model.Model catalogModel;
+    private static volatile SemanticRestService restService;
 
     private static final WindowComponentInfo info = new WindowComponentInfo(
             COMPONENT_ID,
             COMPONENT_NAME,
             null, // Custom icon can be registered here
             ProjectWindowsManager.SIDE_WEST,
+            ProjectWindowsManager.STATE_DOCKED,
+            true
+    );
+
+    private static final WindowComponentInfo ontologyViewInfo = new WindowComponentInfo(
+            "SEMANTIC_ONTOLOGY_VIEW",
+            "Semantic Ontology",
+            null,
+            ProjectWindowsManager.SIDE_EAST,
             ProjectWindowsManager.STATE_DOCKED,
             true
     );
@@ -96,15 +109,45 @@ public class SemanticAlignmentPlugin extends Plugin {
         // run zero-touch after Cameo launches (no manual Tools > Macros step).
         HarnessBootstrap.startAsync(pluginDirectory);
 
+        // Fire Jena ARQ's ServiceLoader initialization deterministically inside OUR
+        // classloader before any SPARQL runs (SPI inside foreign classloaders is the
+        // known failure mode in Cameo).
+        try {
+            org.apache.jena.query.ARQ.init();
+        } catch (Throwable t) {
+            log.error("ARQ init failed", t);
+            DiagnosticLog.event("ERROR", "ARQ init failed: " + t);
+        }
+
         // Alignment catalog: loaded off the startup path; the sidebar degrades to a
         // "catalog loading/missing" hint until this completes.
         Thread catalogLoader = new Thread(() -> {
-            ConceptIndex index = CatalogLoader.load(
+            CatalogLoader.LoadedCatalog catalog = CatalogLoader.loadAll(
                     CatalogLoader.resolveCatalogDirectory(pluginDirectory));
-            suggestionRanker = new SuggestionRanker(index, StereotypeRouter.load(pluginDirectory));
+            catalogModel = catalog.model();
+            suggestionRanker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDirectory));
         }, "semantic-catalog-loader");
         catalogLoader.setDaemon(true);
         catalogLoader.start();
+
+        // UX click budgets are measured, not aspirational (v3 plan section 5)
+        UxMetrics.install();
+
+        // Plugin-owned REST surface (8766): /sparql for scenarios and future LLM
+        // assistants, /metrics for the click budgets. Dataset = catalog TBox + live
+        // project ABox snapshotted on the EDT per request.
+        restService = new SemanticRestService(() -> {
+            org.apache.jena.rdf.model.Model tbox = catalogModel;
+            org.apache.jena.rdf.model.Model abox = snapshotActiveProjectModel();
+            if (tbox == null) {
+                return abox;
+            }
+            if (abox == null) {
+                return tbox;
+            }
+            return org.apache.jena.rdf.model.ModelFactory.createUnion(tbox, abox);
+        });
+        restService.start();
 
         // One panel per project browser: the panel captures its own project so that
         // selections, mappings, and audits always target the project they came from.
@@ -114,6 +157,8 @@ public class SemanticAlignmentPlugin extends Plugin {
                 SemanticBrowserPanel panel = new SemanticBrowserPanel(project);
                 browser.addPanel(panel);
                 panel.hookSelectionListener(browser);
+                browser.addPanel(new OntologyViewPanel(project,
+                        () -> catalogModel, ontologyViewInfo));
                 DiagnosticLog.event("LIFECYCLE", "Sidebar registered for project: " + project.getName());
             }
 
@@ -128,8 +173,28 @@ public class SemanticAlignmentPlugin extends Plugin {
     public boolean close() {
         log.info("Closing Semantic Alignment Plugin...");
         DiagnosticLog.event("LIFECYCLE", "Plugin close");
+        if (restService != null) {
+            restService.stop();
+        }
         DiagnosticLog.shutdown();
         return true;
+    }
+
+    /** ABox snapshot of the active project, taken on the EDT; null when none is open. */
+    private static org.apache.jena.rdf.model.Model snapshotActiveProjectModel() {
+        try {
+            final org.apache.jena.rdf.model.Model[] holder = new org.apache.jena.rdf.model.Model[1];
+            SwingUtilities.invokeAndWait(() -> {
+                Project project = com.nomagic.magicdraw.core.Application.getInstance().getProject();
+                if (project != null && !project.isProjectClosed() && !project.isProjectDisposed()) {
+                    holder[0] = new SemanticRDFExporter(project).exportToModel();
+                }
+            });
+            return holder[0];
+        } catch (Exception e) {
+            log.error("Project snapshot for REST dataset failed", e);
+            return null;
+        }
     }
 
     @Override

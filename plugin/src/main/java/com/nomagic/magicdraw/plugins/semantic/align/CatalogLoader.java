@@ -56,24 +56,34 @@ public final class CatalogLoader {
         return null;
     }
 
+    /** Index plus the union TBox model (shared by SPARQL and reasoning views). */
+    public record LoadedCatalog(ConceptIndex index, Model model) {
+    }
+
     /** Loads every .ttl in the catalog directory. Never throws; problems are journaled. */
     public static ConceptIndex load(File catalogDirectory) {
+        return loadAll(catalogDirectory).index();
+    }
+
+    /** Single-pass load producing both the concept index and the union TBox model. */
+    public static LoadedCatalog loadAll(File catalogDirectory) {
         ConceptIndex index = new ConceptIndex();
+        Model union = ModelFactory.createDefaultModel();
         if (catalogDirectory == null) {
             DiagnosticLog.event("ERROR", "Concept catalog directory not found - suggestions disabled. "
                     + "Deploy catalog/ with the plugin or set -D" + CATALOG_PROPERTY);
-            return index;
+            return new LoadedCatalog(index, union);
         }
         File[] files = catalogDirectory.listFiles((d, name) -> name.toLowerCase().endsWith(".ttl"));
         if (files == null || files.length == 0) {
             DiagnosticLog.event("ERROR", "Concept catalog is empty: " + catalogDirectory);
-            return index;
+            return new LoadedCatalog(index, union);
         }
         StringBuilder stats = new StringBuilder();
         for (File file : files) {
             try {
                 int before = index.size();
-                loadFile(file, index);
+                loadFile(file, index, union);
                 stats.append(file.getName()).append('=').append(index.size() - before).append(' ');
             } catch (Exception e) {
                 log.error("Catalog file failed to load: " + file, e);
@@ -86,14 +96,16 @@ public final class CatalogLoader {
                     + " catalog files from " + catalogDirectory);
         } else {
             DiagnosticLog.event("CATALOG", "Concept index ready: " + index.size()
-                    + " concepts | " + stats.toString().trim());
+                    + " concepts, " + union.size() + " TBox triples | " + stats.toString().trim());
         }
-        return index;
+        return new LoadedCatalog(index, union);
     }
 
-    private static void loadFile(File file, ConceptIndex index) {
+    private static void loadFile(File file, ConceptIndex index, Model union) {
         Model model = ModelFactory.createDefaultModel();
         RDFDataMgr.read(model, file.getAbsolutePath());
+        union.add(model);
+        union.setNsPrefixes(model.getNsPrefixMap());
         String ontologyId = file.getName().replaceFirst("\\.ttl$", "");
         Map<String, String> nsToPrefix = invert(model.getNsPrefixMap());
 

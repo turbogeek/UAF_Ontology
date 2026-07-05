@@ -79,6 +79,16 @@ public class SemanticRDFExporter {
      * Traverses the active project element containment tree and returns a Turtle serialized string.
      */
     public String exportToTurtleString() {
+        StringWriter writer = new StringWriter();
+        exportToModel().write(writer, "TURTLE");
+        return writer.toString();
+    }
+
+    /**
+     * Same traversal, returned as a live Jena model - the shared substrate for the
+     * SBVR/Turtle ontology views and the SPARQL panel (v3 plan sections 2-3).
+     */
+    public Model exportToModel() {
         Model model = ModelFactory.createDefaultModel();
         PREFIXES.forEach(model::setNsPrefix);
         conceptCache.clear();
@@ -96,10 +106,7 @@ public class SemanticRDFExporter {
         if (root != null) {
             traverse(root, model);
         }
-
-        StringWriter writer = new StringWriter();
-        model.write(writer, "TURTLE");
-        return writer.toString();
+        return model;
     }
 
     /**

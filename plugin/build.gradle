@@ -30,8 +30,10 @@ dependencies {
     compileOnly fileTree(dir: "${cameoHome}/lib", include: ['*.jar'])
     testImplementation fileTree(dir: "${cameoHome}/lib", include: ['*.jar'])
 
-    // Apache Jena dependencies
+    // Apache Jena dependencies (arq pinned explicitly: the SPARQL panel and /sparql
+    // endpoint depend on it directly, not just transitively through shacl)
     implementation 'org.apache.jena:jena-core:4.6.1'
+    implementation 'org.apache.jena:jena-arq:4.6.1'
     implementation 'org.apache.jena:jena-shacl:4.6.1'
 
     // NOTE: no JavaFX. Cameo's jlink'd runtime omits jdk.unsupported.desktop
