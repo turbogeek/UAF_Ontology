@@ -24,21 +24,51 @@ public class SBVREngine {
 
     /**
      * Translates element parameters into a plain-text SBVR Structured English sentence.
+     * Covers scenarios SC-01 through SC-08 of design spec section 10.1:
+     * instantiation, composition, association, ownership, generalization, refinement,
+     * conformance, and goal channeling.
      */
     public String generatePlainSBVR(String elementURI, String conceptFQN, String relation, String targetName) {
         String baseName = getLocalName(elementURI);
         String conceptName = getLocalName(conceptFQN);
+        String rel = relation == null ? "" : relation.trim();
 
-        if (relation == null || relation.trim().isEmpty()) {
+        if (rel.isEmpty()) {
+            // SC-01: plain instantiation
             return "Instance: " + baseName + " is a " + conceptName + ".";
-        } else if (targetName != null) {
-            if (relation.equalsIgnoreCase("contains")) {
-                return "Instance: " + baseName + " contains " + getLocalName(targetName) + ".";
-            } else {
-                return "Instance: " + baseName + " is a " + conceptName + " " + relation + " " + getLocalName(targetName) + ".";
-            }
         }
-        return "";
+        if (rel.equalsIgnoreCase("specializes") || rel.equalsIgnoreCase("is a kind of")) {
+            // SC-05: generalizations describe concepts, not instances
+            return "Concept: " + baseName + " is a kind of " + conceptName + ".";
+        }
+        if (targetName == null || targetName.trim().isEmpty()) {
+            // SC-06: the aligned concept itself is the relation target ("X refines Y")
+            return "Instance: " + baseName + " " + rel + " " + conceptName + ".";
+        }
+        if (rel.equalsIgnoreCase("contains")) {
+            // SC-02: composition
+            return "Instance: " + baseName + " contains " + getLocalName(targetName) + ".";
+        }
+        if (equalsIgnoringSpacing(conceptName, rel)) {
+            // SC-03/SC-07: the aligned concept IS the relation (e.g. sr:connectedTo with
+            // relation "connected to") - repeating it as a type clause would be circular
+            return "Instance: " + baseName + " " + rel + " " + getLocalName(targetName) + ".";
+        }
+        if (baseName.equals(conceptName) || baseName.endsWith(" " + conceptName)) {
+            // SC-08: suppress the type clause when the name already states the concept
+            // ("Prevent Spoilage Goal is a Goal" reads as redundant to SBVR reviewers)
+            return "Instance: " + baseName + " " + rel + " " + getLocalName(targetName) + ".";
+        }
+        // SC-04: full form with type clause and relation
+        return "Instance: " + baseName + " is a " + conceptName + " " + rel + " " + getLocalName(targetName) + ".";
+    }
+
+    /**
+     * Relation labels arrive as prose ("connected to") while concept local names arrive
+     * camelCase-split ("Connected To"); spacing and case must not affect the comparison.
+     */
+    private boolean equalsIgnoringSpacing(String left, String right) {
+        return left.replace(" ", "").equalsIgnoreCase(right.replace(" ", ""));
     }
 
     /**
@@ -68,8 +98,9 @@ public class SBVREngine {
      */
     private String formatLabel(String rawName) {
         String result = rawName.replace("inst-", "").replace("post-", "").replace("org-", "");
-        // Regex splitting camelCase words (but keeps numbers attached to their predecessor word)
-        result = result.replaceAll("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])", " ");
+        // Split camelCase on lower/digit-to-upper and acronym-to-word boundaries only;
+        // hyphenated acronyms like "AT-AT" must stay intact.
+        result = result.replaceAll("(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ");
         result = result.replace("_", " ");
         
         String[] words = result.split(" ");

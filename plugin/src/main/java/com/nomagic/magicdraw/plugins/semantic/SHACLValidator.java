@@ -11,6 +11,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
+import org.apache.jena.shacl.validation.ReportEntry;
 import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -74,8 +75,10 @@ public class SHACLValidator {
 
             File shapesFile = new File(shapesFilePath);
             if (!shapesFile.exists()) {
-                log.warn("SHACL shapes file not found at: " + shapesFilePath + ". Returning blank audit.");
-                return new SHACLAuditReport(0, List.of("SHACL shapes file not found: " + shapesFilePath));
+                log.warn("SHACL shapes file not found at: " + shapesFilePath);
+                // Fail closed: a missing shapes file must never be reported as a clean audit,
+                // or the dashboard badge would show green without any validation having run.
+                return new SHACLAuditReport(1, List.of("SHACL shapes file not found: " + shapesFilePath));
             }
 
             Model shapesModel = ModelFactory.createDefaultModel();
@@ -85,10 +88,21 @@ public class SHACLValidator {
             Shapes shapes = Shapes.parse(shapesGraph);
             ValidationReport report = ShaclValidator.get().validate(shapes, dataGraph);
 
-            int violations = report.conforms() ? 0 : 1; // Simplification of violation count
+            int violations = 0;
             List<String> details = new ArrayList<>();
             if (!report.conforms()) {
-                details.add("SHACL constraint violation found in model alignment.");
+                for (ReportEntry entry : report.getEntries()) {
+                    violations++;
+                    String message = entry.message();
+                    details.add("Violation at " + entry.focusNode() + ": "
+                            + (message != null && !message.isBlank() ? message : String.valueOf(entry.constraint())));
+                }
+                if (violations == 0) {
+                    // Defensive: a non-conforming report should always carry entries, but the
+                    // dashboard must never show green on a failed validation.
+                    violations = 1;
+                    details.add("SHACL validation failed without detailed report entries.");
+                }
             }
 
             return new SHACLAuditReport(violations, details);

@@ -1,0 +1,3 @@
+// Names the jar semantic-alignment-plugin.jar as required by plugin.xml
+// (without this the project inherits the directory name "plugin").
+rootProject.name = 'semantic-alignment-plugin'

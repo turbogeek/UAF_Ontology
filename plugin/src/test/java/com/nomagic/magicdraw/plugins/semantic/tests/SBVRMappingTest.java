@@ -1,79 +1,104 @@
 package com.nomagic.magicdraw.plugins.semantic.tests;
 
+import com.nomagic.magicdraw.plugins.semantic.SBVREngine;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Validates the generation of SBVR (Semantics of Business Vocabulary and Business Rules) Structured English.
- * Asserts mapping transformations for both instantiation and relation composition.
+ * Validates SBVR Structured English generation against the production SBVREngine for all
+ * eight formal mapping scenarios of design spec section 10.1 (SC-01 .. SC-08).
+ *
+ * Formatting convention: the engine renders camelCase and snake_case identifiers as
+ * space-separated Title Case words ("EchoBase" -> "Echo Base"), which is asserted here
+ * as the single authoritative behavior.
  * Trace: PLG-REQ-04
  */
 public class SBVRMappingTest {
 
+    private final SBVREngine engine = new SBVREngine();
+
     @Test
-    public void testSBVRGenerationAssertions() {
-        // Test Case 1: Simple Instantiation Mapping (SUMO / EMMO Concept)
-        String sbvr1 = generateSBVR("http://purl.org/uaf/example/ev_power#inst-ev_battery_pack", "battinfo:BatteryPack", null, null);
-        assertEquals("Instance: Ev Battery Pack is a Battery Pack.", stripHtml(sbvr1));
-
-        // Test Case 2: Composition Linkage
-        String sbvr2 = generateSBVR("http://purl.org/uaf/example/ev_power#inst-ev_battery_pack", "battinfo:BatteryPack", "contains", "BatteryModule1");
-        assertEquals("Instance: Ev Battery Pack contains Battery Module1.", stripHtml(sbvr2));
-
-        // Test Case 3: UML Owned Post Mapping (ORG Concept)
-        String sbvr3 = generateSBVR("sr:post-lead_aerospace_architect", "org:Post", "owned by", "sr:org-design_division");
-        assertEquals("Instance: Lead Aerospace Architect is a Post owned by Design Division.", stripHtml(sbvr3));
+    public void testSC01SimpleInstantiation() {
+        String sbvr = engine.generateSBVR(
+                "http://purl.org/uaf/example/ev_power#EchoBase", "sumo:MilitaryBase", null, null);
+        assertEquals("Instance: Echo Base is a Military Base.", stripHtml(sbvr));
     }
 
-    /**
-     * Mock SBVR translation logic for unit test verification.
-     */
-    private String generateVRString(String elementURI, String conceptFQN, String relation, String targetName) {
-        String baseName = getLocalName(elementURI);
-        String conceptName = getLocalName(conceptFQN);
-
-        if (relation == null || relation.isEmpty()) {
-            return "Instance: " + baseName + " is a " + conceptName + ".";
-        } else if (targetName != null) {
-            if (relation.equalsIgnoreCase("contains")) {
-                return "Instance: " + baseName + " contains " + getLocalName(targetName) + ".";
-            } else {
-                return "Instance: " + baseName + " is a " + conceptName + " " + relation + " " + getLocalName(targetName) + ".";
-            }
-        }
-        return "";
+    @Test
+    public void testSC02Composition() {
+        String sbvr = engine.generateSBVR(
+                "http://purl.org/uaf/example/ev_power#BatteryPack", "battinfo:BatteryModule",
+                "contains", "Module1");
+        assertEquals("Instance: Battery Pack contains Module1.", stripHtml(sbvr));
     }
 
-    private String generateSBVR(String elementURI, String conceptFQN, String relation, String targetName) {
-        // Renders HTML formatted SBVR markup
-        return "<html><body><span class='instance'>" + generateVRString(elementURI, conceptFQN, relation, targetName) + "</span></body></html>";
+    @Test
+    public void testSC03AssociationWithRelationAsConcept() {
+        // The aligned concept IS the relation (sr:connectedTo); no "is a" clause expected.
+        String sbvr = engine.generateSBVR("Transmitter", "sr:connectedTo", "connected to", "Receiver");
+        assertEquals("Instance: Transmitter connected to Receiver.", stripHtml(sbvr));
     }
 
-    private String getLocalName(String uriOrFqn) {
-        if (uriOrFqn == null) return "";
-        int hashIdx = uriOrFqn.lastIndexOf('#');
-        if (hashIdx != -1) return formatLabel(uriOrFqn.substring(hashIdx + 1));
-        int colonIdx = uriOrFqn.lastIndexOf(':');
-        if (colonIdx != -1) return formatLabel(uriOrFqn.substring(colonIdx + 1));
-        int slashIdx = uriOrFqn.lastIndexOf('/');
-        if (slashIdx != -1) return formatLabel(uriOrFqn.substring(slashIdx + 1));
-        return formatLabel(uriOrFqn);
+    @Test
+    public void testSC04OwnedPostMapping() {
+        String sbvr = engine.generateSBVR(
+                "sr:post-lead_aerospace_architect", "org:Post", "owned by", "sr:org-design_division");
+        assertEquals("Instance: Lead Aerospace Architect is a Post owned by Design Division.", stripHtml(sbvr));
     }
 
-    private String formatLabel(String rawName) {
-        // Strip prefixes and format camelCase / snake_case to Space Separated Words
-        String result = rawName.replace("inst-", "").replace("post-", "").replace("org-", "");
-        result = result.replaceAll("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])", " ");
-        result = result.replace("_", " ");
-        
-        // Capitalize first letter of each word
-        String[] words = result.split(" ");
-        StringBuilder sb = new StringBuilder();
-        for (String w : words) {
-            if (w.isEmpty()) continue;
-            sb.append(Character.toUpperCase(w.charAt(0))).append(w.substring(1)).append(" ");
-        }
-        return sb.toString().trim();
+    @Test
+    public void testSC05Generalization() {
+        String sbvr = engine.generateSBVR("AT-AT", "sumo:LandVehicle", "specializes", null);
+        assertEquals("Concept: AT-AT is a kind of Land Vehicle.", stripHtml(sbvr));
+    }
+
+    @Test
+    public void testSC06RequirementRefinement() {
+        // Relation with no explicit target: the aligned concept is the relation target.
+        String sbvr = engine.generateSBVR(
+                "ic:TempControlRequirement", "ic:ActivePreservationCapability", "refines", null);
+        assertEquals("Instance: Temp Control Requirement refines Active Preservation Capability.",
+                stripHtml(sbvr));
+    }
+
+    @Test
+    public void testSC07StandardConformance() {
+        String sbvr = engine.generateSBVR(
+                "sr:PropulsionMfgTeam", "sr:conformsTo", "conforms to", "ISO 9001");
+        assertEquals("Instance: Propulsion Mfg Team conforms to ISO 9001.", stripHtml(sbvr));
+    }
+
+    @Test
+    public void testSC08GoalChanneling() {
+        // Base name already ends with the concept name ("... Goal" / bmm:Goal), so the
+        // redundant type clause is suppressed.
+        String sbvr = engine.generateSBVR(
+                "ic:PreventSpoilageGoal", "bmm:Goal", "channels efforts towards", "InsulinCooler");
+        assertEquals("Instance: Prevent Spoilage Goal channels efforts towards Insulin Cooler.",
+                stripHtml(sbvr));
+    }
+
+    @Test
+    public void testSnakeCaseInstantiation() {
+        String sbvr = engine.generateSBVR(
+                "http://purl.org/uaf/example/ev_power#inst-ev_battery_pack", "battinfo:BatteryPack", null, null);
+        assertEquals("Instance: Ev Battery Pack is a Battery Pack.", stripHtml(sbvr));
+    }
+
+    @Test
+    public void testHtmlWrapperPresent() {
+        String sbvr = engine.generateSBVR("EchoBase", "sumo:MilitaryBase", null, null);
+        assertTrue("SBVR output must be HTML-wrapped for the sidebar view",
+                sbvr.startsWith("<html>") && sbvr.endsWith("</html>"));
+    }
+
+    @Test
+    public void testNullInputsProduceEmptyNames() {
+        // Defensive contract: nulls must not throw, they degrade to empty name tokens.
+        String sbvr = engine.generatePlainSBVR(null, null, null, null);
+        assertEquals("Instance:  is a .", sbvr);
     }
 
     private String stripHtml(String html) {

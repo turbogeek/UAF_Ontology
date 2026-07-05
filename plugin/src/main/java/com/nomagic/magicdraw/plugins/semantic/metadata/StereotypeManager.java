@@ -14,9 +14,9 @@ import org.apache.log4j.Logger;
 public final class StereotypeManager {
 
     private static final Logger log = Logger.getLogger(StereotypeManager.class);
-    private static final String PROFILE_NAME = "UAF Semantic Alignment Profile";
-    private static final String STEREOTYPE_NAME = "SemanticAlignment";
-    private static final String PROPERTY_NAME = "mappedConceptURI";
+    public static final String PROFILE_NAME = "UAF Semantic Alignment Profile";
+    public static final String STEREOTYPE_NAME = "SemanticAlignment";
+    public static final String PROPERTY_NAME = "mappedConceptURI";
 
     // Private constructor to prevent instantiation of utility class
     private StereotypeManager() {

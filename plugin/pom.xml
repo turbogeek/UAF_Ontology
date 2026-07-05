@@ -12,8 +12,9 @@
     <description>Integrates systems engineering models with EMMO, SUMO, BMM, and W3C ORG ontologies.</description>
 
     <properties>
-        <maven.compiler.source>12</maven.compiler.source>
-        <maven.compiler.target>12</maven.compiler.target>
+        <!-- Kept in sync with the Gradle toolchain and the Cameo-bundled Temurin 21 JRE -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default local install directory, customizable by builder -->
         <cameo.install.dir>E:/Magic SW/CMSoS26xR1pr</cameo.install.dir>
@@ -74,9 +75,8 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+                    <!-- No --enable-preview: preview-flagged classes refuse to load in
+                         Cameo's JVM, which is not started with that flag. -->
                 </configuration>
             </plugin>
 

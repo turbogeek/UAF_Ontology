@@ -3,10 +3,17 @@ plugins {
 }
 
 group = 'com.nomagic.magicdraw.plugins'
-version = '2.1.0'
+version = '2.2.0'
+
+// CATIA Magic / Cameo install this plugin compiles against and deploys into.
+// Override per machine with: gradle -PcameoHome="D:/other/install" <task>
+def cameoHome = providers.gradleProperty('cameoHome').getOrElse('E:/Magic SW/CMSoS26xR1pr')
+def pluginId = 'com.nomagic.magicdraw.plugins.semantic'
 
 java {
     toolchain {
+        // Must match the JRE bundled with the Cameo install (Temurin 21) or the plugin
+        // classes will not load inside Cameo's JVM.
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
@@ -14,20 +21,20 @@ java {
 repositories {
     mavenCentral()
     flatDir {
-        dirs 'E:/Magic SW/CMSoS26xR1pr/lib'
+        dirs "${cameoHome}/lib"
     }
 }
 
 dependencies {
     // Compile against all Cameo/MagicDraw jars
-    compileOnly fileTree(dir: 'E:/Magic SW/CMSoS26xR1pr/lib', include: ['*.jar'])
-    testImplementation fileTree(dir: 'E:/Magic SW/CMSoS26xR1pr/lib', include: ['*.jar'])
+    compileOnly fileTree(dir: "${cameoHome}/lib", include: ['*.jar'])
+    testImplementation fileTree(dir: "${cameoHome}/lib", include: ['*.jar'])
 
     // Apache Jena dependencies
     implementation 'org.apache.jena:jena-core:4.6.1'
     implementation 'org.apache.jena:jena-shacl:4.6.1'
 
-    // Direct JavaFX dependencies with Windows classifier
+    // Direct JavaFX dependencies with Windows classifier (Cameo's JRE does not bundle JavaFX)
     implementation 'org.openjfx:javafx-base:21:win'
     implementation 'org.openjfx:javafx-graphics:21:win'
     implementation 'org.openjfx:javafx-controls:21:win'
@@ -37,10 +44,78 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs += ['--enable-preview']
+// NOTE: --enable-preview is deliberately absent. Preview-flagged class files refuse to
+// load in a JVM started without the flag, and Cameo's JVM is not started with it.
+
+jar {
+    // plugin.xml declares this exact jar name
+    archiveFileName = 'semantic-alignment-plugin.jar'
 }
 
-tasks.withType(Test) {
-    jvmArgs += ['--enable-preview']
+test {
+    // SemanticValidationTestHarness boots a full headless Cameo instance; it is
+    // integration-scoped and runs via the dedicated cameoTest task below.
+    exclude '**/SemanticValidationTestHarness*'
+}
+
+tasks.register('cameoTest', Test) {
+    description = 'Runs MagicDrawTestCase-based tests against the local Cameo install (needs license).'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    include '**/SemanticValidationTestHarness*'
+    systemProperty 'install.root', cameoHome
+}
+
+// ---------------------------------------------------------------------------
+// Deployment: assembles the plugin folder inside the Cameo install.
+// Layout:  <cameoHome>/plugins/<pluginId>/
+//            plugin.xml                     (generated, lists every bundled jar)
+//            semantic-alignment-plugin.jar
+//            uaf_traceability_shapes.ttl    (default SHACL shapes)
+//            lib/*.jar                      (Jena + JavaFX + transitives)
+// ---------------------------------------------------------------------------
+def descriptorDir = layout.buildDirectory.dir('generated/descriptor')
+
+tasks.register('generatePluginDescriptor') {
+    description = 'Generates the deployed plugin.xml including all bundled runtime jars.'
+    inputs.files configurations.runtimeClasspath
+    outputs.dir descriptorDir
+    doLast {
+        def libEntries = configurations.runtimeClasspath.files
+                .collect { "        <library name=\"lib/${it.name}\"/>" }
+                .sort()
+                .join('\n')
+        def xml = """<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="${pluginId}"
+        name="UAF and SysML Semantic Integration Plugin"
+        version="${version}"
+        provider-name="NoMagic"
+        class="com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin"
+        ownClassloader="true">
+    <requires>
+        <api version="1.0"/>
+    </requires>
+    <runtime>
+        <library name="semantic-alignment-plugin.jar"/>
+${libEntries}
+    </runtime>
+</plugin>
+"""
+        def outFile = descriptorDir.get().file('plugin.xml').asFile
+        outFile.parentFile.mkdirs()
+        outFile.text = xml
+    }
+}
+
+tasks.register('deployPlugin', Sync) {
+    description = "Deploys the plugin into ${cameoHome}/plugins/${pluginId} (restart Cameo afterwards)."
+    group = 'distribution'
+    dependsOn tasks.named('jar'), tasks.named('generatePluginDescriptor')
+    into "${cameoHome}/plugins/${pluginId}"
+    from tasks.named('jar')
+    from descriptorDir
+    from(configurations.runtimeClasspath) { into 'lib' }
+    // Default SHACL shapes ship with the plugin so the audit works out of the box
+    from new File(projectDir.parentFile, 'UAF to OWL Goals/ontologies/uaf_traceability_shapes.ttl')
 }
