@@ -27,9 +27,15 @@ gUFO 97, BMM 37. Total ≈ 1,400 concepts — trivially an in-memory index. gUFO
 22 `owl:disjointWith` axioms (real reasoning fuel); ORG/BMM carry domain/range axioms.
 
 **Critical catalog gap**: uaf_ontology.ttl and uafsml_ontology.ttl have **no
-disjointness axioms** — a UAF-typed model can never be found inconsistent today. v3
-must ship a `uaf_disjointness.ttl` overlay (e.g., `uaf:Capability owl:disjointWith
-uaf:Resource`) or the reasoner has nothing visible to say.
+disjointness axioms** — a UAF-typed model can never be found inconsistent today.
+**Decision (owner, 2026-07-05): integrate disjointness directly into the ontologies we
+control** (uaf_ontology, uafsml_ontology, and likewise kerml/sysml2/UML as applicable),
+NOT as a separate overlay file. Flagship error class to catch: **actual elements placed
+in logical views** — e.g., designers putting real organizations (`ActualOrganization`)
+into the operational view, which is meant to be logical (`OperationalPerformer`/
+`OperationalAgent`); logical-vs-actual disjointness makes that a provable inconsistency.
+General principle: we own these ontologies, so axiom improvements (disjointness,
+domain/range) are welcome wherever they let the reasoner find real model errors.
 
 **Graphify** captures the whole corpus as a knowledge graph with community clustering —
 usable as (a) a co-occurrence prior for suggestion ranking ("elements in this cluster
@@ -76,14 +82,35 @@ element's ranked list) | Confidence | Status; "Apply all ≥ 0.80" commits one s
 
 ## 2. Ontology view (new browser window, per-project like the sidebar)
 
-- **Turtle tab (P1)**: read-only serialized project graph, "include inferred" checkbox,
-  Save .ttl.
+**Audience split (owner requirement): ~90% of users are Muggles** — non-ontologists.
+The default view is plain English; expert views exist but never lead.
+
+- **SBVR tab (P1, the DEFAULT tab)**: the resulting ontology rendered as SBVR
+  Structured English via the existing SBVREngine (one sentence per fact:
+  instantiation, containment, associations, generalization), grouped by element,
+  color-coded per the mockup. Precedent: `msar_instances-sbvr.html`. This is the
+  Muggle window into the ontology.
+- **Turtle tab (P1, expert)**: read-only serialized project graph, "include inferred"
+  checkbox, Save .ttl.
 - **Tree tab (P2)**: class hierarchy of namespaces actually used → instances beneath;
   **inferred types/nodes in italic with distinct icon** (InfModel − base model);
   double-click instance → selects the element in the containment tree (exporter's
   IRI↔elementID map).
 - **Graph tab (P3)**: self-contained HTML via the graphify viewer, community-colored,
   opened with Desktop.browse().
+
+**Display scale/cost is dynamic (owner requirement)**: no view materializes the whole
+graph eagerly. SBVR and Turtle render the first N facts (default 500) with a shown/total
+count and "Load more" / "Save full file…" actions; the tree lazy-loads children on
+expand; renders happen off the EDT with the result swapped in. Budgets asserted by
+tests: first paint of any tab ≤ 500 ms at tutorial scale, and opening a view must never
+freeze Cameo regardless of model size.
+
+**Muggle guidance (P2)**: a "Guide" panel — stereotype-routed explanations and worked
+examples per design spec 12.3 (Capability → strategic taxonomy guide, ActualOrganization
+→ org guide, battery → BattINFO guide), each showing the SBVR translation pattern and an
+example alignment. Backlog (post-P3): LLM assistant surface on top of the same guide
+content and /sparql endpoint.
 
 ## 3. Query — SPARQL panel + REST
 
@@ -110,8 +137,12 @@ Canned queries (each demonstrates value on a tutorial scenario):
 - **Tier 2 (audit, P3)**: separate `reasoner` Gradle module bundling OWLAPI 5.5.1 + ELK
   0.6.0; classification + consistency with justifications; optionally emit findings into
   Cameo's standard validation results window.
-- **Catalog work (P2, prerequisite)**: author `uaf_disjointness.ttl` overlay so UAF-typed
-  models can actually fail consistency.
+- **Catalog work (P1, prerequisite — moved up per owner)**: integrate disjointness
+  axioms directly into uaf_ontology.ttl and uafsml_ontology.ttl (and kerml/sysml2 where
+  meaningful), including logical-vs-actual disjointness (OperationalPerformer et al.
+  disjoint from ActualOrganization/ActualPerson/ActualResource) so misplacing actual
+  elements in logical views becomes a detectable inconsistency. Each axiom set gets a
+  regression test proving the reasoner catches the target error.
 
 ## 5. Scenario automation — reduce clicks, prove it
 
@@ -132,8 +163,10 @@ inference ≤1 s; audit ≤2 s (mockup promised 0.84–1.12 s).
 ## 6. Phasing (each phase ends: unit + integration suites green, committed)
 
 - **P1 "Align fast" (~3–5 days)**: ConceptIndex + ranking + suggestion UI, CURIE field
-  removed, SPARQL panel + 5 queries + /sparql + /metrics + UxMetrics, Turtle tab,
-  jena-arq pinned. Tests IT6 + IT8-lite.
+  removed, SPARQL panel + 5 queries + /sparql + /metrics + UxMetrics, ontology view
+  with SBVR (default) + Turtle tabs (dynamic/lazy rendering), disjointness integrated
+  into the UAF ontologies + reasoner regression tests, jena-arq pinned.
+  Tests IT6 + IT8-lite.
 - **P2 "See and trust" (~1–2 weeks)**: ontology tree (asserted vs inferred), bulk table,
   element-level semantics + violations, uaf_disjointness.ttl, suites SA/SB, IT7/IT8.
 - **P3 "Deep reasoning + context" (~2–3 weeks)**: ELK/OWLAPI module + justifications,
@@ -141,15 +174,12 @@ inference ≤1 s; audit ≤2 s (mockup promised 0.84–1.12 s).
   extension wizard (custom subclass with pre-persist consistency check), suite SC,
   optional BioPortal.
 
-## Open decisions (need owner's call)
+## Decisions (resolved with owner, 2026-07-05)
 
-1. **Default routing metamodel: UAF 1.3 (`uaf_ontology`) or UAFSML 2.0
-   (`uafsml_ontology`)?** Bridge loads both; the ranker's boosts, SBVR vocabulary, and
-   canned queries need one default. (UAFSML 2.0 is better structured; 1.3 has the DMM
-   pedigree.)
-2. **DL reasoner: ELK (EL profile — fast, light, Apache-2.0, covers subclass +
-   disjointness) vs full-DL (e.g., Openllet) for gUFO's richer axioms.**
-   Recommendation: ELK.
-3. **BioPortal remote lookup: include in P3 (network + API key + offline fallback) or
-   stay fully offline?** The local catalog covers all three tutorials today.
-   Recommendation: defer; revisit after P2.
+1. **Default routing metamodel: UAFSML 2.0** (`uafsml_ontology`), with the bridge
+   loading UAF 1.3 alongside. Disjointness improvements go into BOTH.
+2. **DL reasoner: ELK** (P3), Jena rules interactively (P2).
+3. **BioPortal: deferred** — fully offline local catalog; revisit after P2.
+4. **Disjointness lives IN the ontologies we control**, not overlay files (see above).
+5. **Ontology view leads with SBVR English** (Muggle-first); Turtle/Tree/Graph are
+   expert tabs; all views render lazily with dynamic scale limits.
