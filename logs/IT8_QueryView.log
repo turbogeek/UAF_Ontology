@@ -1,8 +1,10 @@
-17:42:10.478  === IT8 query-view START ===
-17:42:10.637  /sparql SELECT OK (1373 bytes, contains EchoBase)
-17:42:10.646  /sparql ASK OK: a sumo:MilitaryBase individual exists
-17:42:11.246  SBVR view OK: English rendering contains the fixture sentence
-17:42:11.635  Turtle view OK
-17:42:11.637  full Turtle export saved: C:\Users\DBR2\.semantic_alignment_plugin\ontology-export.ttl (1495 bytes)
-17:42:11.638  RESULT: PASS
-17:42:11.639  === IT8 DONE ===
+17:58:27.837  === IT8 query-view START ===
+17:58:28.018  /sparql SELECT OK (1373 bytes, contains EchoBase)
+17:58:28.025  /sparql ASK OK: a sumo:MilitaryBase individual exists
+17:58:28.585  SBVR view OK: English rendering contains the fixture sentence
+17:58:28.980  Turtle view OK
+17:58:28.982  full Turtle export saved: C:\Users\DBR2\.semantic_alignment_plugin\ontology-export.ttl (1496 bytes)
+17:58:29.056  /catalog/reload OK: {"concepts":1110,"tboxTriples":8704,"userCatalog":"C:\\Users\\DBR2\\.semantic_alignment_plugin\\catalog"}
+17:58:29.062  on-demand regulatory ontology is queryable without restart
+17:58:29.131  RESULT: PASS
+17:58:29.132  === IT8 DONE ===

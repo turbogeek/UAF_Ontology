@@ -39,9 +39,10 @@ public class SHACLValidator {
     }
 
     /**
-     * Executes OWL DL consistency reasoning over the exported ABox unioned with the given
-     * TBox ontology files (disjointness, domain/range axioms). Implemented with Jena's
-     * OWL reasoner; swap point for a true HermiT engine if OWLAPI is bundled later.
+     * Executes consistency reasoning over the exported ABox unioned with the given TBox
+     * ontology files, via the ACTIVE ReasonerAdapter (owner decision: engine-agnostic;
+     * select with -Dsemantic.plugin.reasoner, default jena-rules). Method name is kept
+     * for API stability with the design spec's "HermiT reasoning" requirement.
      * Trace: PLG-REQ-06
      */
     public ReasonerResult runHermitReasoner(String rdfTurtle, java.util.Collection<File> tboxFiles) {
@@ -49,33 +50,22 @@ public class SHACLValidator {
             throw new IllegalArgumentException("RDF content cannot be null.");
         }
         try {
-            Model model = ModelFactory.createDefaultModel();
-            RDFDataMgr.read(model, new ByteArrayInputStream(rdfTurtle.getBytes(StandardCharsets.UTF_8)), Lang.TTL);
+            Model abox = ModelFactory.createDefaultModel();
+            RDFDataMgr.read(abox, new ByteArrayInputStream(rdfTurtle.getBytes(StandardCharsets.UTF_8)), Lang.TTL);
+            Model tbox = ModelFactory.createDefaultModel();
             if (tboxFiles != null) {
-                for (File tbox : tboxFiles) {
-                    if (tbox != null && tbox.exists()) {
-                        RDFDataMgr.read(model, tbox.getAbsolutePath());
+                for (File file : tboxFiles) {
+                    if (file != null && file.exists()) {
+                        RDFDataMgr.read(tbox, file.getAbsolutePath());
                     } else {
-                        log.warn("TBox file missing, skipped: " + tbox);
+                        log.warn("TBox file missing, skipped: " + file);
                     }
                 }
             }
-
-            // Using Jena's built-in OWL reasoner for consistency validation
-            org.apache.jena.reasoner.Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
-            InfModel infModel = ModelFactory.createInfModel(reasoner, model);
-
-            ValidityReport report = infModel.validate();
-            boolean isConsistent = report.isValid();
-
-            List<String> messages = new ArrayList<>();
-            if (!isConsistent) {
-                Iterator<ValidityReport.Report> it = report.getReports();
-                while (it.hasNext()) {
-                    messages.add(it.next().getDescription());
-                }
-            }
-            return new ReasonerResult(isConsistent, messages);
+            com.nomagic.magicdraw.plugins.semantic.reasoning.ReasonerAdapter.ConsistencyResult result =
+                    com.nomagic.magicdraw.plugins.semantic.reasoning.Reasoners.active()
+                            .checkConsistency(abox, tbox);
+            return new ReasonerResult(result.consistent(), result.messages());
         } catch (Exception e) {
             log.error("Reasoning consistency check failed", e);
             return new ReasonerResult(false, List.of("Exception occurred: " + e.getMessage()));

@@ -120,13 +120,10 @@ public class SemanticAlignmentPlugin extends Plugin {
         }
 
         // Alignment catalog: loaded off the startup path; the sidebar degrades to a
-        // "catalog loading/missing" hint until this completes.
-        Thread catalogLoader = new Thread(() -> {
-            CatalogLoader.LoadedCatalog catalog = CatalogLoader.loadAll(
-                    CatalogLoader.resolveCatalogDirectory(pluginDirectory));
-            catalogModel = catalog.model();
-            suggestionRanker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDirectory));
-        }, "semantic-catalog-loader");
+        // "catalog loading/missing" hint until this completes. Includes the user
+        // catalog dir for on-demand ontology imports (medical device / regulatory).
+        Thread catalogLoader = new Thread(SemanticAlignmentPlugin::reloadCatalog,
+                "semantic-catalog-loader");
         catalogLoader.setDaemon(true);
         catalogLoader.start();
 
@@ -146,7 +143,7 @@ public class SemanticAlignmentPlugin extends Plugin {
                 return tbox;
             }
             return org.apache.jena.rdf.model.ModelFactory.createUnion(tbox, abox);
-        });
+        }, SemanticAlignmentPlugin::reloadCatalog);
         restService.start();
 
         // One panel per project browser: the panel captures its own project so that
@@ -178,6 +175,23 @@ public class SemanticAlignmentPlugin extends Plugin {
         }
         DiagnosticLog.shutdown();
         return true;
+    }
+
+    /**
+     * (Re)loads shipped + user catalogs and swaps the ranker atomically. Called at init
+     * and from REST /catalog/reload, so on-demand ontology imports (drop a .ttl in the
+     * user catalog dir) become alignable without restarting Cameo.
+     *
+     * @return summary string for the REST response
+     */
+    static String reloadCatalog() {
+        CatalogLoader.LoadedCatalog catalog = CatalogLoader.loadMerged(pluginDirectory);
+        catalogModel = catalog.model();
+        suggestionRanker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDirectory));
+        return "{\"concepts\":" + catalog.index().size()
+                + ",\"tboxTriples\":" + catalog.model().size()
+                + ",\"userCatalog\":\"" + CatalogLoader.resolveUserCatalogDirectory()
+                        .getAbsolutePath().replace("\\", "\\\\") + "\"}";
     }
 
     /** ABox snapshot of the active project, taken on the EDT; null when none is open. */

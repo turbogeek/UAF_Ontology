@@ -1,13 +1,13 @@
-17:41:59.811  === IT5 audit-violations START ===
-17:41:59.854  TBox dropped: E:\Magic SW\CMSoS26xR1pr\plugins\com.nomagic.magicdraw.plugins.semantic\tbox\it5-disjoint.ttl
-17:42:00.190  Phase A audit: 2026-07-05 17:41:59.964 | AUDIT | project=Use Case Tester | consistent=false | shaclViolations=0 | tboxFiles=1 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl | "Individual a member of disjoint classes" \n Culprit = <http://purl.org/uaf/project/_2026x_1_2b0010b_1783291315094_650419_18558> \n Implicated node: <http://www.ontologyportal.org/SUMO.owl#Vehicle> \n Implicated node: <http://www.ontologyportal.org/SUMO.owl#MilitaryBase> \n
-17:42:00.192  Phase A OK: inconsistency detected
-17:42:00.195  Phase A badge OK: STATUS: INCONSISTENT
-17:42:00.198  shapes override set: E:\_Documents\git\UAF_Ontology\logs\it5-violating-shapes.ttl
-17:42:00.519  Phase B audit: 2026-07-05 17:42:00.302 | AUDIT | project=Use Case Tester | consistent=true | shaclViolations=5 | tboxFiles=0 | shapes=it5-violating-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl | Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783291315096_369581_18561: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783291315095_507414_18559: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783291315094_650419_18558: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783291315096_67451_18560: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783291315972_500730_18568: IT5 synthetic constraint: certification evidence required.
-17:42:00.522  Phase B OK: 5 violation(s) reported
-17:42:00.523  Phase B badge OK: STATUS: 5 VIOLATION(S)
-17:42:00.846  Phase C OK: 2026-07-05 17:42:00.609 | AUDIT | project=Use Case Tester | consistent=true | shaclViolations=0 | tboxFiles=0 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl
-17:42:00.848  Phase C badge OK: STATUS: CONSISTENT
-17:42:00.849  RESULT: PASS
-17:42:00.850  === IT5 DONE ===
+17:58:17.156  === IT5 audit-violations START ===
+17:58:17.204  TBox dropped: E:\Magic SW\CMSoS26xR1pr\plugins\com.nomagic.magicdraw.plugins.semantic\tbox\it5-disjoint.ttl
+17:58:17.550  Phase A audit: 2026-07-05 17:58:17.319 | AUDIT | project=Use Case Tester | consistent=false | shaclViolations=0 | tboxFiles=1 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl | "Individual a member of disjoint classes" \n Culprit = <http://purl.org/uaf/project/_2026x_1_2b0010b_1783292291920_728956_18558> \n Implicated node: <http://www.ontologyportal.org/SUMO.owl#Vehicle> \n Implicated node: <http://www.ontologyportal.org/SUMO.owl#MilitaryBase> \n
+17:58:17.551  Phase A OK: inconsistency detected
+17:58:17.558  Phase A badge OK: STATUS: INCONSISTENT
+17:58:17.562  shapes override set: E:\_Documents\git\UAF_Ontology\logs\it5-violating-shapes.ttl
+17:58:17.887  Phase B audit: 2026-07-05 17:58:17.679 | AUDIT | project=Use Case Tester | consistent=true | shaclViolations=5 | tboxFiles=0 | shapes=it5-violating-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl | Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783292292611_37681_18568: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783292291922_692308_18560: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783292291922_194398_18561: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783292291920_728956_18558: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783292291921_618145_18559: IT5 synthetic constraint: certification evidence required.
+17:58:17.890  Phase B OK: 5 violation(s) reported
+17:58:17.891  Phase B badge OK: STATUS: 5 VIOLATION(S)
+17:58:18.216  Phase C OK: 2026-07-05 17:58:17.988 | AUDIT | project=Use Case Tester | consistent=true | shaclViolations=0 | tboxFiles=0 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl
+17:58:18.218  Phase C badge OK: STATUS: CONSISTENT
+17:58:18.219  RESULT: PASS
+17:58:18.220  === IT5 DONE ===

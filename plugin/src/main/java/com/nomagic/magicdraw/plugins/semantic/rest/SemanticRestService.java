@@ -37,14 +37,18 @@ public final class SemanticRestService {
     private static final String PORT_PROPERTY = "semantic.plugin.rest.port";
 
     private final Supplier<Model> datasetSupplier;
+    private final Supplier<String> catalogReloader;
     private HttpServer server;
 
     /**
      * @param datasetSupplier supplies the query dataset (catalog TBox + project ABox);
      *                        invoked per request so results always reflect the live model
+     * @param catalogReloader re-indexes shipped + user catalogs (on-demand ontology
+     *                        import); returns a JSON summary
      */
-    public SemanticRestService(Supplier<Model> datasetSupplier) {
+    public SemanticRestService(Supplier<Model> datasetSupplier, Supplier<String> catalogReloader) {
         this.datasetSupplier = datasetSupplier;
+        this.catalogReloader = catalogReloader;
     }
 
     public void start() {
@@ -52,7 +56,16 @@ public final class SemanticRestService {
         try {
             server = HttpServer.create(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), port), 0);
             server.createContext("/health", ex -> respond(ex, 200, "application/json",
-                    "{\"service\":\"semantic-alignment\",\"endpoints\":[\"/sparql\",\"/metrics\",\"/metrics/reset\"]}"));
+                    "{\"service\":\"semantic-alignment\",\"endpoints\":[\"/sparql\",\"/metrics\",\"/metrics/reset\",\"/catalog/reload\"]}"));
+            server.createContext("/catalog/reload", ex -> {
+                try {
+                    respond(ex, 200, "application/json", catalogReloader.get());
+                } catch (Exception e) {
+                    log.error("/catalog/reload failed", e);
+                    respond(ex, 500, "application/json",
+                            "{\"error\":\"" + String.valueOf(e.getMessage()).replace("\"", "'") + "\"}");
+                }
+            });
             server.createContext("/metrics", ex -> {
                 if ("POST".equals(ex.getRequestMethod()) && ex.getRequestURI().getPath().endsWith("/reset")) {
                     UxMetrics.reset();

@@ -174,12 +174,27 @@ inference ≤1 s; audit ≤2 s (mockup promised 0.84–1.12 s).
   extension wizard (custom subclass with pre-persist consistency check), suite SC,
   optional BioPortal.
 
-## Decisions (resolved with owner, 2026-07-05)
+## Decisions (resolved with owner, 2026-07-05; revised same day)
 
-1. **Default routing metamodel: UAFSML 2.0** (`uafsml_ontology`), with the bridge
-   loading UAF 1.3 alongside. Disjointness improvements go into BOTH.
-2. **DL reasoner: ELK** (P3), Jena rules interactively (P2).
-3. **BioPortal: deferred** — fully offline local catalog; revisit after P2.
+1. **UAF 1.3 first** (`uaf_ontology`): polish the 1.3 experience end to end — routing
+   defaults, pins, SBVR vocabulary, canned queries. KerML/SysMLv2/UAFSML follow after
+   1.3 is polished. Disjointness improvements still land in every ontology we control.
+2. **Reasoner: non-denominational** (per VOM / OntologyForMuggles experience) — we do
+   not yet know which engine suits this workload. Reasoning goes behind a
+   `ReasonerAdapter` abstraction (selected via `-Dsemantic.plugin.reasoner`, default
+   `jena-rules`); ELK/HermiT/Openllet become pluggable candidates to be *benchmarked*,
+   not a committed choice.
+3. **External ontologies: on-demand import is the requirement** (BioPortal is just one
+   transport). Driving scenario: **medical devices** (primary) and **drug manufacture**
+   (secondary), where the critical ontologies concern **governance, certification, and
+   approval of devices** (regulatory: FDA/MDR/UDI/ISO-13485 territory). Mechanism: a
+   user catalog directory that survives redeploys + runtime re-index (no restart), so
+   any acquired ontology drops in and is immediately alignable. Backlog (LLM API
+   effort): **building ontologies from documents** — extract candidate
+   classes/relations from regulatory documents into draft TTL for curation.
 4. **Disjointness lives IN the ontologies we control**, not overlay files (see above).
 5. **Ontology view leads with SBVR English** (Muggle-first); Turtle/Tree/Graph are
    expert tabs; all views render lazily with dynamic scale limits.
+6. **Code coverage is part of the definition of tested**: JaCoCo wired into the Gradle
+   build; coverage reviewed per change so tests are demonstrably exercising the logic
+   they claim to.

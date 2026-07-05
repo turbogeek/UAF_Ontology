@@ -134,6 +134,34 @@ try {
             fail('full Turtle export file missing: ' + saved)
         }
     }
+    // --- Phase D: on-demand ontology import (medical-device regulatory scenario) -------
+    def userCatalog = new File(new File(System.getProperty('user.home'), '.semantic_alignment_plugin'), 'catalog')
+    userCatalog.mkdirs()
+    def regFile = new File(userCatalog, 'it8-device-regulatory.ttl')
+    regFile.setText('''@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix mdreg: <http://example.org/medical-device-regulatory#> .
+mdreg:RegulatoryApproval a owl:Class ; rdfs:label "Regulatory Approval" ;
+    rdfs:comment "Approval issued by a competent authority for a medical device." .
+''', 'UTF-8')
+    try {
+        def reload = http('POST', '/catalog/reload', '')
+        if (reload.code != 200) {
+            fail('/catalog/reload -> ' + reload.code + ' ' + reload.body.take(200))
+        } else {
+            diag('/catalog/reload OK: ' + reload.body)
+            def askReg = http('POST', '/sparql',
+                    'ASK { <http://example.org/medical-device-regulatory#RegulatoryApproval> a <http://www.w3.org/2002/07/owl#Class> }')
+            if (askReg.code == 200 && askReg.body.contains('true')) {
+                diag('on-demand regulatory ontology is queryable without restart')
+            } else {
+                fail('imported ontology not in dataset: ' + askReg.code + ' ' + askReg.body.take(200))
+            }
+        }
+    } finally {
+        regFile.delete()
+        http('POST', '/catalog/reload', '') // restore pristine catalog
+    }
 } catch (Throwable t) {
     diagT('UNCAUGHT in IT8', t)
     pass = false

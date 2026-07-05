@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 group = 'com.nomagic.magicdraw.plugins'
@@ -55,7 +56,37 @@ test {
     // SemanticValidationTestHarness boots a full headless Cameo instance; it is
     // integration-scoped and runs via the dedicated cameoTest task below.
     exclude '**/SemanticValidationTestHarness*'
+    finalizedBy jacocoTestReport
 }
+
+// Coverage is part of "tested" (owner requirement): every test run produces a report;
+// UI-heavy classes are exercised by the GUI integration suite instead, so thresholds
+// are enforced on the logic packages the unit tests claim to cover.
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    violationRules {
+        rule {
+            element = 'PACKAGE'
+            includes = ['com.nomagic.magicdraw.plugins.semantic.align',
+                        'com.nomagic.magicdraw.plugins.semantic.reasoning']
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.75
+            }
+        }
+    }
+}
+check.dependsOn jacocoTestCoverageVerification
 
 tasks.register('cameoTest', Test) {
     description = 'Runs MagicDrawTestCase-based tests against the local Cameo install (needs license).'

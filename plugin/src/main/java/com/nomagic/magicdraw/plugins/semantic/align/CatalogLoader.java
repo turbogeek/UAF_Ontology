@@ -39,6 +39,38 @@ public final class CatalogLoader {
         throw new UnsupportedOperationException("Utility class cannot be instantiated.");
     }
 
+    /**
+     * User catalog directory for ON-DEMAND ontology imports (owner scenario: medical
+     * device / drug manufacture programs pulling in governance, certification, and
+     * approval ontologies as needed). Lives under the diagnostic home so redeploys
+     * never wipe it; drop a .ttl here and hit /catalog/reload - no restart.
+     */
+    public static File resolveUserCatalogDirectory() {
+        File dir = DiagnosticLog.getLogDirectory().resolve("catalog").toFile();
+        if (!dir.exists() && !dir.mkdirs()) {
+            log.warn("Could not create user catalog directory: " + dir);
+        }
+        return dir;
+    }
+
+    /** Merges the shipped plugin catalog with the user's on-demand imports. */
+    public static LoadedCatalog loadMerged(File pluginDirectory) {
+        LoadedCatalog shipped = loadAll(resolveCatalogDirectory(pluginDirectory));
+        File userDir = resolveUserCatalogDirectory();
+        File[] userFiles = userDir.listFiles((d, name) -> name.toLowerCase().endsWith(".ttl"));
+        if (userFiles == null || userFiles.length == 0) {
+            return shipped;
+        }
+        LoadedCatalog user = loadAll(userDir);
+        for (ConceptEntry entry : user.index().entries()) {
+            shipped.index().add(entry);
+        }
+        shipped.model().add(user.model());
+        DiagnosticLog.event("CATALOG", "User catalog merged: +" + user.index().size()
+                + " concepts from " + userDir);
+        return shipped;
+    }
+
     public static File resolveCatalogDirectory(File pluginDirectory) {
         String override = System.getProperty(CATALOG_PROPERTY);
         if (override != null && !override.isBlank()) {

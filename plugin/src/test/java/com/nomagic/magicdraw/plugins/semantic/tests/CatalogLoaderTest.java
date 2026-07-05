@@ -57,4 +57,31 @@ public class CatalogLoaderTest {
         ConceptIndex index = CatalogLoader.load(new File("does/not/exist"));
         assertTrue("missing catalog must yield an empty (not null) index", index.isEmpty());
     }
+
+    @Test
+    public void testOnDemandRegulatoryOntologyBecomesAlignable() throws Exception {
+        // Owner scenario: a medical-device program imports a governance/certification
+        // ontology on demand; its concepts must be indexable exactly like shipped ones.
+        java.nio.file.Path dir = java.nio.file.Files.createTempDirectory("user-catalog");
+        java.nio.file.Files.writeString(dir.resolve("device-regulatory.ttl"), """
+                @prefix owl:  <http://www.w3.org/2002/07/owl#> .
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                @prefix mdreg: <http://example.org/medical-device-regulatory#> .
+                mdreg:CertifiedDevice a owl:Class ;
+                    rdfs:label "Certified Device" ;
+                    rdfs:comment "A medical device holding current regulatory certification." .
+                mdreg:RegulatoryApproval a owl:Class ;
+                    rdfs:label "Regulatory Approval" ;
+                    rdfs:comment "An approval issued by a competent authority (e.g. FDA, MDR notified body)." .
+                mdreg:QualityManagementSystem a owl:Class ;
+                    rdfs:label "Quality Management System" ;
+                    rdfs:comment "ISO 13485-style QMS governing device manufacture." .
+                """);
+        CatalogLoader.LoadedCatalog loaded = CatalogLoader.loadAll(dir.toFile());
+        assertEquals(3, loaded.index().size());
+        assertTrue("imported regulatory concept must be searchable",
+                loaded.index().candidates(ConceptIndex.tokenize("certified")).stream()
+                        .anyMatch(e -> e.iri().endsWith("#CertifiedDevice")));
+        assertTrue("TBox triples must join the query dataset", loaded.model().size() >= 9);
+    }
 }

@@ -1,11 +1,11 @@
-17:42:01.339  === IT6 suggest-align START ===
-17:42:01.368  REST healthy: {"service":"semantic-alignment","endpoints":["/sparql","/metrics","/metrics/reset"]}
-17:42:01.401  created SuggestProbe_1783291321381
-17:42:09.604  note: no zero-keystroke SUGGEST event (acceptable for signal-less name)
-17:42:09.836  narrowed: 2026-07-05 17:42:09.782 | SUGGEST | SuggestProbe_1783291321381 | query=Organization | top=org:Organization:56, sumo:Organization:56, uaf:Organization:56, uafsml:def-organization:56, org:OrganizationalUnit:39, uaf:OrganizationInPhase:39, uaf:OrganizationalResource:39, uafsml:def-organizationmetadata:39
-17:42:09.869  mapping: 2026-07-05 17:42:09.867 | MAPPING | Class SuggestProbe_1783291321381 -> http://www.w3.org/ns/org#Organization | status=OK
-17:42:09.870  stored IRI OK: http://www.w3.org/ns/org#Organization
-17:42:09.872  metrics: {"clicks":1,"keystrokes":0}
-17:42:09.877  click budget OK: 1 clicks (budget <= 2)
-17:42:09.879  RESULT: PASS
-17:42:09.879  === IT6 DONE ===
+17:58:18.711  === IT6 suggest-align START ===
+17:58:18.743  REST healthy: {"service":"semantic-alignment","endpoints":["/sparql","/metrics","/metrics/reset","/catalog/reload"]}
+17:58:18.775  created SuggestProbe_1783292298754
+17:58:26.992  note: no zero-keystroke SUGGEST event (acceptable for signal-less name)
+17:58:27.249  narrowed: 2026-07-05 17:58:27.197 | SUGGEST | SuggestProbe_1783292298754 | query=Organization | top=org:Organization:56, sumo:Organization:56, uaf:Organization:56, uafsml:def-organization:56, org:OrganizationalUnit:39, uaf:OrganizationInPhase:39, uaf:OrganizationalResource:39, uafsml:def-organizationmetadata:39
+17:58:27.286  mapping: 2026-07-05 17:58:27.285 | MAPPING | Class SuggestProbe_1783292298754 -> http://www.w3.org/ns/org#Organization | status=OK
+17:58:27.288  stored IRI OK: http://www.w3.org/ns/org#Organization
+17:58:27.291  metrics: {"clicks":1,"keystrokes":0}
+17:58:27.299  click budget OK: 1 clicks (budget <= 2)
+17:58:27.300  RESULT: PASS
+17:58:27.302  === IT6 DONE ===
