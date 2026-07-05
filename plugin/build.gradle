@@ -103,6 +103,7 @@ tasks.register('generatePluginDescriptor') {
         ownClassloader="true">
     <requires>
         <api version="1.0"/>
+        <required-plugin id="AutomatonPlugin" name="Automaton"/>
     </requires>
     <runtime>
         <library name="semantic-alignment-plugin.jar"/>
@@ -144,6 +145,12 @@ tasks.register('deployPlugin', Sync) {
     // shapes for requirement-satisfaction graphs (selectable via -Dsemantic.plugin.shapes)
     from new File(projectDir, 'shapes/semantic-plugin-shapes.ttl')
     from new File(projectDir.parentFile, 'UAF to OWL Goals/ontologies/uaf_traceability_shapes.ttl')
+    // Integrated REST test harness, auto-started by HarnessBootstrap at plugin init
+    from(providers.gradleProperty('harnessSrc')
+            .getOrElse('E:/_Documents/git/TutorialForCatiaMagicApiMCP/test harness')) {
+        include 'start-harness.groovy', 'stop-harness.groovy', 'SysMLv2Logger.groovy'
+        into 'harness'
+    }
     // tbox/ is runtime-writable (integration tests drop consistency axioms there)
     preserve { include 'tbox/**' }
 }

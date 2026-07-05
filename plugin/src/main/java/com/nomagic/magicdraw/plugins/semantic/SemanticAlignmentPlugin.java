@@ -88,6 +88,10 @@ public class SemanticAlignmentPlugin extends Plugin {
         // (e.g. on project close) and every later Platform.runLater call is dropped.
         Platform.setImplicitExit(false);
 
+        // Integrated REST test harness: auto-starts on port 8765 so integration tests
+        // run zero-touch after Cameo launches (no manual Tools > Macros step).
+        HarnessBootstrap.startAsync(pluginDirectory);
+
         // One panel per project browser: the panel captures its own project so that
         // selections, mappings, and audits always target the project they came from.
         Browser.addBrowserInitializer(new Browser.BrowserInitializer() {

@@ -10,6 +10,8 @@
         ownClassloader="true">
     <requires>
         <api version="1.0"/>
+        <!-- Supplies the Groovy runtime for the integrated REST test harness -->
+        <required-plugin id="AutomatonPlugin" name="Automaton"/>
     </requires>
     <runtime>
         <library name="semantic-alignment-plugin.jar"/>
