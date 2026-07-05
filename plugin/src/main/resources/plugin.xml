@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="com.nomagic.magicdraw.plugins.semantic"
+        name="UAF and SysML Semantic Integration Plugin"
+        version="2.1.0"
+        provider-name="NoMagic"
+        class="com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin">
+    <requires>
+        <api-version>26xR1</api-version>
+    </requires>
+    <runtime>
+        <library name="semantic-alignment-plugin.jar"/>
+    </runtime>
+    <description>
+        CATIA Magic plugin connecting UML / SysML models with standard ontologies (SUMO, BMM, ORG, EMMO) with SBVR structured descriptions and SHACL validations.
+    </description>
+</plugin>
