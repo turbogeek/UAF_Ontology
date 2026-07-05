@@ -2,6 +2,11 @@ package com.nomagic.magicdraw.plugins.semantic;
 
 import com.nomagic.magicdraw.core.Project;
 import com.nomagic.magicdraw.plugins.Plugin;
+import com.nomagic.magicdraw.plugins.semantic.align.CatalogLoader;
+import com.nomagic.magicdraw.plugins.semantic.align.ConceptIndex;
+import com.nomagic.magicdraw.plugins.semantic.align.ConceptSuggestion;
+import com.nomagic.magicdraw.plugins.semantic.align.StereotypeRouter;
+import com.nomagic.magicdraw.plugins.semantic.align.SuggestionRanker;
 import com.nomagic.magicdraw.plugins.semantic.commands.TransactionWrapper;
 import com.nomagic.magicdraw.plugins.semantic.metadata.StereotypeManager;
 import com.nomagic.magicdraw.ui.ProjectWindowsManager;
@@ -59,6 +64,9 @@ public class SemanticAlignmentPlugin extends Plugin {
     // Written once in init(); the deployed plugin folder holds the default SHACL shapes.
     private static volatile File pluginDirectory;
 
+    // Built once on a background thread at init; null until the catalog is loaded.
+    private static volatile SuggestionRanker suggestionRanker;
+
     private static final WindowComponentInfo info = new WindowComponentInfo(
             COMPONENT_ID,
             COMPONENT_NAME,
@@ -87,6 +95,16 @@ public class SemanticAlignmentPlugin extends Plugin {
         // Integrated REST test harness: auto-starts on port 8765 so integration tests
         // run zero-touch after Cameo launches (no manual Tools > Macros step).
         HarnessBootstrap.startAsync(pluginDirectory);
+
+        // Alignment catalog: loaded off the startup path; the sidebar degrades to a
+        // "catalog loading/missing" hint until this completes.
+        Thread catalogLoader = new Thread(() -> {
+            ConceptIndex index = CatalogLoader.load(
+                    CatalogLoader.resolveCatalogDirectory(pluginDirectory));
+            suggestionRanker = new SuggestionRanker(index, StereotypeRouter.load(pluginDirectory));
+        }, "semantic-catalog-loader");
+        catalogLoader.setDaemon(true);
+        catalogLoader.start();
 
         // One panel per project browser: the panel captures its own project so that
         // selections, mappings, and audits always target the project they came from.
@@ -198,10 +216,17 @@ public class SemanticAlignmentPlugin extends Plugin {
         private final JLabel selectionLabel = new JLabel("Selected Element: (none)");
         private final JLabel typeLabel = new JLabel("Stereotype: -");
         private final JTextArea sbvrArea = new JTextArea("Select an element in the containment tree.");
+        private final DefaultListModel<ConceptSuggestion> suggestionModel = new DefaultListModel<>();
+        private final JList<ConceptSuggestion> suggestionList = new JList<>(suggestionModel);
         private final JTextField searchField = new JTextField();
         private final JButton auditButton = new JButton("Run Audit");
         private final JLabel statusBadge = new JLabel("STATUS: NOT AUDITED");
         private final JTextArea consoleArea = new JTextArea();
+
+        // Context the ranker scores against; updated on every tree selection.
+        private volatile String selectedName = "";
+        private volatile List<String> selectedStereotypes = List.of();
+        private final Timer searchDebounce = new Timer(150, e -> refreshSuggestions());
 
         SemanticBrowserPanel(Project project) {
             super(new BorderLayout());
@@ -254,18 +279,68 @@ public class SemanticAlignmentPlugin extends Plugin {
             root.add(sbvrScroll);
             root.add(Box.createVerticalStrut(10));
 
-            // Concept mapping input: Enter applies the IRI to the selected element
-            JLabel searchHeader = new JLabel("Align with Ontology Concept");
+            // Suggested mappings: ranked for the selected element with zero keystrokes;
+            // ONE CLICK on a row applies the mapping (v3 plan click budget).
+            JLabel suggestHeader = new JLabel("Suggested Mappings (click to apply)");
+            suggestHeader.setForeground(FG_MUTED);
+            suggestHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(suggestHeader);
+            suggestionList.setName("semantic.suggestionList");
+            suggestionList.setBackground(BG_CARD);
+            suggestionList.setForeground(FG_MAIN);
+            suggestionList.setSelectionBackground(new Color(0x0369a1));
+            suggestionList.setSelectionForeground(Color.WHITE);
+            suggestionList.setVisibleRowCount(5);
+            suggestionList.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value,
+                        int idx, boolean sel, boolean focus) {
+                    Component c = super.getListCellRendererComponent(list, value, idx, sel, focus);
+                    if (value instanceof ConceptSuggestion s) {
+                        setText(String.format("%s   %s   %d%%",
+                                s.entry().label(), s.entry().curie(), Math.round(s.score() * 100)));
+                        setToolTipText(s.entry().comment().isBlank() ? s.entry().iri() : s.entry().comment());
+                    }
+                    return c;
+                }
+            });
+            suggestionList.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent event) {
+                    int row = suggestionList.locationToIndex(event.getPoint());
+                    if (row >= 0 && row < suggestionModel.size()) {
+                        ConceptSuggestion suggestion = suggestionModel.get(row);
+                        DiagnosticLog.event("SUGGEST", "clicked " + suggestion.entry().curie()
+                                + " (" + Math.round(suggestion.score() * 100) + "%) for " + selectedName);
+                        applyMappingFromUI(suggestion.entry().iri());
+                    }
+                }
+            });
+            JScrollPane suggestScroll = new JScrollPane(suggestionList);
+            suggestScroll.setPreferredSize(new Dimension(280, 96));
+            suggestScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(suggestScroll);
+            root.add(Box.createVerticalStrut(10));
+
+            // Search narrows the suggestion list live; Enter keeps the expert path
+            // (raw CURIE/IRI) so scripted and power-user flows stay intact.
+            JLabel searchHeader = new JLabel("Search Ontology Concepts");
             searchHeader.setForeground(FG_MUTED);
             searchHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
             root.add(searchHeader);
             searchField.setName("semantic.conceptField");
-            searchField.setToolTipText("Concept IRI (e.g. sumo:MilitaryBase) + Enter");
+            searchField.setToolTipText("Type 2-4 characters to narrow suggestions; Enter applies a raw CURIE/IRI");
             searchField.setBackground(BG_CARD);
             searchField.setForeground(FG_MAIN);
             searchField.setCaretColor(FG_MAIN);
             searchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
             searchField.setAlignmentX(Component.LEFT_ALIGNMENT);
+            searchDebounce.setRepeats(false);
+            searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+                @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { searchDebounce.restart(); }
+                @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { searchDebounce.restart(); }
+                @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { searchDebounce.restart(); }
+            });
             searchField.addActionListener(event -> {
                 String text = searchField.getText();
                 if (text != null && !text.isBlank()) {
@@ -362,6 +437,11 @@ public class SemanticAlignmentPlugin extends Plugin {
                 DiagnosticLog.event("SELECTION", name + " | stereotypes=" + typeText
                         + " | concept=" + (conceptURI == null ? "-" : conceptURI) + " | sbvr=" + sbvr);
                 showSelection(name, typeText, sbvr);
+
+                // Zero-keystroke suggestions for the new selection (v3 plan section 1)
+                selectedName = sbvrSubject;
+                selectedStereotypes = stereotypes.stream().map(Stereotype::getName).toList();
+                refreshSuggestions();
             } catch (Exception e) {
                 log.error("Selection handling failed", e);
                 DiagnosticLog.event("ERROR", "Selection handling failed: " + e);
@@ -497,6 +577,34 @@ public class SemanticAlignmentPlugin extends Plugin {
                 selectionLabel.setText("Selected Element: " + name);
                 typeLabel.setText("Stereotype: " + typeText);
                 sbvrArea.setText(sbvr);
+            });
+        }
+
+        /**
+         * Re-ranks the suggestion list for the current element; a typed query narrows,
+         * an empty field falls back to zero-keystroke element ranking. Index lookups
+         * over the ~1,400-concept catalog are sub-millisecond, so this runs inline on
+         * the EDT. Trace: v3 plan section 1
+         */
+        private void refreshSuggestions() {
+            SwingUtilities.invokeLater(() -> {
+                SuggestionRanker ranker = suggestionRanker;
+                suggestionModel.clear();
+                if (ranker == null) {
+                    return; // catalog still loading (or missing - journaled by the loader)
+                }
+                String query = searchField.getText();
+                List<ConceptSuggestion> top = (query == null || query.isBlank())
+                        ? ranker.suggestForElement(selectedName, selectedStereotypes, 5)
+                        : ranker.search(query.trim(), selectedName, selectedStereotypes, 8);
+                top.forEach(suggestionModel::addElement);
+                if (!top.isEmpty()) {
+                    DiagnosticLog.event("SUGGEST", selectedName
+                            + " | query=" + (query == null || query.isBlank() ? "-" : query.trim())
+                            + " | top=" + top.stream()
+                                    .map(s -> s.entry().curie() + ":" + Math.round(s.score() * 100))
+                                    .collect(Collectors.joining(", ")));
+                }
             });
         }
 

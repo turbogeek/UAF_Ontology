@@ -140,6 +140,13 @@ tasks.register('deployPlugin', Sync) {
         include 'start-harness.groovy', 'stop-harness.groovy', 'SysMLv2Logger.groovy'
         into 'harness'
     }
+    // Alignment catalog for the suggestion index (TBox/schema ontologies only -
+    // instance/example files stay out to keep the index focused and the load fast)
+    from(new File(projectDir.parentFile, 'UAF to OWL Goals/ontologies')) {
+        include 'uaf_ontology.ttl', 'uafsml_ontology.ttl', 'kerml.ttl', 'sysml2.ttl',
+                'gufo.ttl', 'bmm.ttl', 'org.ttl', 'sumo.ttl', 'uaf_bridge.ttl'
+        into 'catalog'
+    }
     // tbox/ is runtime-writable (integration tests drop consistency axioms there)
     preserve { include 'tbox/**' }
 }
