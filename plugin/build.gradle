@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.nomagic.magicdraw.plugins'
+version = '2.1.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'E:/Magic SW/CMSoS26xR1pr/lib'
+    }
+}
+
+dependencies {
+    // Compile against all Cameo/MagicDraw jars
+    compileOnly fileTree(dir: 'E:/Magic SW/CMSoS26xR1pr/lib', include: ['*.jar'])
+    testImplementation fileTree(dir: 'E:/Magic SW/CMSoS26xR1pr/lib', include: ['*.jar'])
+
+    // Apache Jena dependencies
+    implementation 'org.apache.jena:jena-core:4.6.1'
+    implementation 'org.apache.jena:jena-shacl:4.6.1'
+
+    // Direct JavaFX dependencies with Windows classifier
+    implementation 'org.openjfx:javafx-base:21:win'
+    implementation 'org.openjfx:javafx-graphics:21:win'
+    implementation 'org.openjfx:javafx-controls:21:win'
+    implementation 'org.openjfx:javafx-swing:21:win'
+
+    // Testing dependencies
+    testImplementation 'junit:junit:4.13.2'
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['--enable-preview']
+}
+
+tasks.withType(Test) {
+    jvmArgs += ['--enable-preview']
+}
