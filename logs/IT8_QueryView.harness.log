@@ -1,0 +1,9 @@
+﻿17:42:10.478  === IT8 query-view START ===
+17:42:10.637  /sparql SELECT OK (1373 bytes, contains EchoBase)
+17:42:10.646  /sparql ASK OK: a sumo:MilitaryBase individual exists
+17:42:11.246  SBVR view OK: English rendering contains the fixture sentence
+17:42:11.635  Turtle view OK
+17:42:11.637  full Turtle export saved: C:\Users\DBR2\.semantic_alignment_plugin\ontology-export.ttl (1495 bytes)
+17:42:11.638  RESULT: PASS
+17:42:11.639  === IT8 DONE ===
+

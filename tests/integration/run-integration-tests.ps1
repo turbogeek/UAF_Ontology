@@ -24,7 +24,8 @@ $logDir = Join-Path (Split-Path -Parent (Split-Path -Parent $testDir)) 'UAF_Onto
 if (-not (Test-Path $logDir)) { $logDir = 'E:\_Documents\git\UAF_Ontology\logs' }
 
 $tests = @('IT0_PluginLoaded', 'IT1_ProfileAndFixture', 'IT2_MappingUndo',
-           'IT3_GuiSelection', 'IT4_GuiAudit', 'IT5_AuditViolations')
+           'IT3_GuiSelection', 'IT4_GuiAudit', 'IT5_AuditViolations',
+           'IT6_SuggestAlign', 'IT8_QueryView')
 if (-not $SkipCleanup) { $tests += 'IT9_CleanupFixture' }
 
 # --- Harness reachability -----------------------------------------------------

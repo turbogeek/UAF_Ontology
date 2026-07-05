@@ -147,7 +147,14 @@ public class SemanticRDFExporter {
         Resource elementResource = model.createResource(elementURI(element));
         elementResource.addProperty(RDF.type, model.createResource(conceptURI));
 
-        String label = sanitizeLabel(element.getHumanName());
+        // Bare element name, not getHumanName()'s "Class EchoBase" - the label feeds
+        // the SBVR English view where the metatype prefix reads as noise.
+        String rawLabel = element.getHumanName();
+        if (element instanceof com.nomagic.uml2.ext.magicdraw.classes.mdkernel.NamedElement named
+                && named.getName() != null && !named.getName().isEmpty()) {
+            rawLabel = named.getName();
+        }
+        String label = sanitizeLabel(rawLabel);
         if (!label.isEmpty()) {
             // Quote/backslash escaping is delegated to Jena's Turtle writer; sanitizeLabel
             // removes only the control characters the writer will not neutralize (spec 8.3).

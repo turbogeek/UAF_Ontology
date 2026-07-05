@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -36,6 +37,11 @@ public class CatalogLoaderTest {
         assertNotNull("org:Organization must be indexed", organization);
         assertTrue("org concepts must carry comments for tooltips/guides",
                 !organization.comment().isBlank());
+        // Multilingual regression: W3C ORG has @fr/@es/... labels; English must win the
+        // primary slot or exact-match ranking silently degrades (live IT6 finding).
+        assertEquals("Organization", organization.label());
+        assertTrue("other languages become searchable aliases",
+                organization.altLabels().stream().anyMatch(l -> !l.equals("Organization")));
 
         assertTrue("uaf:OperationalPerformer must be indexed",
                 index.entries().stream().anyMatch(e ->

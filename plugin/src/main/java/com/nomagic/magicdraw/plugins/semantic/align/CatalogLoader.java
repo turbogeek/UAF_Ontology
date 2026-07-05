@@ -120,14 +120,19 @@ public final class CatalogLoader {
             String prefix = nsToPrefix.getOrDefault(ns, ontologyId);
             String local = subject.getLocalName();
 
-            String label = firstLiteral(subject, RDFS.label);
+            // W3C ORG carries multilingual labels; a French "organisation"@fr must not
+            // become the primary label or exact-match ranking silently breaks. English
+            // (or untagged) wins; every other language becomes a searchable alias.
+            List<String> allLabels = literals(subject, RDFS.label.getURI(), model);
+            String label = preferEnglish(subject, RDFS.label);
             if (label == null || label.isBlank()) {
                 label = local;
             }
-            List<String> altLabels = new ArrayList<>();
+            List<String> altLabels = new ArrayList<>(allLabels);
+            altLabels.remove(label);
             altLabels.addAll(literals(subject, SKOS_NS + "prefLabel", model));
             altLabels.addAll(literals(subject, SKOS_NS + "altLabel", model));
-            String comment = firstLiteral(subject, RDFS.comment);
+            String comment = preferEnglish(subject, RDFS.comment);
 
             Set<String> tokens = new HashSet<>(ConceptIndex.tokenize(label));
             tokens.addAll(ConceptIndex.tokenize(local));
@@ -151,18 +156,27 @@ public final class CatalogLoader {
         return result;
     }
 
-    private static String firstLiteral(Resource subject, org.apache.jena.rdf.model.Property property) {
+    /** First English or untagged literal, falling back to any language. */
+    private static String preferEnglish(Resource subject, org.apache.jena.rdf.model.Property property) {
+        String fallback = null;
         StmtIterator it = subject.listProperties(property);
         while (it.hasNext()) {
             RDFNode node = it.next().getObject();
-            if (node.isLiteral()) {
+            if (!node.isLiteral()) {
+                continue;
+            }
+            String lang = node.asLiteral().getLanguage();
+            if (lang == null || lang.isEmpty() || lang.startsWith("en")) {
                 return node.asLiteral().getString();
             }
+            if (fallback == null) {
+                fallback = node.asLiteral().getString();
+            }
         }
-        return null;
+        return fallback;
     }
 
-    private static List<String> literals(Resource subject, String propertyIri, Model model) {
+    static List<String> literals(Resource subject, String propertyIri, Model model) {
         List<String> result = new ArrayList<>();
         StmtIterator it = subject.listProperties(model.createProperty(propertyIri));
         while (it.hasNext()) {
