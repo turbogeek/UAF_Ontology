@@ -1,0 +1,13 @@
+14:45:13.137  === IT5 audit-violations START ===
+14:45:13.178  TBox dropped: E:\Magic SW\CMSoS26xR1pr\plugins\com.nomagic.magicdraw.plugins.semantic\tbox\it5-disjoint.ttl
+14:45:13.515  Phase A audit: 2026-07-05 14:45:13.298 | AUDIT | project=Use Case Tester | consistent=false | shaclViolations=0 | tboxFiles=1 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl | "Individual a member of disjoint classes" \n Culprit = <http://purl.org/uaf/project/_2026x_1_2b0010b_1783280709432_16445_18558> \n Implicated node: <http://www.ontologyportal.org/SUMO.owl#Vehicle> \n Implicated node: <http://www.ontologyportal.org/SUMO.owl#MilitaryBase> \n
+14:45:13.517  Phase A OK: inconsistency detected
+14:45:13.519  Phase A badge OK: STATUS: INCONSISTENT
+14:45:13.521  shapes override set: E:\_Documents\git\UAF_Ontology\logs\it5-violating-shapes.ttl
+14:45:13.844  Phase B audit: 2026-07-05 14:45:13.630 | AUDIT | project=Use Case Tester | consistent=true | shaclViolations=5 | tboxFiles=0 | shapes=it5-violating-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl | Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783280709432_16445_18558: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783280710072_58093_18568: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783280709436_614051_18560: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783280709434_949689_18559: IT5 synthetic constraint: certification evidence required. ;; Violation at http://purl.org/uaf/project/_2026x_1_2b0010b_1783280709438_42582_18561: IT5 synthetic constraint: certification evidence required.
+14:45:13.847  Phase B OK: 5 violation(s) reported
+14:45:13.850  Phase B badge OK: STATUS: 5 VIOLATION(S)
+14:45:14.173  Phase C OK: 2026-07-05 14:45:13.938 | AUDIT | project=Use Case Tester | consistent=true | shaclViolations=0 | tboxFiles=0 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl
+14:45:14.174  Phase C badge OK: STATUS: CONSISTENT
+14:45:14.175  RESULT: PASS
+14:45:14.176  === IT5 DONE ===

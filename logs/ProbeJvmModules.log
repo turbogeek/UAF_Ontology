@@ -1,0 +1,61 @@
+14:37:11.501  java.version=21.0.10 vendor=Eclipse Adoptium
+14:37:11.529  java.home=E:\Magic SW\CMSoS26xR1pr\jre
+14:37:11.547  input args (52):
+14:37:11.552    ARG: --add-exports=java.desktop/jdk.swing.interop=ALL-UNNAMED
+14:37:11.553    ARG: -XX:+IgnoreUnrecognizedVMOptions
+14:37:11.554    ARG: -Xmx600000M
+14:37:11.555    ARG: -Xss1024K
+14:37:11.557    ARG: -DLOCALCONFIG=true
+14:37:11.558    ARG: -Desi.system.config=data/application.conf
+14:37:11.559    ARG: -Djdk.attach.allowAttachSelf=true
+14:37:11.560    ARG: -Dsun.locale.formatasdefault=true
+14:37:11.560    ARG: --illegal-access=permit
+14:37:11.561    ARG: -XX:-OmitStackTraceInFastThrow
+14:37:11.562    ARG: -Dadd.plugin.name.to.application.title=false
+14:37:11.562    ARG: -Dstart.application.with.updm2.or.uaf.plugin=uaf
+14:37:11.563    ARG: -Dmigrate.project.from.updm2.to.uaf=false
+14:37:11.564    ARG: -Dfile.encoding=UTF-8
+14:37:11.564    ARG: --add-exports=java.desktop/sun.print=ALL-UNNAMED
+14:37:11.565    ARG: --add-exports=java.base/sun.security.validator=ALL-UNNAMED
+14:37:11.566    ARG: --add-opens=java.base/java.lang=ALL-UNNAMED
+14:37:11.567    ARG: --add-opens=java.base/sun.security.action=ALL-UNNAMED
+14:37:11.568    ARG: --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED
+14:37:11.568    ARG: --add-opens=java.desktop/javax.swing=ALL-UNNAMED
+14:37:11.569    ARG: --add-opens=java.desktop/javax.swing.text=ALL-UNNAMED
+14:37:11.570    ARG: --add-opens=java.desktop/javax.swing.table=ALL-UNNAMED
+14:37:11.571    ARG: --add-opens=java.desktop/javax.accessibility=ALL-UNNAMED
+14:37:11.572    ARG: --add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED
+14:37:11.573    ARG: --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED
+14:37:11.575    ARG: --add-opens=java.desktop/javax.swing.plaf.metal=ALL-UNNAMED
+14:37:11.575    ARG: --add-opens=java.desktop/java.awt=ALL-UNNAMED
+14:37:11.577    ARG: --add-opens=java.desktop/java.awt.event=ALL-UNNAMED
+14:37:11.577    ARG: --add-opens=java.desktop/sun.awt.windows=ALL-UNNAMED
+14:37:11.578    ARG: --add-opens=java.desktop/sun.awt.dnd=ALL-UNNAMED
+14:37:11.579    ARG: --add-opens=java.desktop/sun.awt=ALL-UNNAMED
+14:37:11.579    ARG: --add-opens=java.desktop/sun.awt.im=ALL-UNNAMED
+14:37:11.580    ARG: --add-opens=java.desktop/sun.awt.image=ALL-UNNAMED
+14:37:11.582    ARG: --add-opens=java.desktop/sun.awt.datatransfer=ALL-UNNAMED
+14:37:11.582    ARG: --add-opens=java.desktop/sun.swing=ALL-UNNAMED
+14:37:11.583    ARG: --add-opens=java.desktop/sun.font=ALL-UNNAMED
+14:37:11.583    ARG: --add-opens=java.xml/com.sun.org.apache.xml.internal.serialize=ALL-UNNAMED
+14:37:11.584    ARG: --add-opens=java.datatransfer/java.awt.datatransfer=ALL-UNNAMED
+14:37:11.584    ARG: --add-opens=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED
+14:37:11.586    ARG: --add-exports=java.base/jdk.internal.module=ALL-UNNAMED
+14:37:11.587    ARG: --add-opens=java.desktop/com.apple.eawt=ALL-UNNAMED
+14:37:11.588    ARG: --add-opens=java.desktop/com.apple.laf=ALL-UNNAMED
+14:37:11.588    ARG: --add-opens=java.desktop/sun.lwawt=ALL-UNNAMED
+14:37:11.589    ARG: --add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED
+14:37:11.590    ARG: --add-opens=java.desktop/com.apple.eawt.event=ALL-UNNAMED
+14:37:11.591    ARG: --add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED
+14:37:11.592    ARG: --add-opens=java.base/sun.util.locale.provider=ALL-UNNAMED
+14:37:11.592    ARG: --add-exports=jdk.attach/sun.tools.attach=ALL-UNNAMED
+14:37:11.593    ARG: -Djdk.util.zip.disableZip64ExtraFieldValidation=true
+14:37:11.594    ARG: -Dinitial.user.language=en
+14:37:11.595    ARG: -Dlauncher.properties.file=E:\Magic SW\CMSoS26xR1pr\bin\msosa.properties
+14:37:11.595    ARG: -DMAIN_CLASS=com.nomagic.magicdraw.Main
+14:37:11.596  JAVA_TOOL_OPTIONS env: --add-exports=java.desktop/jdk.swing.interop=ALL-UNNAMED
+14:37:11.610  java.desktop present; jdk.swing.interop exported to script unnamed module: false
+14:37:11.611  jdk.swing.interop exported unconditionally: false
+14:37:11.714  jdk.swing.interop exported to PLUGIN unnamed module: false
+14:37:11.717  Class.forName via plugin CL FAILED: java.lang.ClassNotFoundException: jdk.swing.interop.SwingInterOpUtils
+14:37:11.718  probe done

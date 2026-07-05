@@ -1,0 +1,11 @@
+14:07:31.530  SemanticBrowserPanel-hosted JFXPanels found: 1
+14:07:31.535  panel[0] host=1906792772 fx=1705786092 showing=false size=484x170
+14:07:31.564  panel[0] LABEL: Selected Element: (none)
+14:07:31.565  panel[0] LABEL: Stereotype: -
+14:07:31.566  panel[0] LABEL: SBVR Structured English
+14:07:31.567  panel[0] LABEL: Align with Ontology Concept
+14:07:31.567  panel[0] LABEL: STATUS: NOT AUDITED
+14:07:31.568  panel[0] BUTTON: Run Audit disabled=false
+14:07:31.569  panel[0] TEXTAREA: Select an element in the containment tree.
+14:07:31.570  panel[0] TEXTAREA: 
+14:07:31.570  probe done

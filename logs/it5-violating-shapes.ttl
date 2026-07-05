@@ -1,0 +1,10 @@
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix uaf: <http://purl.org/uaf/ontology#> .
+uaf:ImpossibleShape a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:property [
+        sh:path uaf:certificationEvidence ;
+        sh:minCount 1 ;
+        sh:message "IT5 synthetic constraint: certification evidence required." ;
+    ] .

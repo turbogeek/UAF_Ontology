@@ -1,0 +1,10 @@
+14:08:49.411  SemanticBrowserPanel instances in window tree: 1
+14:08:49.416  --- panel[0] id=1906792772 ---
+14:08:49.421    fxReady = false
+14:08:49.422    pendingSelection = [Ljava.lang.String;@665bfc64
+14:08:49.423    project = Use Case Tester
+14:08:49.424    selectionLabel id=1277917177
+14:08:49.425    statusBadge   id=796763366
+14:08:49.425    jfxPanel      id=1705786092 showing=false
+14:08:49.431    scene badge id=796763366 text=STATUS: NOT AUDITED | fieldBadgeTextNow=STATUS: NOT AUDITED
+14:08:49.432  probe done

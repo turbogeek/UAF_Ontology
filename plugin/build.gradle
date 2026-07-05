@@ -34,11 +34,8 @@ dependencies {
     implementation 'org.apache.jena:jena-core:4.6.1'
     implementation 'org.apache.jena:jena-shacl:4.6.1'
 
-    // Direct JavaFX dependencies with Windows classifier (Cameo's JRE does not bundle JavaFX)
-    implementation 'org.openjfx:javafx-base:21:win'
-    implementation 'org.openjfx:javafx-graphics:21:win'
-    implementation 'org.openjfx:javafx-controls:21:win'
-    implementation 'org.openjfx:javafx-swing:21:win'
+    // NOTE: no JavaFX. Cameo's jlink'd runtime omits jdk.unsupported.desktop
+    // (jdk.swing.interop), which javafx.embed.swing requires - the sidebar is pure Swing.
 
     // Testing dependencies
     testImplementation 'junit:junit:4.13.2'
@@ -69,10 +66,6 @@ tasks.register('cameoTest', Test) {
     maxHeapSize = '4g'
 }
 
-// Gradle cannot activate the openjfx POM's platform profiles, so the classifier-less
-// javafx-*.jar stubs (empty jars) land on runtimeClasspath next to the real -win jars.
-// They must not be deployed or listed in the descriptor.
-def isJavaFxStubJar = { File f -> f.name ==~ /javafx-\w+-[\d.]+\.jar/ }
 
 // ---------------------------------------------------------------------------
 // Deployment: assembles the plugin folder inside the Cameo install.
@@ -90,7 +83,6 @@ tasks.register('generatePluginDescriptor') {
     outputs.dir descriptorDir
     doLast {
         def libEntries = configurations.runtimeClasspath.files
-                .findAll { !isJavaFxStubJar(it) }
                 .collect { "        <library name=\"lib/${it.name}\"/>" }
                 .sort()
                 .join('\n')
@@ -137,10 +129,7 @@ tasks.register('deployPlugin', Sync) {
     into "${cameoHome}/plugins/${pluginId}"
     from tasks.named('jar')
     from descriptorDir
-    from(configurations.runtimeClasspath) {
-        into 'lib'
-        exclude { isJavaFxStubJar(it.file) }
-    }
+    from(configurations.runtimeClasspath) { into 'lib' }
     // Default SHACL shapes matching the exporter vocabulary, plus the UAF traceability
     // shapes for requirement-satisfaction graphs (selectable via -Dsemantic.plugin.shapes)
     from new File(projectDir, 'shapes/semantic-plugin-shapes.ttl')

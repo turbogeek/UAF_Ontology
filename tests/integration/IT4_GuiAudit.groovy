@@ -1,20 +1,18 @@
 // IT4_GuiAudit.groovy
 // =====================================================================================
-// Integration test 4: FULL GUI audit. Fires the sidebar's "Run Audit" JavaFX button
+// Integration test 4: FULL GUI audit. Clicks the sidebar's "Run Audit" Swing button
 // (real user path), then asserts:
 //   - an AUDIT journal event with consistent=true and shaclViolations=0
 //   - last-audit-export.ttl exists, parses as Turtle (Jena via plugin classloader),
 //     and contains the fixture's type/hasPart/connectedTo/label triples (PLG-REQ-01/02)
-//   - the status badge reads "STATUS: CONSISTENT"
-// Requires IT1 (fixture) and the plugin sidebar to be open. Trace: PLG-REQ-01/02/05/06
+//   - the status badge label reads "STATUS: CONSISTENT"
+// Requires IT1 (fixture). Trace: PLG-REQ-01/02/05/06
 // =====================================================================================
 import com.nomagic.magicdraw.core.Application
 import com.nomagic.magicdraw.plugins.PluginUtils
 
 import javax.swing.SwingUtilities
 import java.text.SimpleDateFormat
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
@@ -62,56 +60,33 @@ def plugin = PluginUtils.getPlugins().find {
 if (plugin == null) { fail('Plugin not loaded.'); diag('RESULT: FAIL'); return }
 def pluginCL = plugin.getClass().getClassLoader()
 
-def onFx = { Closure work ->
-    def platformCls = Class.forName('javafx.application.Platform', true, pluginCL)
-    def latch = new CountDownLatch(1)
-    def error = new AtomicReference()
-    def out = new AtomicReference()
-    platformCls.getMethod('runLater', Runnable).invoke(null, {
-        try { out.set(work.call()) } catch (Throwable t) { error.set(t) } finally { latch.countDown() }
-    } as Runnable)
-    if (!latch.await(10, TimeUnit.SECONDS)) { throw new IllegalStateException('FX task timed out') }
-    if (error.get() != null) { throw (Throwable) error.get() }
-    return out.get()
-}
-
-def findSidebarFxPanel = {
-    def result = null
+def findByName = { String name ->
+    def result = new AtomicReference()
     def walk
     walk = { java.awt.Component c ->
-        if (result != null) { return }
-        if (c.getClass().getName().endsWith('JFXPanel')) {
-            def p = c.getParent()
-            while (p != null) {
-                if (p.getClass().getName().contains('SemanticBrowserPanel')) { result = c; return }
-                p = p.getParent()
-            }
-        }
+        if (result.get() != null) { return }
+        if (name == c.getName()) { result.set(c); return }
         if (c instanceof java.awt.Container) { c.getComponents().each { walk(it) } }
     }
-    java.awt.Window.getWindows().each { w -> if (result == null) { walk(w) } }
-    return result
+    SwingUtilities.invokeAndWait { java.awt.Window.getWindows().each { w -> if (result.get() == null) { walk(w) } } }
+    return result.get()
+}
+def readOnEdt = { Closure work ->
+    def result = new AtomicReference()
+    SwingUtilities.invokeAndWait { result.set(work.call()) }
+    return result.get()
 }
 
 try {
-    def fxPanelHolder = new AtomicReference()
-    SwingUtilities.invokeAndWait { fxPanelHolder.set(findSidebarFxPanel()) }
-    def fxPanel = fxPanelHolder.get()
-    if (fxPanel == null) { fail('sidebar JFXPanel not found.'); diag('RESULT: FAIL'); return }
+    def auditButton = findByName('semantic.auditButton')
+    def statusBadge = findByName('semantic.statusBadge')
+    if (auditButton == null || statusBadge == null) {
+        fail('audit button / status badge not found by name.'); diag('RESULT: FAIL'); return
+    }
 
     long mark = JOURNAL.exists() ? JOURNAL.length() : 0L
-
-    // Fire the real GUI button on the FX thread - identical to a user click.
-    onFx {
-        def scene = fxPanel.getScene()
-        def button = scene.getRoot().lookupAll('.button').find {
-            it.respondsTo('getText') && it.getText() == 'Run Audit'
-        }
-        if (button == null) { throw new IllegalStateException('"Run Audit" button not found') }
-        button.fire()
-        return null
-    }
-    diag('Run Audit fired via JavaFX button')
+    SwingUtilities.invokeAndWait { auditButton.doClick() } // real user click path
+    diag('Run Audit clicked')
 
     def auditLine = waitForJournalLine(mark, ['| AUDIT |'], 30000)
     if (auditLine == null) {
@@ -136,7 +111,6 @@ try {
             if (ttl.contains(token)) { diag('export contains ' + what + ' (' + token + ')') }
             else { fail('export missing ' + what + ' (' + token + ')') }
         }
-        // Prove the Turtle is well-formed by parsing it with the plugin's own Jena.
         try {
             def mfCls = Class.forName('org.apache.jena.rdf.model.ModelFactory', true, pluginCL)
             def model = mfCls.getMethod('createDefaultModel').invoke(null)
@@ -151,16 +125,10 @@ try {
         }
     }
 
-    // Badge state (poll briefly - the FX update is queued after the journal write).
+    // Badge state (poll briefly - the Swing update is queued after the journal write).
     String badgeText = null
     for (int i = 0; i < 20 && badgeText != 'STATUS: CONSISTENT'; i++) {
-        badgeText = onFx {
-            def scene = fxPanel.getScene()
-            def badge = scene.getRoot().lookupAll('.label').find {
-                it.respondsTo('getText') && it.getText()?.startsWith('STATUS:')
-            }
-            return badge == null ? null : badge.getText()
-        }
+        badgeText = readOnEdt { statusBadge.getText() }
         if (badgeText != 'STATUS: CONSISTENT') { Thread.sleep(250) }
     }
     if (badgeText == 'STATUS: CONSISTENT') { diag('badge OK: ' + badgeText) }

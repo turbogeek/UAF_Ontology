@@ -1,0 +1,14 @@
+﻿14:45:07.724  === IT0 plugin-loaded START ===
+14:45:07.834  plugin loaded: com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin | classloader=java.net.URLClassLoader@1791040d
+14:45:07.840  plugin directory: E:\Magic SW\CMSoS26xR1pr\plugins\com.nomagic.magicdraw.plugins.semantic
+14:45:08.132  class OK: com.nomagic.magicdraw.plugins.semantic.SemanticRDFExporter
+14:45:08.134  class OK: com.nomagic.magicdraw.plugins.semantic.SHACLValidator
+14:45:08.134  class OK: com.nomagic.magicdraw.plugins.semantic.SBVREngine
+14:45:08.135  class OK: com.nomagic.magicdraw.plugins.semantic.DiagnosticLog
+14:45:08.137  class OK: org.apache.jena.rdf.model.ModelFactory
+14:45:08.138  class OK: org.apache.jena.shacl.ShaclValidator
+14:45:08.140  journal OK: C:\Users\DBR2\.semantic_alignment_plugin\semantic-plugin.log (7672 bytes)
+14:45:08.146  SBVR smoke test OK: Instance: Echo Base is a Military Base.
+14:45:08.147  RESULT: PASS
+14:45:08.147  === IT0 DONE ===
+

@@ -2,19 +2,16 @@
 // =====================================================================================
 // Integration test 3: FULL GUI interaction. Programmatically selects fixture elements in
 // the containment tree (real TreeSelectionListener path) and asserts the plugin sidebar
-// reacted by reading the DiagnosticLog journal (SELECTION events). Then maps the
-// unmapped GuiMappingProbe through the sidebar's concept TextField on the JavaFX thread
-// (real user path: type IRI + Enter) and asserts the MAPPING event and model change.
+// reacted - both via the DiagnosticLog journal (SELECTION events) and by reading the
+// Swing sidebar's labels directly. Then maps the unmapped GuiMappingProbe through the
+// sidebar's concept text field (real user path: type IRI + Enter).
 // Requires IT1. Trace: PLG-REQ-03, PLG-REQ-04
 // =====================================================================================
 import com.nomagic.magicdraw.core.Application
-import com.nomagic.magicdraw.plugins.PluginUtils
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper
 
 import javax.swing.SwingUtilities
 import java.text.SimpleDateFormat
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
@@ -33,7 +30,6 @@ boolean pass = true
 def fail = { String m -> pass = false; diag('FAIL: ' + m) }
 
 final File JOURNAL = new File(new File(System.getProperty('user.home'), '.semantic_alignment_plugin'), 'semantic-plugin.log')
-// Polls the journal for a line containing all tokens, appearing after byte offset `from`.
 def waitForJournalLine = { long from, List<String> tokens, int timeoutMs ->
     long deadline = System.currentTimeMillis() + timeoutMs
     while (System.currentTimeMillis() < deadline) {
@@ -43,8 +39,7 @@ def waitForJournalLine = { long from, List<String> tokens, int timeoutMs ->
                 raf.seek(from)
                 byte[] buf = new byte[(int) (JOURNAL.length() - from)]
                 raf.readFully(buf)
-                String tail = new String(buf, 'UTF-8')
-                def line = tail.readLines().find { l -> tokens.every { l.contains(it) } }
+                def line = new String(buf, 'UTF-8').readLines().find { l -> tokens.every { l.contains(it) } }
                 if (line != null) { return line }
             } finally { raf.close() }
         }
@@ -66,11 +61,19 @@ def echoBase = pkg.getOwnedElement().find { it.respondsTo('getName') && it.getNa
 def guiProbe = pkg.getOwnedElement().find { it.respondsTo('getName') && it.getName() == 'GuiMappingProbe' }
 if (echoBase == null || guiProbe == null) { fail('Fixture elements missing - run IT1 first.'); diag('RESULT: FAIL'); return }
 
-def plugin = PluginUtils.getPlugins().find {
-    it.getClass().getName() == 'com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin'
+// Finds a component by its stable name anywhere under any window (the sidebar sets
+// semantic.* names exactly for this purpose).
+def findByName = { String name ->
+    def result = new AtomicReference()
+    def walk
+    walk = { java.awt.Component c ->
+        if (result.get() != null) { return }
+        if (name == c.getName()) { result.set(c); return }
+        if (c instanceof java.awt.Container) { c.getComponents().each { walk(it) } }
+    }
+    SwingUtilities.invokeAndWait { java.awt.Window.getWindows().each { w -> if (result.get() == null) { walk(w) } } }
+    return result.get()
 }
-if (plugin == null) { fail('Plugin not loaded.'); diag('RESULT: FAIL'); return }
-def pluginCL = plugin.getClass().getClassLoader()
 
 // Selects an element in the containment tree on the EDT via the real JTree selection
 // path, which fires the plugin's TreeSelectionListener exactly like a user click.
@@ -89,44 +92,17 @@ def selectInTree = { element ->
     if (error != null) { throw error }
 }
 
-// Runs a closure on the JavaFX thread (toolkit lives in the plugin's classloader).
-def onFx = { Closure work ->
-    def platformCls = Class.forName('javafx.application.Platform', true, pluginCL)
-    def latch = new CountDownLatch(1)
-    def error = new AtomicReference()
-    platformCls.getMethod('runLater', Runnable).invoke(null, {
-        try { work.call() } catch (Throwable t) { error.set(t) } finally { latch.countDown() }
-    } as Runnable)
-    if (!latch.await(10, TimeUnit.SECONDS)) { throw new IllegalStateException('FX task timed out') }
-    if (error.get() != null) { throw (Throwable) error.get() }
-}
-
-// Finds the sidebar's JFXPanel by walking the Swing tree under all windows.
-def findSidebarFxPanel = {
-    def result = null
-    def walk
-    walk = { java.awt.Component c ->
-        if (result != null) { return }
-        if (c.getClass().getName().endsWith('JFXPanel')) {
-            def p = c.getParent()
-            while (p != null) {
-                if (p.getClass().getName().contains('SemanticBrowserPanel')) { result = c; return }
-                p = p.getParent()
-            }
-        }
-        if (c instanceof java.awt.Container) {
-            c.getComponents().each { walk(it) }
-        }
-    }
-    java.awt.Window.getWindows().each { w -> if (result == null) { walk(w) } }
-    return result
+def readOnEdt = { Closure work ->
+    def result = new AtomicReference()
+    SwingUtilities.invokeAndWait { result.set(work.call()) }
+    return result.get()
 }
 
 try {
     // --- Phase A: selection follows the tree ---------------------------------------
     long mark = JOURNAL.exists() ? JOURNAL.length() : 0L
     selectInTree(echoBase)
-    def selLine = waitForJournalLine(mark, ['| SELECTION |', 'Echo Base'], 8000)
+    def selLine = waitForJournalLine(mark, ['| SELECTION |', 'EchoBase'], 8000)
     if (selLine == null) {
         fail('no SELECTION journal event for EchoBase within 8s (listener not firing?)')
     } else {
@@ -138,55 +114,64 @@ try {
         }
     }
 
-    // --- Phase B: sidebar panel exists in the Swing tree ---------------------------
-    def fxPanelHolder = new AtomicReference()
-    SwingUtilities.invokeAndWait { fxPanelHolder.set(findSidebarFxPanel()) }
-    def fxPanel = fxPanelHolder.get()
-    if (fxPanel == null) {
-        fail('sidebar JFXPanel not found in any window (panel not registered?)')
+    // --- Phase B: sidebar Swing components reflect the selection --------------------
+    def selectionLabel = findByName('semantic.selectionLabel')
+    def sbvrArea = findByName('semantic.sbvrArea')
+    if (selectionLabel == null || sbvrArea == null) {
+        fail('sidebar components not found by name (panel not registered?)')
     } else {
-        diag('sidebar JFXPanel found: ' + fxPanel.getClass().getName())
+        // The sidebar updates via invokeLater; give the queue a moment.
+        String labelText = null
+        for (int i = 0; i < 20; i++) {
+            labelText = readOnEdt { selectionLabel.getText() }
+            if (labelText?.contains('EchoBase')) { break }
+            Thread.sleep(200)
+        }
+        if (labelText?.contains('EchoBase')) {
+            diag('sidebar label OK: ' + labelText)
+        } else {
+            fail('sidebar selection label did not update: ' + labelText)
+        }
+        String sbvrText = readOnEdt { sbvrArea.getText() }
+        if (sbvrText == 'Instance: Echo Base is a Military Base.') {
+            diag('sidebar SBVR area OK: ' + sbvrText)
+        } else {
+            fail('sidebar SBVR area text: ' + sbvrText)
+        }
     }
 
     // --- Phase C: map GuiMappingProbe through the sidebar text field ----------------
-    if (fxPanel != null) {
-        mark = JOURNAL.exists() ? JOURNAL.length() : 0L
-        selectInTree(guiProbe)
-        def probeSel = waitForJournalLine(mark, ['| SELECTION |', 'Gui Mapping Probe'], 8000)
-        if (probeSel == null) {
-            fail('no SELECTION event for GuiMappingProbe')
-        } else if (!probeSel.contains('concept=-')) {
-            diag('note: GuiMappingProbe already mapped (rerun) - GUI mapping still exercised')
-        }
+    mark = JOURNAL.exists() ? JOURNAL.length() : 0L
+    selectInTree(guiProbe)
+    def probeSel = waitForJournalLine(mark, ['| SELECTION |', 'GuiMappingProbe'], 8000)
+    if (probeSel == null) {
+        fail('no SELECTION event for GuiMappingProbe')
+    } else if (!probeSel.contains('concept=-')) {
+        diag('note: GuiMappingProbe already mapped (rerun) - GUI mapping still exercised')
+    }
 
+    def conceptField = findByName('semantic.conceptField')
+    if (conceptField == null) {
+        fail('concept text field not found by name')
+    } else {
         mark = JOURNAL.exists() ? JOURNAL.length() : 0L
-        onFx {
-            def scene = fxPanel.getScene()
-            if (scene == null) { throw new IllegalStateException('JFXPanel has no scene yet') }
-            def field = scene.getRoot().lookupAll('.text-field').find {
-                it.respondsTo('getPromptText') && it.getPromptText()?.contains('Concept IRI')
-            }
-            if (field == null) { throw new IllegalStateException('concept TextField not found in scene') }
-            field.setText(GUI_CONCEPT)
-            def handler = field.getOnAction()
-            if (handler == null) { throw new IllegalStateException('concept TextField has no onAction handler') }
-            handler.handle(null) // same path as the user pressing Enter
+        SwingUtilities.invokeAndWait {
+            conceptField.setText(GUI_CONCEPT)
+            conceptField.postActionEvent() // same path as the user pressing Enter
         }
-        def mapLine = waitForJournalLine(mark, ['| MAPPING |', 'Gui Mapping Probe', 'status=OK'], 8000)
+        def mapLine = waitForJournalLine(mark, ['| MAPPING |', 'GuiMappingProbe', 'status=OK'], 8000)
         if (mapLine == null) {
             fail('no successful MAPPING journal event within 8s')
         } else {
             diag('mapping event: ' + mapLine.trim())
         }
-        // Model-level confirmation
         def stereo = StereotypesHelper.getStereotype(project, 'SemanticAlignment')
         if (stereo != null && StereotypesHelper.hasStereotype(guiProbe, stereo)) {
             diag('model confirms GuiMappingProbe is now aligned')
         } else {
             fail('model does not show the stereotype on GuiMappingProbe after GUI mapping')
         }
-        // Sidebar refresh shows the new alignment
-        def refreshed = waitForJournalLine(mark, ['| SELECTION |', 'Gui Mapping Probe', GUI_CONCEPT], 8000)
+        def refreshed = waitForJournalLine(mark, ['| SELECTION |', 'GuiMappingProbe', GUI_CONCEPT], 8000)
         if (refreshed == null) {
             fail('sidebar did not refresh with the new concept after mapping')
         } else {

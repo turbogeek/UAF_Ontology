@@ -49,9 +49,7 @@ if (plugin == null) {
      'com.nomagic.magicdraw.plugins.semantic.SBVREngine',
      'com.nomagic.magicdraw.plugins.semantic.DiagnosticLog',
      'org.apache.jena.rdf.model.ModelFactory',
-     'org.apache.jena.shacl.ShaclValidator',
-     'javafx.application.Platform',
-     'javafx.embed.swing.JFXPanel'].each { cn ->
+     'org.apache.jena.shacl.ShaclValidator'].each { cn ->
         try {
             Class.forName(cn, true, pluginCL)
             diag('class OK: ' + cn)

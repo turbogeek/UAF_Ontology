@@ -4,7 +4,7 @@
 //   Phase A - TBox inconsistency: drops a disjointness TBox into the plugin's tbox/
 //             folder (read per-audit, no restart) making EchoBase provably inconsistent
 //             (hasPart domain=Vehicle, Vehicle disjointWith MilitaryBase). Expects
-//             consistent=false and a red badge.
+//             consistent=false and a red INCONSISTENT badge.
 //   Phase B - SHACL violations: points -Dsemantic.plugin.shapes at a shapes file that
 //             requires a property no exported individual has. Expects violations>0.
 //   Phase C - cleanup and green re-audit: removes the TBox + property override, expects
@@ -16,8 +16,6 @@ import com.nomagic.magicdraw.plugins.PluginUtils
 
 import javax.swing.SwingUtilities
 import java.text.SimpleDateFormat
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
@@ -63,69 +61,48 @@ def plugin = PluginUtils.getPlugins().find {
     it.getClass().getName() == 'com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin'
 }
 if (plugin == null) { fail('Plugin not loaded.'); diag('RESULT: FAIL'); return }
-def pluginCL = plugin.getClass().getClassLoader()
 def pluginDir = plugin.getDescriptor()?.getPluginDirectory()
 if (pluginDir == null) { fail('Plugin directory unresolved.'); diag('RESULT: FAIL'); return }
 
-def onFx = { Closure work ->
-    def platformCls = Class.forName('javafx.application.Platform', true, pluginCL)
-    def latch = new CountDownLatch(1)
-    def error = new AtomicReference()
-    def out = new AtomicReference()
-    platformCls.getMethod('runLater', Runnable).invoke(null, {
-        try { out.set(work.call()) } catch (Throwable t) { error.set(t) } finally { latch.countDown() }
-    } as Runnable)
-    if (!latch.await(10, TimeUnit.SECONDS)) { throw new IllegalStateException('FX task timed out') }
-    if (error.get() != null) { throw (Throwable) error.get() }
-    return out.get()
-}
-def findSidebarFxPanel = {
-    def result = null
+def findByName = { String name ->
+    def result = new AtomicReference()
     def walk
     walk = { java.awt.Component c ->
-        if (result != null) { return }
-        if (c.getClass().getName().endsWith('JFXPanel')) {
-            def p = c.getParent()
-            while (p != null) {
-                if (p.getClass().getName().contains('SemanticBrowserPanel')) { result = c; return }
-                p = p.getParent()
-            }
-        }
+        if (result.get() != null) { return }
+        if (name == c.getName()) { result.set(c); return }
         if (c instanceof java.awt.Container) { c.getComponents().each { walk(it) } }
     }
-    java.awt.Window.getWindows().each { w -> if (result == null) { walk(w) } }
-    return result
+    SwingUtilities.invokeAndWait { java.awt.Window.getWindows().each { w -> if (result.get() == null) { walk(w) } } }
+    return result.get()
+}
+def readOnEdt = { Closure work ->
+    def result = new AtomicReference()
+    SwingUtilities.invokeAndWait { result.set(work.call()) }
+    return result.get()
 }
 
-def fxPanelHolder = new AtomicReference()
-SwingUtilities.invokeAndWait { fxPanelHolder.set(findSidebarFxPanel()) }
-def fxPanel = fxPanelHolder.get()
-if (fxPanel == null) { fail('sidebar JFXPanel not found.'); diag('RESULT: FAIL'); return }
+def auditButton = findByName('semantic.auditButton')
+def statusBadge = findByName('semantic.statusBadge')
+if (auditButton == null || statusBadge == null) {
+    fail('audit button / status badge not found by name.'); diag('RESULT: FAIL'); return
+}
 
 def fireAudit = {
-    onFx {
-        def button = fxPanel.getScene().getRoot().lookupAll('.button').find {
-            it.respondsTo('getText') && it.getText() == 'Run Audit'
-        }
-        if (button == null) { throw new IllegalStateException('"Run Audit" button not found') }
-        if (button.isDisabled()) { throw new IllegalStateException('audit button still disabled (previous audit running)') }
-        button.fire()
-        return null
+    // Wait for the button to be re-enabled (previous audit finished), then click it.
+    long deadline = System.currentTimeMillis() + 10000
+    while (System.currentTimeMillis() < deadline && !(boolean) readOnEdt { auditButton.isEnabled() }) {
+        Thread.sleep(200)
     }
-}
-def readBadge = {
-    onFx {
-        def badge = fxPanel.getScene().getRoot().lookupAll('.label').find {
-            it.respondsTo('getText') && it.getText()?.startsWith('STATUS:')
-        }
-        return badge == null ? null : badge.getText()
+    if (!(boolean) readOnEdt { auditButton.isEnabled() }) {
+        throw new IllegalStateException('audit button still disabled (previous audit running)')
     }
+    SwingUtilities.invokeAndWait { auditButton.doClick() }
 }
 def pollBadge = { String expectPrefix, int timeoutMs ->
     long deadline = System.currentTimeMillis() + timeoutMs
     String text = null
     while (System.currentTimeMillis() < deadline) {
-        text = readBadge()
+        text = readOnEdt { statusBadge.getText() }
         if (text != null && text.startsWith(expectPrefix)) { return text }
         Thread.sleep(250)
     }
@@ -152,9 +129,9 @@ sumo:Vehicle owl:disjointWith sumo:MilitaryBase .
 
     long mark = JOURNAL.exists() ? JOURNAL.length() : 0L
     fireAudit()
-    def lineA = waitForJournalLine(mark, ['| AUDIT |', 'tboxFiles='], 30000)
+    def lineA = waitForJournalLine(mark, ['| AUDIT |', 'tboxFiles=1'], 30000)
     if (lineA == null) {
-        fail('Phase A: no AUDIT event within 30s')
+        fail('Phase A: no AUDIT event with the TBox within 30s')
     } else {
         diag('Phase A audit: ' + lineA.trim())
         if (!lineA.contains('consistent=false')) { fail('Phase A: disjointness TBox did not cause inconsistency') }

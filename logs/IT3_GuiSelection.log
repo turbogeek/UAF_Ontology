@@ -1,0 +1,10 @@
+14:45:10.868  === IT3 gui-selection START ===
+14:45:11.031  selection event: 2026-07-05 14:45:10.978 | SELECTION | Class EchoBase | stereotypes=SemanticAlignment | concept=sumo:MilitaryBase | sbvr=Instance: Echo Base is a Military Base.
+14:45:11.032  SBVR sentence correct for mapped element
+14:45:11.374  sidebar label OK: Selected Element: Class EchoBase
+14:45:11.377  sidebar SBVR area OK: Instance: Echo Base is a Military Base.
+14:45:11.490  mapping event: 2026-07-05 14:45:11.487 | MAPPING | Class GuiMappingProbe -> sumo:Device | status=OK
+14:45:11.491  model confirms GuiMappingProbe is now aligned
+14:45:11.494  sidebar refresh event: 2026-07-05 14:45:11.485 | SELECTION | Class GuiMappingProbe | stereotypes=SemanticAlignment | concept=sumo:Device | sbvr=Instance: Gui Mapping Probe is a Device.
+14:45:11.495  RESULT: PASS
+14:45:11.497  === IT3 DONE ===

@@ -13,6 +13,7 @@ import com.nomagic.magicdraw.ui.browser.WindowComponent;
 import com.nomagic.magicdraw.ui.browser.WindowComponentContent;
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Element;
+import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.NamedElement;
 import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 import com.nomagic.ui.ExtendedPanel;
 import org.apache.log4j.Logger;
@@ -20,6 +21,9 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -29,22 +33,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-
 /**
  * Main lifecycle entry point for the UAF/SysML Semantic Integration Plugin.
  * Registers one sidebar panel per project browser; each panel is bound to its own
  * project and selection so multiple open projects never cross-talk. All user-visible
  * reactions are journaled through DiagnosticLog so the REST test harness can assert
  * on GUI behavior.
+ *
+ * The sidebar is pure Swing. The design spec (12.4) originally called for a JavaFX
+ * JFXPanel, but Cameo's jlink'd runtime omits the jdk.unsupported.desktop module that
+ * javafx.embed.swing requires (jdk.swing.interop), so JFXPanel cannot function in the
+ * target install. Swing meets the same layout spec with one toolkit and no JVM flags
+ * (spec 8.1 portability wins over the mockup technology choice).
  * Trace: PLG-REQ-01, PLG-REQ-02, PLG-REQ-04, PLG-REQ-05
  */
 public class SemanticAlignmentPlugin extends Plugin {
@@ -83,10 +83,6 @@ public class SemanticAlignmentPlugin extends Plugin {
             DiagnosticLog.event("LIFECYCLE", "Headless mode: sidebar registration skipped");
             return;
         }
-
-        // Without this, JavaFX shuts its toolkit down when the last JFXPanel disappears
-        // (e.g. on project close) and every later Platform.runLater call is dropped.
-        Platform.setImplicitExit(false);
 
         // Integrated REST test harness: auto-starts on port 8765 so integration tests
         // run zero-touch after Cameo launches (no manual Tools > Macros step).
@@ -180,51 +176,135 @@ public class SemanticAlignmentPlugin extends Plugin {
     }
 
     /**
-     * Swing browser panel container holding the JavaFX panel. Bound to exactly one
-     * project; all model interaction flows through this instance.
+     * Pure-Swing sidebar panel bound to exactly one project; all model interaction
+     * flows through this instance. Components carry stable names so integration tests
+     * can locate them in the component tree.
      */
     private static final class SemanticBrowserPanel extends ExtendedPanel implements WindowComponent {
+
+        private static final Color BG_DARK = new Color(0x0f172a);
+        private static final Color BG_CARD = new Color(0x1e293b);
+        private static final Color FG_MAIN = new Color(0xf8fafc);
+        private static final Color FG_MUTED = new Color(0x94a3b8);
+        private static final Color FG_ACCENT = new Color(0x38bdf8);
+        private static final Color BADGE_NEUTRAL = new Color(0x475569);
+        private static final Color BADGE_RUNNING = new Color(0xb45309);
+        private static final Color BADGE_OK = new Color(0x059669);
+        private static final Color BADGE_BAD = new Color(0xdc2626);
 
         private final Project project;
         private volatile Element selectedElement;
 
-        private JFXPanel jfxPanel;
-        // JavaFX controls; only touched on the FX thread and null until initFX has run.
-        private Label selectionLabel;
-        private Label typeLabel;
-        private TextArea sbvrArea;
-        private TextField searchField;
-        private Button auditButton;
-        private Label statusBadge;
-        private TextArea consoleArea;
-
-        // Selections can arrive before the async JavaFX layout exists; the latest one is
-        // parked here and replayed at the end of initFX instead of being dropped.
-        private volatile boolean fxReady;
-        private volatile String[] pendingSelection;
+        private final JLabel selectionLabel = new JLabel("Selected Element: (none)");
+        private final JLabel typeLabel = new JLabel("Stereotype: -");
+        private final JTextArea sbvrArea = new JTextArea("Select an element in the containment tree.");
+        private final JTextField searchField = new JTextField();
+        private final JButton auditButton = new JButton("Run Audit");
+        private final JLabel statusBadge = new JLabel("STATUS: NOT AUDITED");
+        private final JTextArea consoleArea = new JTextArea();
 
         SemanticBrowserPanel(Project project) {
             super(new BorderLayout());
             this.project = project;
+            buildUi();
+        }
 
-            JLabel loadingLabel = new JLabel("Loading Semantic Alignment Dashboard...");
-            loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            loadingLabel.setForeground(new Color(148, 163, 184)); // Muted slate color
-            add(loadingLabel, BorderLayout.CENTER);
+        private void buildUi() {
+            setName("semantic.sidebar");
+            JPanel root = new JPanel();
+            root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
+            root.setBackground(BG_DARK);
+            root.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-            // Initialize JavaFX JFXPanel asynchronously on JavaFX Application Thread
-            SwingUtilities.invokeLater(() -> {
-                jfxPanel = new JFXPanel();
-                add(jfxPanel, BorderLayout.CENTER);
-                Platform.runLater(() -> {
-                    initFX(jfxPanel);
-                    SwingUtilities.invokeLater(() -> {
-                        remove(loadingLabel);
-                        revalidate();
-                        repaint();
-                    });
-                });
+            Font monoFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+
+            // Top section: selected element card (spec 12.4)
+            selectionLabel.setName("semantic.selectionLabel");
+            selectionLabel.setForeground(FG_MAIN);
+            selectionLabel.setFont(selectionLabel.getFont().deriveFont(Font.BOLD, 13f));
+            typeLabel.setName("semantic.typeLabel");
+            typeLabel.setForeground(FG_MUTED);
+            JPanel metaCard = new JPanel();
+            metaCard.setLayout(new BoxLayout(metaCard, BoxLayout.Y_AXIS));
+            metaCard.setBackground(BG_CARD);
+            metaCard.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(0x334155)),
+                    BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+            metaCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+            metaCard.add(selectionLabel);
+            metaCard.add(typeLabel);
+            root.add(metaCard);
+            root.add(Box.createVerticalStrut(10));
+
+            // Middle section: SBVR view
+            JLabel sbvrHeader = new JLabel("SBVR Structured English");
+            sbvrHeader.setForeground(FG_MUTED);
+            sbvrHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(sbvrHeader);
+            sbvrArea.setName("semantic.sbvrArea");
+            sbvrArea.setEditable(false);
+            sbvrArea.setLineWrap(true);
+            sbvrArea.setWrapStyleWord(true);
+            sbvrArea.setBackground(BG_CARD);
+            sbvrArea.setForeground(FG_ACCENT);
+            sbvrArea.setFont(monoFont);
+            JScrollPane sbvrScroll = new JScrollPane(sbvrArea);
+            sbvrScroll.setPreferredSize(new Dimension(280, 90));
+            sbvrScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(sbvrScroll);
+            root.add(Box.createVerticalStrut(10));
+
+            // Concept mapping input: Enter applies the IRI to the selected element
+            JLabel searchHeader = new JLabel("Align with Ontology Concept");
+            searchHeader.setForeground(FG_MUTED);
+            searchHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(searchHeader);
+            searchField.setName("semantic.conceptField");
+            searchField.setToolTipText("Concept IRI (e.g. sumo:MilitaryBase) + Enter");
+            searchField.setBackground(BG_CARD);
+            searchField.setForeground(FG_MAIN);
+            searchField.setCaretColor(FG_MAIN);
+            searchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+            searchField.setAlignmentX(Component.LEFT_ALIGNMENT);
+            searchField.addActionListener(event -> {
+                String text = searchField.getText();
+                if (text != null && !text.isBlank()) {
+                    applyMappingFromUI(text.trim());
+                }
             });
+            root.add(searchField);
+            root.add(Box.createVerticalStrut(10));
+
+            // Bottom section: validation dashboard
+            auditButton.setName("semantic.auditButton");
+            auditButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            auditButton.addActionListener(event -> runAuditAsync());
+            root.add(auditButton);
+            root.add(Box.createVerticalStrut(6));
+
+            statusBadge.setName("semantic.statusBadge");
+            statusBadge.setOpaque(true);
+            statusBadge.setBackground(BADGE_NEUTRAL);
+            statusBadge.setForeground(Color.WHITE);
+            statusBadge.setFont(statusBadge.getFont().deriveFont(Font.BOLD, 11f));
+            statusBadge.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+            statusBadge.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(statusBadge);
+            root.add(Box.createVerticalStrut(6));
+
+            consoleArea.setName("semantic.consoleArea");
+            consoleArea.setEditable(false);
+            consoleArea.setLineWrap(true);
+            consoleArea.setBackground(new Color(0x020617));
+            consoleArea.setForeground(FG_MUTED);
+            consoleArea.setFont(monoFont.deriveFont(10f));
+            JScrollPane consoleScroll = new JScrollPane(consoleArea);
+            consoleScroll.setPreferredSize(new Dimension(280, 70));
+            consoleScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(consoleScroll);
+
+            add(new JScrollPane(root), BorderLayout.CENTER);
+            DiagnosticLog.event("LIFECYCLE", "Sidebar UI built (Swing)");
         }
 
         /**
@@ -255,20 +335,29 @@ public class SemanticAlignmentPlugin extends Plugin {
         }
 
         /**
-         * Runs on the EDT (tree selection events); model reads happen here, UI updates
-         * are republished to the JavaFX thread. Trace: PLG-REQ-04
+         * Runs on the EDT (tree selection events); model reads and UI updates share the
+         * thread, so no cross-toolkit bridging is needed. Trace: PLG-REQ-04
          */
         private void handleSelection(Element element) {
             try {
                 selectedElement = element;
                 String name = element.getHumanName();
+                // getHumanName prefixes the metatype ("Class EchoBase"); SBVR sentences
+                // must speak about the element itself, so prefer the bare name.
+                String sbvrSubject = name;
+                if (element instanceof NamedElement) {
+                    String bare = ((NamedElement) element).getName();
+                    if (bare != null && !bare.isEmpty()) {
+                        sbvrSubject = bare;
+                    }
+                }
                 List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(element);
                 String typeText = stereotypes.isEmpty()
                         ? element.getHumanType()
                         : stereotypes.stream().map(Stereotype::getName).collect(Collectors.joining(", "));
                 String conceptURI = readMappedConceptURI(element);
                 String sbvr = conceptURI != null
-                        ? SBVR_ENGINE.generatePlainSBVR(name, conceptURI, null, null)
+                        ? SBVR_ENGINE.generatePlainSBVR(sbvrSubject, conceptURI, null, null)
                         : "No semantic alignment applied. Enter a concept IRI below and press Enter to map.";
                 DiagnosticLog.event("SELECTION", name + " | stereotypes=" + typeText
                         + " | concept=" + (conceptURI == null ? "-" : conceptURI) + " | sbvr=" + sbvr);
@@ -296,10 +385,8 @@ public class SemanticAlignmentPlugin extends Plugin {
         }
 
         /**
-         * Called from the JavaFX thread (concept field action): applies the typed concept
-         * IRI to the selected element. Model writes must happen inside a session on the
-         * EDT, so the FX thread only queues the work. The session is opened on the
-         * element's own project, which by construction is this panel's project.
+         * Called on the EDT (concept field action): applies the typed concept IRI to the
+         * selected element inside a session on the element's own project.
          * Trace: PLG-REQ-03, PLG-REQ-06
          */
         private void applyMappingFromUI(String conceptURI) {
@@ -309,41 +396,39 @@ public class SemanticAlignmentPlugin extends Plugin {
                 appendConsole("[FAIL] Select an element in the containment tree first.");
                 return;
             }
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    if (project.isProjectClosed() || project.isProjectDisposed()
-                            || project.isDisposed(element)) {
-                        DiagnosticLog.event("MAPPING", "Rejected: project or element no longer alive");
-                        appendConsole("[FAIL] The project or element is no longer open.");
-                        return;
-                    }
-                    if (!element.isEditable()) {
-                        DiagnosticLog.event("MAPPING", element.getHumanName()
-                                + " -> " + conceptURI + " | status=REJECTED read-only element");
-                        appendConsole("[FAIL] Element is read-only (library or locked element).");
-                        return;
-                    }
-                    Project owner = Project.getProject(element);
-                    TransactionWrapper.executeWrite(owner != null ? owner : project,
-                            "Apply Semantic Mapping",
-                            () -> StereotypeManager.applySemanticMapping(element, conceptURI));
-                    DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI + " | status=OK");
-                    appendConsole("[OK] Mapped to " + conceptURI);
-                    handleSelection(element); // refresh the sidebar with the new alignment
-                } catch (Exception e) {
-                    log.error("Semantic mapping failed", e);
-                    DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI
-                            + " | status=FAILED | " + e.getMessage());
-                    appendConsole("[FAIL] " + e.getMessage());
+            try {
+                if (project.isProjectClosed() || project.isProjectDisposed()
+                        || project.isDisposed(element)) {
+                    DiagnosticLog.event("MAPPING", "Rejected: project or element no longer alive");
+                    appendConsole("[FAIL] The project or element is no longer open.");
+                    return;
                 }
-            });
+                if (!element.isEditable()) {
+                    DiagnosticLog.event("MAPPING", element.getHumanName()
+                            + " -> " + conceptURI + " | status=REJECTED read-only element");
+                    appendConsole("[FAIL] Element is read-only (library or locked element).");
+                    return;
+                }
+                Project owner = Project.getProject(element);
+                TransactionWrapper.executeWrite(owner != null ? owner : project,
+                        "Apply Semantic Mapping",
+                        () -> StereotypeManager.applySemanticMapping(element, conceptURI));
+                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI + " | status=OK");
+                appendConsole("[OK] Mapped to " + conceptURI);
+                handleSelection(element); // refresh the sidebar with the new alignment
+            } catch (Exception e) {
+                log.error("Semantic mapping failed", e);
+                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI
+                        + " | status=FAILED | " + e.getMessage());
+                appendConsole("[FAIL] " + e.getMessage());
+            }
         }
 
         /**
-         * Called from the JavaFX thread (audit button). The model snapshot (RDF export)
-         * runs on the EDT - the MagicDraw model store is single-threaded and traversing
-         * it from a worker races concurrent edits. Only the reasoner and SHACL run on
-         * the background worker (spec 7.2 non-blocking UI for the expensive part).
+         * Called on the EDT (audit button). The model snapshot (RDF export) runs on the
+         * EDT - the MagicDraw model store is single-threaded and traversing it from a
+         * worker races concurrent edits. Only the reasoner and SHACL run on the
+         * background worker (spec 7.2 non-blocking UI for the expensive part).
          * Trace: PLG-REQ-05, PLG-REQ-06
          */
         private void runAuditAsync() {
@@ -407,93 +492,8 @@ public class SemanticAlignmentPlugin extends Plugin {
             worker.start();
         }
 
-        /**
-         * Renders the JavaFX UI layout inside the JFXPanel (spec 12.4 layout).
-         */
-        private void initFX(JFXPanel panel) {
-            VBox root = new VBox(10);
-            root.setPadding(new Insets(12));
-            root.setStyle("-fx-background-color: #0f172a;"); // Dark slate background matching graphify theme
-
-            // Top section: Selected element card
-            selectionLabel = new Label("Selected Element: (none)");
-            selectionLabel.setStyle("-fx-text-fill: #f8fafc; -fx-font-weight: bold; -fx-font-size: 13px;");
-
-            typeLabel = new Label("Stereotype: -");
-            typeLabel.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px;");
-
-            VBox metaCard = new VBox(4, selectionLabel, typeLabel);
-            metaCard.setPadding(new Insets(10));
-            metaCard.setStyle("-fx-background-color: #1e293b; -fx-background-radius: 6px; -fx-border-color: #334155; -fx-border-radius: 6px;");
-            root.getChildren().add(metaCard);
-
-            // Middle section: SBVR View
-            Label sbvrHeader = new Label("SBVR Structured English");
-            sbvrHeader.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-weight: bold;");
-
-            sbvrArea = new TextArea("Select an element in the containment tree.");
-            sbvrArea.setEditable(false);
-            sbvrArea.setWrapText(true);
-            sbvrArea.setPrefHeight(90);
-            sbvrArea.setStyle("-fx-control-inner-background: #1e293b; -fx-text-fill: #38bdf8; -fx-font-family: \"Courier New\", monospace; -fx-font-size: 12px;");
-            root.getChildren().addAll(sbvrHeader, sbvrArea);
-
-            // Concept mapping input: Enter applies the IRI to the selected element
-            Label searchHeader = new Label("Align with Ontology Concept");
-            searchHeader.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-weight: bold;");
-
-            searchField = new TextField();
-            searchField.setPromptText("Concept IRI (e.g. sumo:MilitaryBase) + Enter");
-            searchField.setStyle("-fx-background-color: #1e293b; -fx-text-fill: #f8fafc; -fx-prompt-text-fill: #64748b; -fx-border-color: #334155; -fx-border-radius: 4px;");
-            searchField.setOnAction(event -> {
-                String text = searchField.getText();
-                if (text != null && !text.isBlank()) {
-                    applyMappingFromUI(text.trim());
-                }
-            });
-            root.getChildren().addAll(searchHeader, searchField);
-
-            // Bottom section: Validation dashboard
-            auditButton = new Button("Run Audit");
-            auditButton.setStyle("-fx-background-color: #1d4ed8; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-font-size: 11px;");
-            auditButton.setOnAction(event -> runAuditAsync());
-
-            statusBadge = new Label("STATUS: NOT AUDITED");
-            statusBadge.setStyle(badgeStyle("#475569"));
-            root.getChildren().addAll(auditButton, statusBadge);
-
-            consoleArea = new TextArea();
-            consoleArea.setEditable(false);
-            consoleArea.setWrapText(true);
-            consoleArea.setPrefHeight(70);
-            consoleArea.setStyle("-fx-control-inner-background: #020617; -fx-text-fill: #94a3b8; -fx-font-family: \"Courier New\", monospace; -fx-font-size: 10px;");
-            root.getChildren().add(consoleArea);
-
-            Scene scene = new Scene(root, 300, 500);
-            panel.setScene(scene);
-
-            fxReady = true;
-            String[] pending = pendingSelection;
-            if (pending != null) {
-                pendingSelection = null;
-                selectionLabel.setText("Selected Element: " + pending[0]);
-                typeLabel.setText("Stereotype: " + pending[1]);
-                sbvrArea.setText(pending[2]);
-            }
-        }
-
-        private static String badgeStyle(String colorHex) {
-            return "-fx-background-color: " + colorHex + "; -fx-text-fill: #ffffff; -fx-padding: 4px 8px; "
-                    + "-fx-background-radius: 4px; -fx-font-weight: bold; -fx-font-size: 11px;";
-        }
-
         private void showSelection(String name, String typeText, String sbvr) {
-            if (!fxReady) {
-                // Park it; initFX replays the latest selection instead of dropping it.
-                pendingSelection = new String[]{name, typeText, sbvr};
-                return;
-            }
-            Platform.runLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 selectionLabel.setText("Selected Element: " + name);
                 typeLabel.setText("Stereotype: " + typeText);
                 sbvrArea.setText(sbvr);
@@ -501,20 +501,14 @@ public class SemanticAlignmentPlugin extends Plugin {
         }
 
         private void appendConsole(String message) {
-            if (!fxReady) {
-                return;
-            }
-            Platform.runLater(() -> consoleArea.appendText(message + "\n"));
+            SwingUtilities.invokeLater(() -> consoleArea.append(message + "\n"));
         }
 
         private void showAuditRunning() {
-            if (!fxReady) {
-                return;
-            }
-            Platform.runLater(() -> {
-                auditButton.setDisable(true);
+            SwingUtilities.invokeLater(() -> {
+                auditButton.setEnabled(false);
                 statusBadge.setText("STATUS: AUDITING...");
-                statusBadge.setStyle(badgeStyle("#b45309"));
+                statusBadge.setBackground(BADGE_RUNNING);
             });
         }
 
@@ -522,24 +516,21 @@ public class SemanticAlignmentPlugin extends Plugin {
          * @param consistent reasoner verdict, or null when the audit itself errored
          */
         private void showAuditResult(Boolean consistent, int violations, List<String> messages) {
-            if (!fxReady) {
-                return;
-            }
-            Platform.runLater(() -> {
-                auditButton.setDisable(false);
+            SwingUtilities.invokeLater(() -> {
+                auditButton.setEnabled(true);
                 if (consistent == null) {
                     statusBadge.setText("STATUS: AUDIT ERROR");
-                    statusBadge.setStyle(badgeStyle("#475569"));
+                    statusBadge.setBackground(BADGE_NEUTRAL);
                 } else if (consistent && violations == 0) {
                     statusBadge.setText("STATUS: CONSISTENT");
-                    statusBadge.setStyle(badgeStyle("#059669"));
+                    statusBadge.setBackground(BADGE_OK);
                 } else {
                     statusBadge.setText("STATUS: " + (violations > 0
                             ? violations + " VIOLATION(S)" : "INCONSISTENT"));
-                    statusBadge.setStyle(badgeStyle("#dc2626"));
+                    statusBadge.setBackground(BADGE_BAD);
                 }
                 for (String message : messages) {
-                    consoleArea.appendText(message + "\n");
+                    consoleArea.append(message + "\n");
                 }
             });
         }
