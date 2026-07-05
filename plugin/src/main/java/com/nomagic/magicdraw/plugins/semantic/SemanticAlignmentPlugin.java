@@ -41,10 +41,10 @@ import javafx.scene.layout.VBox;
 
 /**
  * Main lifecycle entry point for the UAF/SysML Semantic Integration Plugin.
- * Registers the custom sidebar tab, wires live element selection from the containment
- * tree into the SBVR view, and drives mapping/audit actions with safe Swing/JavaFX
- * thread bridging. All user-visible reactions are journaled through DiagnosticLog so
- * the REST test harness can assert on GUI behavior.
+ * Registers one sidebar panel per project browser; each panel is bound to its own
+ * project and selection so multiple open projects never cross-talk. All user-visible
+ * reactions are journaled through DiagnosticLog so the REST test harness can assert
+ * on GUI behavior.
  * Trace: PLG-REQ-01, PLG-REQ-02, PLG-REQ-04, PLG-REQ-05
  */
 public class SemanticAlignmentPlugin extends Plugin {
@@ -56,12 +56,8 @@ public class SemanticAlignmentPlugin extends Plugin {
 
     private static final SBVREngine SBVR_ENGINE = new SBVREngine();
 
-    // The sidebar is a singleton per application while projects come and go; the latest
-    // registered panel/project/selection are what mapping and audit actions operate on.
+    // Written once in init(); the deployed plugin folder holds the default SHACL shapes.
     private static volatile File pluginDirectory;
-    private static volatile Project activeProject;
-    private static volatile SemanticBrowserPanel activePanel;
-    private static volatile Element selectedElement;
 
     private static final WindowComponentInfo info = new WindowComponentInfo(
             COMPONENT_ID,
@@ -92,15 +88,14 @@ public class SemanticAlignmentPlugin extends Plugin {
         // (e.g. on project close) and every later Platform.runLater call is dropped.
         Platform.setImplicitExit(false);
 
-        // Register the panel to the MagicDraw/Cameo browser tab
+        // One panel per project browser: the panel captures its own project so that
+        // selections, mappings, and audits always target the project they came from.
         Browser.addBrowserInitializer(new Browser.BrowserInitializer() {
             @Override
             public void init(Browser browser, Project project) {
-                activeProject = project;
-                SemanticBrowserPanel panel = new SemanticBrowserPanel();
-                activePanel = panel;
+                SemanticBrowserPanel panel = new SemanticBrowserPanel(project);
                 browser.addPanel(panel);
-                hookSelectionListener(browser);
+                panel.hookSelectionListener(browser);
                 DiagnosticLog.event("LIFECYCLE", "Sidebar registered for project: " + project.getName());
             }
 
@@ -115,6 +110,7 @@ public class SemanticAlignmentPlugin extends Plugin {
     public boolean close() {
         log.info("Closing Semantic Alignment Plugin...");
         DiagnosticLog.event("LIFECYCLE", "Plugin close");
+        DiagnosticLog.shutdown();
         return true;
     }
 
@@ -124,171 +120,10 @@ public class SemanticAlignmentPlugin extends Plugin {
     }
 
     /**
-     * Attaches a Swing selection listener to the containment tree so sidebar content
-     * follows the modeler's browser selection. Trace: PLG-REQ-04
-     */
-    private static void hookSelectionListener(Browser browser) {
-        try {
-            ContainmentTree containmentTree = browser.getContainmentTree();
-            if (containmentTree == null) {
-                DiagnosticLog.event("WARN", "Containment tree unavailable; live selection disabled");
-                return;
-            }
-            containmentTree.getTree().addTreeSelectionListener(event -> {
-                Node node = containmentTree.getSelectedNode();
-                Object userObject = node == null ? null : node.getUserObject();
-                if (userObject instanceof Element) {
-                    handleSelection((Element) userObject);
-                }
-            });
-        } catch (Exception e) {
-            log.error("Failed to attach browser selection listener", e);
-            DiagnosticLog.event("ERROR", "Selection listener hookup failed: " + e);
-        }
-    }
-
-    /**
-     * Runs on the EDT (tree selection events); model reads happen here, UI updates are
-     * republished to the JavaFX thread by the panel. Trace: PLG-REQ-04
-     */
-    static void handleSelection(Element element) {
-        try {
-            selectedElement = element;
-            String name = element.getHumanName();
-            List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(element);
-            String typeText = stereotypes.isEmpty()
-                    ? element.getHumanType()
-                    : stereotypes.stream().map(Stereotype::getName).collect(Collectors.joining(", "));
-            String conceptURI = readMappedConceptURI(element);
-            String sbvr = conceptURI != null
-                    ? SBVR_ENGINE.generatePlainSBVR(name, conceptURI, null, null)
-                    : "No semantic alignment applied. Enter a concept IRI below and press Enter to map.";
-            DiagnosticLog.event("SELECTION", name + " | stereotypes=" + typeText
-                    + " | concept=" + (conceptURI == null ? "-" : conceptURI) + " | sbvr=" + sbvr);
-            SemanticBrowserPanel panel = activePanel;
-            if (panel != null) {
-                panel.showSelection(name, typeText, sbvr);
-            }
-        } catch (Exception e) {
-            log.error("Selection handling failed", e);
-            DiagnosticLog.event("ERROR", "Selection handling failed: " + e);
-        }
-    }
-
-    private static String readMappedConceptURI(Element element) {
-        Project project = Project.getProject(element);
-        if (project == null) {
-            return null;
-        }
-        Stereotype stereotype = StereotypesHelper.getStereotype(project, StereotypeManager.STEREOTYPE_NAME);
-        if (stereotype == null || !StereotypesHelper.hasStereotype(element, stereotype)) {
-            return null;
-        }
-        // Tagged values come back as a List regardless of multiplicity; unwrap the first.
-        List<?> values = StereotypesHelper.getStereotypePropertyValue(
-                element, stereotype, StereotypeManager.PROPERTY_NAME);
-        if (values == null || values.isEmpty() || values.get(0) == null) {
-            return null;
-        }
-        String raw = values.get(0).toString().trim();
-        return raw.isEmpty() ? null : raw;
-    }
-
-    /**
-     * Called from the JavaFX thread (search field action): applies the typed concept IRI
-     * to the selected element. Model writes must happen inside a session on the EDT, so
-     * the FX thread only queues the work. Trace: PLG-REQ-03, PLG-REQ-06
-     */
-    static void applyMappingFromUI(String conceptURI) {
-        Element element = selectedElement;
-        Project project = activeProject;
-        SemanticBrowserPanel panel = activePanel;
-        if (element == null || project == null) {
-            DiagnosticLog.event("MAPPING", "Rejected: no element selected");
-            if (panel != null) {
-                panel.appendConsole("[FAIL] Select an element in the containment tree first.");
-            }
-            return;
-        }
-        SwingUtilities.invokeLater(() -> {
-            try {
-                TransactionWrapper.executeWrite(project, "Apply Semantic Mapping",
-                        () -> StereotypeManager.applySemanticMapping(element, conceptURI));
-                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI + " | status=OK");
-                if (panel != null) {
-                    panel.appendConsole("[OK] Mapped to " + conceptURI);
-                }
-                handleSelection(element); // refresh the sidebar with the new alignment
-            } catch (Exception e) {
-                log.error("Semantic mapping failed", e);
-                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI
-                        + " | status=FAILED | " + e.getMessage());
-                if (panel != null) {
-                    panel.appendConsole("[FAIL] " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    /**
-     * Called from the JavaFX thread (audit button): exports the model and validates it on
-     * a background worker so Cameo's GUI stays responsive (spec 7.2 non-blocking UI).
-     * Trace: PLG-REQ-05, PLG-REQ-06
-     */
-    static void runAuditAsync() {
-        SemanticBrowserPanel panel = activePanel;
-        Project project = activeProject;
-        if (project == null) {
-            DiagnosticLog.event("AUDIT", "Rejected: no active project");
-            if (panel != null) {
-                panel.showAuditResult(null, 0, List.of("No active project."));
-            }
-            return;
-        }
-        if (panel != null) {
-            panel.showAuditRunning();
-        }
-        Thread worker = new Thread(() -> {
-            try {
-                SemanticRDFExporter exporter = new SemanticRDFExporter(project);
-                String turtle = exporter.exportToTurtleString();
-                // The exported graph is persisted next to the diagnostic log so harness
-                // tests can parse exactly what the audit validated.
-                Path exportFile = DiagnosticLog.getLogDirectory().resolve("last-audit-export.ttl");
-                Files.writeString(exportFile, turtle, StandardCharsets.UTF_8);
-
-                SHACLValidator validator = new SHACLValidator();
-                SHACLValidator.ReasonerResult reasoning = validator.runHermitReasoner(turtle);
-                File shapesFile = resolveShapesFile();
-                SHACLValidator.SHACLAuditReport audit = shapesFile == null
-                        ? new SHACLValidator.SHACLAuditReport(1, List.of(
-                                "SHACL shapes file not found. Set -Dsemantic.plugin.shapes or deploy uaf_traceability_shapes.ttl with the plugin."))
-                        : validator.runSHACLAudit(turtle, shapesFile.getAbsolutePath());
-
-                List<String> messages = new ArrayList<>(reasoning.getMessages());
-                messages.addAll(audit.getMessages());
-                DiagnosticLog.event("AUDIT", "consistent=" + reasoning.isConsistent()
-                        + " | shaclViolations=" + audit.getViolationsCount()
-                        + " | export=" + exportFile
-                        + (messages.isEmpty() ? "" : " | " + String.join(" ;; ", messages)));
-                if (panel != null) {
-                    panel.showAuditResult(reasoning.isConsistent(), audit.getViolationsCount(), messages);
-                }
-            } catch (Throwable t) {
-                log.error("Semantic audit failed", t);
-                DiagnosticLog.event("ERROR", "Audit failed: " + t);
-                if (panel != null) {
-                    panel.showAuditResult(null, 0, List.of("Audit error: " + t.getMessage()));
-                }
-            }
-        }, "semantic-alignment-audit");
-        worker.setDaemon(true);
-        worker.start();
-    }
-
-    /**
      * SHACL shapes resolve from -Dsemantic.plugin.shapes first (test override), then from
-     * the deployed plugin folder - never from a hard-coded path (spec 8.1).
+     * the deployed plugin folder - never from a hard-coded path (spec 8.1). The plugin
+     * ships semantic-plugin-shapes.ttl matching the exporter vocabulary; the UAF
+     * traceability shapes remain available for requirement-satisfaction graphs.
      */
     static File resolveShapesFile() {
         String override = System.getProperty("semantic.plugin.shapes");
@@ -300,18 +135,55 @@ public class SemanticAlignmentPlugin extends Plugin {
         }
         File dir = pluginDirectory;
         if (dir != null) {
-            File bundled = new File(dir, "uaf_traceability_shapes.ttl");
+            File bundled = new File(dir, "semantic-plugin-shapes.ttl");
             if (bundled.exists()) {
                 return bundled;
+            }
+            File traceability = new File(dir, "uaf_traceability_shapes.ttl");
+            if (traceability.exists()) {
+                return traceability;
             }
         }
         return null;
     }
 
     /**
-     * Swing browser panel container holding the JavaFX panel.
+     * TBox ontologies for the consistency check: every .ttl in the plugin's tbox/
+     * directory. Integration tests can drop axiom files in at runtime (no restart
+     * needed - the folder is re-read on every audit). Without a TBox the reasoner
+     * can only do structural checks, which the audit diagnostic line records.
+     */
+    static List<File> resolveTBoxFiles() {
+        List<File> result = new ArrayList<>();
+        String override = System.getProperty("semantic.plugin.tbox");
+        if (override != null && !override.isBlank()) {
+            File file = new File(override);
+            if (file.exists()) {
+                result.add(file);
+            }
+        }
+        File dir = pluginDirectory;
+        if (dir != null) {
+            File tboxDir = new File(dir, "tbox");
+            File[] files = tboxDir.listFiles((d, name) -> name.toLowerCase().endsWith(".ttl"));
+            if (files != null) {
+                for (File file : files) {
+                    result.add(file);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Swing browser panel container holding the JavaFX panel. Bound to exactly one
+     * project; all model interaction flows through this instance.
      */
     private static final class SemanticBrowserPanel extends ExtendedPanel implements WindowComponent {
+
+        private final Project project;
+        private volatile Element selectedElement;
+
         private JFXPanel jfxPanel;
         // JavaFX controls; only touched on the FX thread and null until initFX has run.
         private Label selectionLabel;
@@ -322,8 +194,14 @@ public class SemanticAlignmentPlugin extends Plugin {
         private Label statusBadge;
         private TextArea consoleArea;
 
-        SemanticBrowserPanel() {
+        // Selections can arrive before the async JavaFX layout exists; the latest one is
+        // parked here and replayed at the end of initFX instead of being dropped.
+        private volatile boolean fxReady;
+        private volatile String[] pendingSelection;
+
+        SemanticBrowserPanel(Project project) {
             super(new BorderLayout());
+            this.project = project;
 
             JLabel loadingLabel = new JLabel("Loading Semantic Alignment Dashboard...");
             loadingLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -343,6 +221,186 @@ public class SemanticAlignmentPlugin extends Plugin {
                     });
                 });
             });
+        }
+
+        /**
+         * Attaches a Swing selection listener to this browser's containment tree so the
+         * sidebar follows the modeler's selection. Trace: PLG-REQ-04
+         */
+        void hookSelectionListener(Browser browser) {
+            try {
+                ContainmentTree containmentTree = browser.getContainmentTree();
+                if (containmentTree == null) {
+                    DiagnosticLog.event("WARN", "Containment tree unavailable; live selection disabled");
+                    return;
+                }
+                containmentTree.getTree().addTreeSelectionListener(event -> {
+                    if (project.isProjectClosed() || project.isProjectDisposed()) {
+                        return; // stale listener after project close - ignore
+                    }
+                    Node node = containmentTree.getSelectedNode();
+                    Object userObject = node == null ? null : node.getUserObject();
+                    if (userObject instanceof Element) {
+                        handleSelection((Element) userObject);
+                    }
+                });
+            } catch (Exception e) {
+                log.error("Failed to attach browser selection listener", e);
+                DiagnosticLog.event("ERROR", "Selection listener hookup failed: " + e);
+            }
+        }
+
+        /**
+         * Runs on the EDT (tree selection events); model reads happen here, UI updates
+         * are republished to the JavaFX thread. Trace: PLG-REQ-04
+         */
+        private void handleSelection(Element element) {
+            try {
+                selectedElement = element;
+                String name = element.getHumanName();
+                List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(element);
+                String typeText = stereotypes.isEmpty()
+                        ? element.getHumanType()
+                        : stereotypes.stream().map(Stereotype::getName).collect(Collectors.joining(", "));
+                String conceptURI = readMappedConceptURI(element);
+                String sbvr = conceptURI != null
+                        ? SBVR_ENGINE.generatePlainSBVR(name, conceptURI, null, null)
+                        : "No semantic alignment applied. Enter a concept IRI below and press Enter to map.";
+                DiagnosticLog.event("SELECTION", name + " | stereotypes=" + typeText
+                        + " | concept=" + (conceptURI == null ? "-" : conceptURI) + " | sbvr=" + sbvr);
+                showSelection(name, typeText, sbvr);
+            } catch (Exception e) {
+                log.error("Selection handling failed", e);
+                DiagnosticLog.event("ERROR", "Selection handling failed: " + e);
+            }
+        }
+
+        private String readMappedConceptURI(Element element) {
+            Stereotype stereotype = StereotypesHelper.getStereotype(
+                    project, StereotypeManager.STEREOTYPE_NAME);
+            if (stereotype == null || !StereotypesHelper.hasStereotype(element, stereotype)) {
+                return null;
+            }
+            // Tagged values come back as a List regardless of multiplicity; unwrap the first.
+            List<?> values = StereotypesHelper.getStereotypePropertyValue(
+                    element, stereotype, StereotypeManager.PROPERTY_NAME);
+            if (values == null || values.isEmpty() || values.get(0) == null) {
+                return null;
+            }
+            String raw = values.get(0).toString().trim();
+            return raw.isEmpty() ? null : raw;
+        }
+
+        /**
+         * Called from the JavaFX thread (concept field action): applies the typed concept
+         * IRI to the selected element. Model writes must happen inside a session on the
+         * EDT, so the FX thread only queues the work. The session is opened on the
+         * element's own project, which by construction is this panel's project.
+         * Trace: PLG-REQ-03, PLG-REQ-06
+         */
+        private void applyMappingFromUI(String conceptURI) {
+            Element element = selectedElement;
+            if (element == null) {
+                DiagnosticLog.event("MAPPING", "Rejected: no element selected");
+                appendConsole("[FAIL] Select an element in the containment tree first.");
+                return;
+            }
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    if (project.isProjectClosed() || project.isProjectDisposed()
+                            || project.isDisposed(element)) {
+                        DiagnosticLog.event("MAPPING", "Rejected: project or element no longer alive");
+                        appendConsole("[FAIL] The project or element is no longer open.");
+                        return;
+                    }
+                    if (!element.isEditable()) {
+                        DiagnosticLog.event("MAPPING", element.getHumanName()
+                                + " -> " + conceptURI + " | status=REJECTED read-only element");
+                        appendConsole("[FAIL] Element is read-only (library or locked element).");
+                        return;
+                    }
+                    Project owner = Project.getProject(element);
+                    TransactionWrapper.executeWrite(owner != null ? owner : project,
+                            "Apply Semantic Mapping",
+                            () -> StereotypeManager.applySemanticMapping(element, conceptURI));
+                    DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI + " | status=OK");
+                    appendConsole("[OK] Mapped to " + conceptURI);
+                    handleSelection(element); // refresh the sidebar with the new alignment
+                } catch (Exception e) {
+                    log.error("Semantic mapping failed", e);
+                    DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI
+                            + " | status=FAILED | " + e.getMessage());
+                    appendConsole("[FAIL] " + e.getMessage());
+                }
+            });
+        }
+
+        /**
+         * Called from the JavaFX thread (audit button). The model snapshot (RDF export)
+         * runs on the EDT - the MagicDraw model store is single-threaded and traversing
+         * it from a worker races concurrent edits. Only the reasoner and SHACL run on
+         * the background worker (spec 7.2 non-blocking UI for the expensive part).
+         * Trace: PLG-REQ-05, PLG-REQ-06
+         */
+        private void runAuditAsync() {
+            if (project.isProjectClosed() || project.isProjectDisposed()) {
+                DiagnosticLog.event("AUDIT", "Rejected: project no longer open");
+                showAuditResult(null, 0, List.of("Project is no longer open."));
+                return;
+            }
+            showAuditRunning();
+            Thread worker = new Thread(() -> {
+                try {
+                    final String[] turtleHolder = new String[1];
+                    final Exception[] exportError = new Exception[1];
+                    SwingUtilities.invokeAndWait(() -> {
+                        try {
+                            if (project.isProjectClosed() || project.isProjectDisposed()) {
+                                exportError[0] = new IllegalStateException("Project closed before export.");
+                                return;
+                            }
+                            turtleHolder[0] = new SemanticRDFExporter(project).exportToTurtleString();
+                        } catch (Exception e) {
+                            exportError[0] = e;
+                        }
+                    });
+                    if (exportError[0] != null) {
+                        throw exportError[0];
+                    }
+                    String turtle = turtleHolder[0];
+
+                    // The exported graph is persisted next to the diagnostic log so harness
+                    // tests can parse exactly what the audit validated.
+                    Path exportFile = DiagnosticLog.getLogDirectory().resolve("last-audit-export.ttl");
+                    Files.writeString(exportFile, turtle, StandardCharsets.UTF_8);
+
+                    SHACLValidator validator = new SHACLValidator();
+                    List<File> tbox = resolveTBoxFiles();
+                    SHACLValidator.ReasonerResult reasoning = validator.runHermitReasoner(turtle, tbox);
+                    File shapesFile = resolveShapesFile();
+                    SHACLValidator.SHACLAuditReport audit = shapesFile == null
+                            ? new SHACLValidator.SHACLAuditReport(1, List.of(
+                                    "SHACL shapes file not found. Set -Dsemantic.plugin.shapes or deploy semantic-plugin-shapes.ttl with the plugin."))
+                            : validator.runSHACLAudit(turtle, shapesFile.getAbsolutePath());
+
+                    List<String> messages = new ArrayList<>(reasoning.getMessages());
+                    messages.addAll(audit.getMessages());
+                    DiagnosticLog.event("AUDIT", "project=" + project.getName()
+                            + " | consistent=" + reasoning.isConsistent()
+                            + " | shaclViolations=" + audit.getViolationsCount()
+                            + " | tboxFiles=" + tbox.size()
+                            + " | shapes=" + (shapesFile == null ? "-" : shapesFile.getName())
+                            + " | export=" + exportFile
+                            + (messages.isEmpty() ? "" : " | " + String.join(" ;; ", messages)));
+                    showAuditResult(reasoning.isConsistent(), audit.getViolationsCount(), messages);
+                } catch (Throwable t) {
+                    log.error("Semantic audit failed", t);
+                    DiagnosticLog.event("ERROR", "Audit failed: " + t);
+                    showAuditResult(null, 0, List.of("Audit error: " + t.getMessage()));
+                }
+            }, "semantic-alignment-audit");
+            worker.setDaemon(true);
+            worker.start();
         }
 
         /**
@@ -409,6 +467,15 @@ public class SemanticAlignmentPlugin extends Plugin {
 
             Scene scene = new Scene(root, 300, 500);
             panel.setScene(scene);
+
+            fxReady = true;
+            String[] pending = pendingSelection;
+            if (pending != null) {
+                pendingSelection = null;
+                selectionLabel.setText("Selected Element: " + pending[0]);
+                typeLabel.setText("Stereotype: " + pending[1]);
+                sbvrArea.setText(pending[2]);
+            }
         }
 
         private static String badgeStyle(String colorHex) {
@@ -416,30 +483,31 @@ public class SemanticAlignmentPlugin extends Plugin {
                     + "-fx-background-radius: 4px; -fx-font-weight: bold; -fx-font-size: 11px;";
         }
 
-        void showSelection(String name, String typeText, String sbvr) {
+        private void showSelection(String name, String typeText, String sbvr) {
+            if (!fxReady) {
+                // Park it; initFX replays the latest selection instead of dropping it.
+                pendingSelection = new String[]{name, typeText, sbvr};
+                return;
+            }
             Platform.runLater(() -> {
-                if (selectionLabel == null) {
-                    return; // FX layout not initialized yet
-                }
                 selectionLabel.setText("Selected Element: " + name);
                 typeLabel.setText("Stereotype: " + typeText);
                 sbvrArea.setText(sbvr);
             });
         }
 
-        void appendConsole(String message) {
-            Platform.runLater(() -> {
-                if (consoleArea != null) {
-                    consoleArea.appendText(message + "\n");
-                }
-            });
+        private void appendConsole(String message) {
+            if (!fxReady) {
+                return;
+            }
+            Platform.runLater(() -> consoleArea.appendText(message + "\n"));
         }
 
-        void showAuditRunning() {
+        private void showAuditRunning() {
+            if (!fxReady) {
+                return;
+            }
             Platform.runLater(() -> {
-                if (auditButton == null) {
-                    return;
-                }
                 auditButton.setDisable(true);
                 statusBadge.setText("STATUS: AUDITING...");
                 statusBadge.setStyle(badgeStyle("#b45309"));
@@ -449,11 +517,11 @@ public class SemanticAlignmentPlugin extends Plugin {
         /**
          * @param consistent reasoner verdict, or null when the audit itself errored
          */
-        void showAuditResult(Boolean consistent, int violations, List<String> messages) {
+        private void showAuditResult(Boolean consistent, int violations, List<String> messages) {
+            if (!fxReady) {
+                return;
+            }
             Platform.runLater(() -> {
-                if (auditButton == null) {
-                    return;
-                }
                 auditButton.setDisable(false);
                 if (consistent == null) {
                     statusBadge.setText("STATUS: AUDIT ERROR");

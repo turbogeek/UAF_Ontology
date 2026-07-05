@@ -1,6 +1,7 @@
 package com.nomagic.magicdraw.plugins.semantic;
 
 import com.nomagic.magicdraw.core.Project;
+import com.nomagic.magicdraw.core.ProjectUtilities;
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Association;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Classifier;
@@ -18,9 +19,13 @@ import org.apache.log4j.Logger;
 
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Traverses Cameo modeling projects and exports elements aligned with the SemanticAlignment
@@ -57,6 +62,11 @@ public class SemanticRDFExporter {
 
     private final Project project;
     private Stereotype alignmentStereotype;
+    // Alignment resolution costs a stereotype check + tagged-value read + IRI parse per
+    // element and is consulted up to four times per element (self, container, general,
+    // association ends); memoized for the duration of one export run.
+    private final Map<Element, Optional<String>> conceptCache = new IdentityHashMap<>();
+    private final Set<String> warnedValues = new HashSet<>();
 
     public SemanticRDFExporter(Project project) {
         if (project == null) {
@@ -71,6 +81,8 @@ public class SemanticRDFExporter {
     public String exportToTurtleString() {
         Model model = ModelFactory.createDefaultModel();
         PREFIXES.forEach(model::setNsPrefix);
+        conceptCache.clear();
+        warnedValues.clear();
 
         // Resolved once per export: the stereotype lookup walks the profile tree, which is
         // too costly to repeat for every element of a large model.
@@ -98,6 +110,12 @@ public class SemanticRDFExporter {
         Collection<Element> owned = element.getOwnedElement();
         if (owned != null) {
             for (Element child : owned) {
+                // Mounted modules (UAF profile, standard libraries) hang under the primary
+                // model too; their thousands of read-only elements are never user-aligned,
+                // so descending into them only burns time (PLG-REQ-01 targets user models).
+                if (ProjectUtilities.isAttachedProjectRoot(child)) {
+                    continue;
+                }
                 traverse(child, model);
             }
         }
@@ -178,23 +196,30 @@ public class SemanticRDFExporter {
     }
 
     private String getAlignedConceptURI(Element element) {
-        if (alignmentStereotype == null || element == null
-                || !StereotypesHelper.hasStereotype(element, alignmentStereotype)) {
+        if (alignmentStereotype == null || element == null) {
             return null;
+        }
+        return conceptCache.computeIfAbsent(element, this::resolveAlignment).orElse(null);
+    }
+
+    private Optional<String> resolveAlignment(Element element) {
+        if (!StereotypesHelper.hasStereotype(element, alignmentStereotype)) {
+            return Optional.empty();
         }
         // Tagged values always come back as a List regardless of declared multiplicity;
         // toString() on the list itself would serialize as "[uri]" and corrupt the IRI.
         List<?> values = StereotypesHelper.getStereotypePropertyValue(
                 element, alignmentStereotype, PROPERTY_NAME);
         if (values == null || values.isEmpty() || values.get(0) == null) {
-            return null;
+            return Optional.empty();
         }
-        String resolved = resolveConceptURI(values.get(0).toString());
-        if (resolved == null) {
+        String raw = values.get(0).toString();
+        String resolved = resolveConceptURI(raw);
+        if (resolved == null && warnedValues.add(raw)) {
             log.warn("Skipping element '" + element.getHumanName()
-                    + "': mappedConceptURI is not a resolvable IRI: " + values.get(0));
+                    + "': mappedConceptURI is not a resolvable IRI: " + raw);
         }
-        return resolved;
+        return Optional.ofNullable(resolved);
     }
 
     private String elementURI(Element element) {

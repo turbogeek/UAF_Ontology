@@ -65,7 +65,14 @@ tasks.register('cameoTest', Test) {
     classpath = sourceSets.test.runtimeClasspath
     include '**/SemanticValidationTestHarness*'
     systemProperty 'install.root', cameoHome
+    // Boots a full headless Cameo; Gradle's default 512m test worker heap OOMs
+    maxHeapSize = '4g'
 }
+
+// Gradle cannot activate the openjfx POM's platform profiles, so the classifier-less
+// javafx-*.jar stubs (empty jars) land on runtimeClasspath next to the real -win jars.
+// They must not be deployed or listed in the descriptor.
+def isJavaFxStubJar = { File f -> f.name ==~ /javafx-\w+-[\d.]+\.jar/ }
 
 // ---------------------------------------------------------------------------
 // Deployment: assembles the plugin folder inside the Cameo install.
@@ -83,6 +90,7 @@ tasks.register('generatePluginDescriptor') {
     outputs.dir descriptorDir
     doLast {
         def libEntries = configurations.runtimeClasspath.files
+                .findAll { !isJavaFxStubJar(it) }
                 .collect { "        <library name=\"lib/${it.name}\"/>" }
                 .sort()
                 .join('\n')
@@ -112,10 +120,30 @@ tasks.register('deployPlugin', Sync) {
     description = "Deploys the plugin into ${cameoHome}/plugins/${pluginId} (restart Cameo afterwards)."
     group = 'distribution'
     dependsOn tasks.named('jar'), tasks.named('generatePluginDescriptor')
+    doFirst {
+        // A running Cameo holds the deployed jars open; a Sync against locked files dies
+        // halfway and leaves a corrupt plugin folder. Fail fast with a clear instruction.
+        def deployedJar = file("${cameoHome}/plugins/${pluginId}/semantic-alignment-plugin.jar")
+        if (deployedJar.exists()) {
+            try {
+                new FileOutputStream(deployedJar, true).close()
+            } catch (IOException e) {
+                throw new GradleException(
+                        "Deployed plugin jar is locked - close CATIA Magic before running deployPlugin.")
+            }
+        }
+    }
     into "${cameoHome}/plugins/${pluginId}"
     from tasks.named('jar')
     from descriptorDir
-    from(configurations.runtimeClasspath) { into 'lib' }
-    // Default SHACL shapes ship with the plugin so the audit works out of the box
+    from(configurations.runtimeClasspath) {
+        into 'lib'
+        exclude { isJavaFxStubJar(it.file) }
+    }
+    // Default SHACL shapes matching the exporter vocabulary, plus the UAF traceability
+    // shapes for requirement-satisfaction graphs (selectable via -Dsemantic.plugin.shapes)
+    from new File(projectDir, 'shapes/semantic-plugin-shapes.ttl')
     from new File(projectDir.parentFile, 'UAF to OWL Goals/ontologies/uaf_traceability_shapes.ttl')
+    // tbox/ is runtime-writable (integration tests drop consistency axioms there)
+    preserve { include 'tbox/**' }
 }

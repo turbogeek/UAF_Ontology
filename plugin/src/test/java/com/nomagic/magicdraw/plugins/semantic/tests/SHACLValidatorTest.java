@@ -66,6 +66,32 @@ public class SHACLValidatorTest {
     }
 
     @Test
+    public void testTBoxDisjointnessDetectedAcrossFiles() throws Exception {
+        // Mirrors the live audit: the ABox is the exporter output, the TBox axioms come
+        // from .ttl files dropped into the plugin's tbox/ directory.
+        File tbox = temp.newFile("tbox.ttl");
+        Files.writeString(tbox.toPath(), """
+                @prefix ex: <http://example.org/> .
+                @prefix owl: <http://www.w3.org/2002/07/owl#> .
+                ex:Organization a owl:Class .
+                ex:Vehicle a owl:Class .
+                ex:Organization owl:disjointWith ex:Vehicle .
+                """, StandardCharsets.UTF_8);
+
+        String abox = """
+                @prefix ex: <http://example.org/> .
+                ex:echoBase a ex:Organization , ex:Vehicle .
+                """;
+        SHACLValidator.ReasonerResult result =
+                validator.runHermitReasoner(abox, java.util.List.of(tbox));
+        assertFalse("Disjointness axiom from the TBox file must make the ABox inconsistent",
+                result.isConsistent());
+
+        // Same ABox without the TBox is trivially consistent - documents why a TBox matters
+        assertTrue(validator.runHermitReasoner(abox).isConsistent());
+    }
+
+    @Test
     public void testShaclViolationsAreCountedIndividually() throws Exception {
         File shapes = temp.newFile("shapes.ttl");
         Files.writeString(shapes.toPath(), SHAPES_TTL, StandardCharsets.UTF_8);

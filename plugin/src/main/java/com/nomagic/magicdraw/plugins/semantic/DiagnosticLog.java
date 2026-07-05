@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Append-only diagnostic event journal for the plugin.
@@ -27,6 +30,16 @@ public final class DiagnosticLog {
     private static final String FILE_NAME = "semantic-plugin.log";
     private static final String DIR_PROPERTY = "semantic.plugin.logdir";
 
+    // Selection events fire on the EDT for every containment-tree click; the file append
+    // happens on this single daemon thread so the EDT never blocks on disk I/O.
+    private static final ExecutorService WRITER = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "semantic-diagnostic-writer");
+        thread.setDaemon(true);
+        return thread;
+    });
+
+    private static volatile Path cachedDirectory;
+
     // Private constructor to prevent instantiation of utility class
     private DiagnosticLog() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated.");
@@ -38,8 +51,12 @@ public final class DiagnosticLog {
      * contains no hard-coded drive letters (spec 8.1 platform independence).
      */
     public static Path getLogDirectory() {
+        Path dir = cachedDirectory;
+        if (dir != null) {
+            return dir;
+        }
         String override = System.getProperty(DIR_PROPERTY);
-        Path dir = (override != null && !override.isBlank())
+        dir = (override != null && !override.isBlank())
                 ? Paths.get(override)
                 : Paths.get(System.getProperty("user.home"), ".semantic_alignment_plugin");
         try {
@@ -47,6 +64,7 @@ public final class DiagnosticLog {
         } catch (IOException e) {
             log.error("Cannot create diagnostic directory: " + dir, e);
         }
+        cachedDirectory = dir;
         return dir;
     }
 
@@ -55,18 +73,39 @@ public final class DiagnosticLog {
     }
 
     /**
-     * Appends one "timestamp | CATEGORY | message" line. Never throws: a diagnostics
+     * Queues one "timestamp | CATEGORY | message" line. Never throws: a diagnostics
      * failure must not be able to take down the host application (spec 8.4).
      */
-    public static synchronized void event(String category, String message) {
+    public static void event(String category, String message) {
         String flattened = message == null ? "" : message.replaceAll("[\\r\\n]+", " \\\\n ");
         String line = LocalDateTime.now().format(TIMESTAMP) + " | " + category + " | " + flattened
                 + System.lineSeparator();
         try {
-            Files.writeString(getLogFile(), line, StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            log.error("Failed to append diagnostic event: " + line, e);
+            WRITER.execute(() -> {
+                try {
+                    Files.writeString(getLogFile(), line, StandardCharsets.UTF_8,
+                            StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    log.error("Failed to append diagnostic event: " + line, e);
+                }
+            });
+        } catch (Exception rejected) {
+            log.error("Diagnostic writer rejected event: " + line, rejected);
+        }
+    }
+
+    /**
+     * Drains pending events on plugin close so the journal is complete before Cameo exits.
+     * Does NOT call System.exit or otherwise touch the host JVM lifecycle.
+     */
+    public static void shutdown() {
+        WRITER.shutdown();
+        try {
+            if (!WRITER.awaitTermination(2, TimeUnit.SECONDS)) {
+                log.warn("Diagnostic writer did not drain within 2s; remaining events dropped.");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }

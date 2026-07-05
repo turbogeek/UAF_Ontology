@@ -1,0 +1,32 @@
+# Default SHACL shapes for the Semantic Alignment plugin audit.
+# These shapes target the vocabulary the SemanticRDFExporter actually emits
+# (rdf:type, rdfs:label, uaf:hasPart, rdfs:subClassOf), so the out-of-the-box
+# audit validates real export invariants. Project-specific shape sets can
+# replace this file via -Dsemantic.plugin.shapes.
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix uaf:  <http://purl.org/uaf/ontology#> .
+
+uaf:AlignedIndividualShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Aligned individual must carry an rdfs:label (element human name)." ;
+    ] ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:nodeKind sh:IRI ;
+        sh:message "Aligned individual must be typed by an ontology concept IRI." ;
+    ] .
+
+uaf:PartLinkShape
+    a sh:NodeShape ;
+    sh:targetObjectsOf uaf:hasPart ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:minCount 1 ;
+        sh:message "Every uaf:hasPart target must itself be a semantically aligned (typed) individual." ;
+    ] .

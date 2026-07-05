@@ -31,14 +31,35 @@ public class SHACLValidator {
 
     /**
      * Executes local OWL reasoning over Turtle RDF triples to check consistency.
+     * Without TBox axioms an ABox-only graph is trivially consistent; use the overload
+     * with TBox files for a meaningful DL check.
      */
     public ReasonerResult runHermitReasoner(String rdfTurtle) {
+        return runHermitReasoner(rdfTurtle, List.of());
+    }
+
+    /**
+     * Executes OWL DL consistency reasoning over the exported ABox unioned with the given
+     * TBox ontology files (disjointness, domain/range axioms). Implemented with Jena's
+     * OWL reasoner; swap point for a true HermiT engine if OWLAPI is bundled later.
+     * Trace: PLG-REQ-06
+     */
+    public ReasonerResult runHermitReasoner(String rdfTurtle, java.util.Collection<File> tboxFiles) {
         if (rdfTurtle == null) {
             throw new IllegalArgumentException("RDF content cannot be null.");
         }
         try {
             Model model = ModelFactory.createDefaultModel();
             RDFDataMgr.read(model, new ByteArrayInputStream(rdfTurtle.getBytes(StandardCharsets.UTF_8)), Lang.TTL);
+            if (tboxFiles != null) {
+                for (File tbox : tboxFiles) {
+                    if (tbox != null && tbox.exists()) {
+                        RDFDataMgr.read(model, tbox.getAbsolutePath());
+                    } else {
+                        log.warn("TBox file missing, skipped: " + tbox);
+                    }
+                }
+            }
 
             // Using Jena's built-in OWL reasoner for consistency validation
             org.apache.jena.reasoner.Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
