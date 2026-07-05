@@ -4257,3 +4257,32 @@ uaf:Schema rdfs:subClassOf [
     owl:onProperty uaf:wasResultOf ;
     owl:someValuesFrom uaf:DesignEvent
 ] .
+
+###############################################################################
+# Disjointness axioms (added 2026-07-05, plugin v3 plan section 4)
+# We control this ontology: these axioms let DL reasoners detect real modeling
+# errors that were previously invisible. Flagship case: ACTUAL elements placed
+# in LOGICAL (operational) views - e.g. a real organization typed into the
+# operational viewpoint. Operational elements are logical abstractions;
+# ActualOrganization / ActualPerson / ActualResource are real-world things.
+###############################################################################
+
+# Logical operational layer is disjoint from the actual layer
+uaf:OperationalPerformer owl:disjointWith uaf:ActualOrganization ,
+                                          uaf:ActualPerson ,
+                                          uaf:ActualResource .
+
+# Behaviors are not organizations, resources, or performers
+uaf:OperationalActivity owl:disjointWith uaf:OperationalPerformer ,
+                                         uaf:ActualOrganization ,
+                                         uaf:ActualResource .
+
+# Abilities are not things that perform or exist
+uaf:Capability owl:disjointWith uaf:OperationalPerformer ,
+                                uaf:ResourcePerformer ,
+                                uaf:OperationalActivity ,
+                                uaf:ActualResource .
+
+# Logical resource types vs actual resources; operational vs resource layer
+uaf:ResourcePerformer owl:disjointWith uaf:ActualResource ,
+                                       uaf:OperationalPerformer .

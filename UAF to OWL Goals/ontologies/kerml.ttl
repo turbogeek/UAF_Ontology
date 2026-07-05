@@ -244,3 +244,10 @@ kerml:pkg-triggers rdf:type owl:Class ;
     rdfs:label "Triggers" ;
     kerml:canonical "Triggers" ;
     rdfs:comment "Standard package Triggers defined in Triggers.kerml" .
+
+
+###############################################################################
+# Disjointness axiom (added 2026-07-05): a definition is never a usage.
+###############################################################################
+
+kerml:Definition owl:disjointWith kerml:Usage .

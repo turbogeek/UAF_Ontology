@@ -334,3 +334,10 @@ sysml2:def-viewpointcheck rdf:type owl:Class ;
     rdfs:label "ViewpointCheck" ;
     sysml2:canonical "Views::ViewpointCheck" ;
     rdfs:comment "Standard SysML v2 / KerML viewpoint def: ViewpointCheck" .
+
+
+###############################################################################
+# Disjointness axiom (added 2026-07-05): a definition is never a usage.
+###############################################################################
+
+sysml2:Definition owl:disjointWith sysml2:Usage .

@@ -3136,3 +3136,13 @@ uafsml:def-developmentvaluestreammetadata rdf:type owl:Class ;
     rdfs:label "DevelopmentValueStreamMetadata" ;
     sysml2:canonical "ValueStreamMetadata::DevelopmentValueStreamMetadata" ;
     rdfs:comment "SysML v2 metadata def definition: 'DevelopmentValueStreamMetadata'" .
+
+
+###############################################################################
+# Disjointness axioms (added 2026-07-05, plugin v3 plan section 4)
+# A definition is never a usage; operational and resource performers are
+# distinct abstraction layers (implementation is traced, not dual-typed).
+###############################################################################
+
+uafsml:Definition owl:disjointWith uafsml:Usage .
+uafsml:def-operationalperformer owl:disjointWith uafsml:def-resourceperformer .
