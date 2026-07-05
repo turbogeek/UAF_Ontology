@@ -289,64 +289,161 @@ Before merging any change, the reviewer must check the code against the followin
 ## 10. SBVR Translation Test Cases & Transaction Validation
 
 ### 10.1. SBVR Mapping Test Cases
-The plugin’s SBVR generation engine must pass a suite of test assertions mapping UML/SysML structures to exact Structured English strings:
+The plugin’s SBVR generation engine must translate UML and SysML elements into structured English sentences. The table below defines the formal mapping scenarios that must be executed by the automated test suite:
+
+| Scenario | UML / SysML Source Structure | Target Ontology Concept | Expected SBVR Output |
+| :--- | :--- | :--- | :--- |
+| **SC-01** | `Class` / `Block` named `EchoBase` | `sumo:MilitaryBase` | `Instance: EchoBase is a MilitaryBase.` |
+| **SC-02** | Nested part `Module1` inside `BatteryPack` | `battinfo:BatteryModule` | `Instance: BatteryPack contains Module1.` |
+| **SC-03** | Association from `Transmitter` to `Receiver` | `sr:connectedTo` | `Instance: Transmitter connected to Receiver.` |
+| **SC-04** | `ActualPost` named `Chemist` in `DesignTeam` | `org:Post` | `Instance: Chemist is a Post owned by DesignTeam.` |
+| **SC-05** | Generalization `AT-AT` specializes `LandVehicle` | `sumo:LandVehicle` | `Concept: AT-AT is a kind of LandVehicle.` |
+| **SC-06** | `Requirement` satisfying strategic capability | `ic:refines` | `Instance: TempControlRequirement refines ActivePreservationCapability.` |
+| **SC-07** | Org Unit conforming to ISO-9001 standard | `sr:conformsTo` | `Instance: PropulsionMfgTeam conforms to ISO 9001.` |
+| **SC-08** | BMM Goal directing efforts to physical system | `bmm:Goal` | `Instance: PreventSpoilageGoal channels efforts towards InsulinCooler.` |
+
+The JUnit code below shows how the test suite validates these SBVR translations against live elements:
 
 ```java
-@Test
-public void testSBVRGenerationAssertions() {
-    SBVREngine engine = new SBVREngine();
+package com.nomagic.magicdraw.plugins.semantic.tests;
 
-    // Test Case 1: Simple Instantiation Mapping
-    String sbvr1 = engine.generateSBVR("http://purl.org/uaf/example/ev_power#inst-ev_battery_pack", "battinfo:BatteryPack", null, null);
-    assertEquals("Instance: HighVoltageBatteryPack is a BatteryPack.", stripHtml(sbvr1));
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-    // Test Case 2: Composition Linkage
-    String sbvr2 = engine.generateSBVR("http://purl.org/uaf/example/ev_power#inst-ev_battery_pack", "battinfo:BatteryPack", "contains", "BatteryModule1");
-    assertTrue(stripHtml(sbvr2).contains("Instance: HighVoltageBatteryPack contains BatteryModule1."));
+public class SBVRMappingTest extends MagicDrawTestCase {
 
-    // Test Case 3: UML Owned Post Mapping
-    String sbvr3 = engine.generateSBVR("sr:post-lead_aerospace_architect", "org:Post", "owned by", "sr:org-design_division");
-    assertTrue(stripHtml(sbvr3).contains("Instance: Lead Systems Architect is a Post owned by Design Division."));
+    @Test
+    public void testSBVRGenerationScenarios() {
+        SBVREngine engine = new SBVREngine();
+
+        // SC-01: Instantiation
+        String sbvr1 = engine.generateSBVR("http://purl.org/uaf/example/ev_power#EchoBase", "sumo:MilitaryBase", null, null);
+        assertEquals("Instance: EchoBase is a MilitaryBase.", stripHtml(sbvr1));
+
+        // SC-02: Composition
+        String sbvr2 = engine.generateSBVR("http://purl.org/uaf/example/ev_power#BatteryPack", "battinfo:BatteryModule", "contains", "Module1");
+        assertEquals("Instance: BatteryPack contains Module1.", stripHtml(sbvr2));
+
+        // SC-06: Requirement Refinement
+        String sbvr3 = engine.generateSBVR("ic:TempControlRequirement", "ic:ActivePreservationCapability", "refines", null);
+        assertEquals("Instance: TempControlRequirement refines ActivePreservationCapability.", stripHtml(sbvr3));
+    }
+
+    private String stripHtml(String html) {
+        return html.replaceAll("<[^>]*>", "").trim();
+    }
 }
 ```
 
 ### 10.2. Undo/Redo Transaction Verification
-To ensure seamless integration with Cameo’s desktop command framework, the plugin must respect user commands and editing sessions:
-*   **Command Stack Integration:** All changes made by the plugin to stereotype tags or property values must be committed using MagicDraw's `com.nomagic.magicdraw.commands.Command` framework. This places the semantic mapping operation directly on Cameo’s Undo/Redo stack.
-*   **Transaction Rollback Consistency:** If a transaction fails or is aborted via `SessionManager.getInstance().cancelSession(project)`, the model must be rolled back completely. No partial property updates may be registered in the undo/redo history, avoiding state corruption in the modeling canvas.
+Any model modifications applied by the plugin must conform to Cameo's Swing undo command framework, ensuring no memory leaks or stale elements remain after an Undo command.
+
+*   **Transaction Wrapper Design:**
+    ```java
+    package com.nomagic.magicdraw.plugins.semantic.commands;
+    
+    import com.nomagic.magicdraw.openapi.uml.SessionManager;
+    import com.nomagic.magicdraw.core.Project;
+    import com.nomagic.utils.Log;
+
+    public class TransactionWrapper {
+        public static void executeWrite(Project project, String sessionName, Runnable command) {
+            SessionManager session = SessionManager.getInstance();
+            session.createSession(project, sessionName);
+            try {
+                command.run();
+                session.closeSession(project);
+            } catch (Exception e) {
+                session.cancelSession(project);
+                Log.error("Semantic Mapping Transaction failed, changes rolled back.", e);
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    ```
+*   **Verification Test Case:**
+    ```java
+    @Test
+    public void testUndoRedoSemanticMapping() {
+        Project project = Application.getInstance().getProject();
+        Class cellElement = (Class) Finder.byName(project, "BatteryCell1A");
+        
+        // Assert initial state: no stereotype applied
+        assertFalse(StereotypesHelper.hasStereotype(cellElement, "SemanticAlignment"));
+
+        // Execute mapping transaction
+        TransactionWrapper.executeWrite(project, "Apply Stereotype", () -> {
+            StereotypesHelper.addStereotype(cellElement, getSemanticStereotype(project));
+        });
+        assertTrue(StereotypesHelper.hasStereotype(cellElement, "SemanticAlignment"));
+
+        // Trigger Cameo Undo Command
+        project.getUndoManager().undo();
+        assertFalse("Model element should return to original unmapped state on Undo", 
+                   StereotypesHelper.hasStereotype(cellElement, "SemanticAlignment"));
+
+        // Trigger Cameo Redo Command
+        project.getUndoManager().redo();
+        assertTrue("Model element should re-apply mapping on Redo", 
+                  StereotypesHelper.hasStereotype(cellElement, "SemanticAlignment"));
+    }
+    ```
 
 ---
 
 ## 11. Static Code Analysis & Java 12 Language Best Practices
 
 ### 11.1. Static Code Analysis (Java Linting)
-Every build must execute static analysis to enforce style, safety, and performance constraints:
-*   **Checkstyle:** Google Style Check rules modified to allow MagicDraw naming patterns (e.g. `com.nomagic` package structures).
-*   **PMD:** Enforces clean syntax, banning unused variables, duplicate literals, and empty catch blocks.
-*   **SpotBugs:** Searches for potential bugs, null pointer exceptions, and concurrent thread access conflicts.
-*   **JUnit Coverage:** Code coverage for core parsing and semantic mappings must achieve a minimum threshold of **95%**.
+To enforce coding compliance, the maven build pipeline binds Checkstyle, PMD, and SpotBugs validation checks:
+
+*   **Checkstyle Integration (`pom.xml`):**
+    ```xml
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+            <configLocation>google_checks.xml</configLocation>
+            <failOnViolation>true</failOnViolation>
+            <violationSeverity>warning</violationSeverity>
+        </configuration>
+    </plugin>
+    ```
+*   **SpotBugs Null-Safety and Concurrency Checks:**
+    Any potential null pointers in EMF tree traversals or multithreaded GUI operations must block compilation. Banned patterns include catching general `NullPointerException` or failing to release transaction lock resources.
 
 ### 11.2. Java 12 Best Practices
-The plugin codebase uses Java 12 features to maintain clean, performant, and modern structures:
-*   **Switch Expressions:** Used in the EMF-to-RDF parser to return mappings cleanly without risk of fall-through errors:
+The plugin codebase uses Java 12 syntax improvements to maintain clean, performant, and modern structures:
+
+*   **Switch Expressions (EMF Stereotype Classifier):**
     ```java
-    String ontologyNamespace = switch (elementStereotype) {
-        case "ActualOrganization", "ActualPost" -> "http://www.w3.org/ns/org#";
-        case "Goal", "BusinessPolicy"          -> "http://www.omg.org/spec/BMM/";
-        case "Vehicle", "Device"                -> "http://www.ontologyportal.org/SUMO.owl#";
-        default                                 -> "http://purl.org/uaf/ontology#";
-    };
+    public String resolveOntologyNamespace(String stereotypeName) {
+        return switch (stereotypeName) {
+            case "ActualOrganization", "ActualPost", "ActualPerson" -> "http://www.w3.org/ns/org#";
+            case "Goal", "BusinessPolicy", "BusinessGoal"          -> "http://www.omg.org/spec/BMM/";
+            case "Vehicle", "Device", "WeaponSystem"                 -> "http://www.ontologyportal.org/SUMO.owl#";
+            case "Battery", "BatteryCell", "BatteryModule"           -> "https://w3id.org/emmo/domain/battery#";
+            default -> "http://purl.org/uaf/ontology#";
+        };
+    }
     ```
-*   **Compact Number Formatting:** Used in telemetry and requirement description panels to render large values (e.g. formatting target apogee meters to `150 km` or battery capacity to `80 kWh` for user display) using `NumberFormat.getCompactNumberInstance()`.
-*   **Teeing Collectors:** Used to count extracted model elements and validation issues simultaneously in a single stream pass:
+*   **Compact Number Formatting (Telemetry Panels):**
+    Formats rocket altitude meter measurements or battery capacities into human-readable compact layouts:
     ```java
-    AuditSummary summary = modelElementsStream.collect(
-        Collectors.teeing(
-            Collectors.counting(),
-            Collectors.filtering(el -> el.hasValidationIssues(), Collectors.toList()),
-            (count, issuesList) -> new AuditSummary(count, issuesList)
-        )
-    );
+    NumberFormat fmt = NumberFormat.getCompactNumberInstance(Locale.US, NumberFormat.Style.SHORT);
+    String compactApogee = fmt.format(150000); // Renders as "150K"
+    ```
+*   **Teeing Collectors (Single-pass Model Auditing):**
+    ```java
+    public AuditReport runAudit(Stream<ModelElement> elements) {
+        return elements.collect(
+            Collectors.teeing(
+                Collectors.filtering(el -> el.hasValidationIssues(), Collectors.toList()),
+                Collectors.counting(),
+                (issues, totalCount) -> new AuditReport(issues, totalCount)
+            )
+        );
+    }
     ```
 
 ---
@@ -354,22 +451,80 @@ The plugin codebase uses Java 12 features to maintain clean, performant, and mod
 ## 12. User Interface, Stereotype Tagging, and Integrated Help Systems
 
 ### 12.1. Plugin Project Activation Workflow
-*   **Profile Dependency:** The semantic alignment capabilities are packaged as a model library profile: `UAF Semantic Alignment Profile.mdzip`.
-*   **Project Property Enablement:** Users activate the plugin for their specific project by toggling the custom Project Property `Enable Semantic Mappings = True` in Cameo's File → Project Properties dialog. 
-*   **Stereotype Application:** When enabled, the plugin automatically registers a custom UML Stereotype `«SemanticAlignment»` from the profile library.
+To enable the semantic validation features per-project:
+1.  **Library Mounting:** The user mounts the `UAF Semantic Profile.mdzip` shared model library into their project directory.
+2.  **Property Toggle:** The plugin adds a custom project property in Cameo's **Project Options** menu:
+    ```
+    Project Options -> Plugins -> Semantic Alignment -> Enable Auditing = True/False
+    ```
+3.  **Listener Registration:** If set to True, the plugin registers a model change listener (`com.nomagic.magicdraw.core.project.ProjectEventListener`) that monitors element additions and modifications in real time, feeding changes to the background audit thread.
 
-### 12.2. Stereotype Tagged Values Storage
-To maintain semantic bindings directly inside the project's native file structure (MDZIP):
-*   The `«SemanticAlignment»` stereotype defines a Tagged Value property: `mappedConceptURI` (string).
-*   When an architect maps a component (e.g. a battery cell) using the plugin sidebar, the plugin:
-    1.  Applies the `«SemanticAlignment»` stereotype to the selected UML element.
-    2.  Writes the target concept IRI (e.g. `https://w3id.org/emmo/domain/battery#BatteryCell`) to the `mappedConceptURI` tagged value.
-*   **Interoperability:** The RDF Exporter reads this tagged value to construct owl:Individual instantiation triples during the model translation process.
+### 12.2. Custom UML Stereotype Mapping (EMF/UML API)
+Semantic mappings are stored inside the project files as UML Stereotypes using Cameo's programmatic stereotyping API:
+
+```java
+package com.nomagic.magicdraw.plugins.semantic.metadata;
+
+import com.nomagic.magicdraw.uml.Finder;
+import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
+import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Class;
+import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Element;
+import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
+
+public class StereotypeManager {
+    public static void applyMappingStereotype(Element element, String conceptURI) {
+        Project project = Project.getProject(element);
+        Stereotype stereotype = StereotypesHelper.getStereotype(project, "SemanticAlignment");
+        
+        if (stereotype == null) {
+            throw new IllegalStateException("UAF Semantic Profile is not active for this project.");
+        }
+        
+        // Apply stereotype and set tagged value mappedConceptURI
+        StereotypesHelper.addStereotype(element, stereotype);
+        StereotypesHelper.setStereotypePropertyValue(element, stereotype, "mappedConceptURI", conceptURI);
+    }
+}
+```
 
 ### 12.3. Integrated Contextual Help System
-To guide modelers through complex UAF grid structures and medical/propulsion standards:
-*   **Contextual Help Panel:** A dedicated split-pane at the bottom of the plugin sidebar. When a user selects a UAF grid cell element, it renders an embedded Markdown file explaining the cell definitions, recommended parent concepts, and validation constraints.
-*   **Hover Verification Dialogs:** Hovering over a validation issue (e.g. an unmapped requirement or a capability gap) opens a non-modal tooltip describing the relevant OMG BMM target goal, or medical regulatory rules (e.g. FDA 21 CFR compliance requirements), suggesting corrective mappings.
+The plugin includes a dedicated split pane at the bottom of the sidebar to assist modelers in choosing correct ontology concepts:
+*   **Help Directory Structure:**
+    ```
+    help/
+      ├── st-tx.md       # Help page explaining Strategic Capability Taxonomy (St-Tx)
+      ├── op-tx.md       # Help page explaining Operational Performer Taxonomy (Op-Tx)
+      └── battinfo.md    # Guide for EMMO Battery chemistry alignments
+    ```
+*   **Contextual Help Resolver Class:**
+    ```java
+    public class HelpResolver {
+        public static String resolveHelpPage(Element selectedElement) {
+            if (StereotypesHelper.hasStereotype(selectedElement, "Capability")) {
+                return "help/st-tx.md";
+            } else if (StereotypesHelper.hasStereotype(selectedElement, "ActualOrganization")) {
+                return "help/op-tx.md";
+            } else if (selectedElement.getHumanType().contains("Battery")) {
+                return "help/battinfo.md";
+            }
+            return "help/general.md";
+        }
+    }
+    ```
+
+### 12.4. Detailed User Interface Specifications
+The plugin sidebar panel must be implemented using a JavaFX `JFXPanel` wrapper, adhering to these structural constraints:
+*   **Layout Specifications:**
+    *   *Top Section:* Selected element name and type metadata card (12px padding, rounded corners, subtle border shadow).
+    *   *Middle Section:* Tabs to switch between **SBVR English View** (using fixed Courier New font and formal color tokens) and **Search & Align Panel** (with a text search input field and a scrollable autocomplete results menu).
+    *   *Bottom Section:* Audit validation dashboard displaying the status badge (Green for Consistent, Red for Violations) and a terminal log console.
+*   **GUI Interaction States:**
+    *   *Busy State:* Disable the "Run Audit" button and show a spinning loading indicator (`ProgressIndicator`) when the HermiT reasoner is executing.
+    *   *Offline State:* If the BioPortal network endpoint drops, display a warning banner at the top of the sidebar: `"Offline Mode Active - Using Cached Local Ontologies"`.
+*   **Accessibility Standards (WCAG Compliance):**
+    *   All sidebar text color contrasts must achieve a minimum contrast ratio of **4.5:1** against the background.
+    *   The search and mapping elements must support full keyboard navigation (Tab focusing and Enter mapping confirmation).
+
 
 
 
