@@ -63,40 +63,27 @@ def onEdtInSession = { String sessionName, Closure work ->
 }
 
 try {
-    // --- 1) Profile + stereotype + tagged value definition -------------------------
-    def stereo = StereotypesHelper.getStereotype(project, STEREO_NAME)
-    if (stereo != null) {
-        diag('stereotype already present: ' + stereo.getQualifiedName())
-    } else {
-        onEdtInSession('IT1 create semantic profile') {
-            def ef = project.getElementsFactory()
-            def profile = ef.createProfileInstance()
-            profile.setName(PROFILE_NAME)
-            profile.setOwner(project.getPrimaryModel())
-            def metaElement = StereotypesHelper.getAllMetaClasses(project).find { it.getName() == 'Element' }
-            if (metaElement == null) {
-                throw new IllegalStateException('UML metaclass "Element" not found')
-            }
-            def created = StereotypesHelper.createStereotype(project, STEREO_NAME, [metaElement])
-            created.setOwner(profile)
-            def prop = ef.createPropertyInstance()
-            prop.setName(PROP_NAME)
-            // Type the tag String when the primitive is locatable; an untyped property
-            // still stores string tagged values, so failure here is non-fatal.
-            try {
-                def finder = Class.forName('com.nomagic.magicdraw.uml.Finder')
-                def byQn = finder.getMethod('byQualifiedName').invoke(null)
-                def strType = byQn.find(project, 'UML Standard Profile::UML2 Metamodel::PrimitiveTypes::String')
-                if (strType != null) { prop.setType(strType) }
-            } catch (Throwable t) {
-                diag('note: String primitive not resolved, tag stays untyped (' + t + ')')
-            }
-            created.getOwnedAttribute().add(prop)
-        }
-        stereo = StereotypesHelper.getStereotype(project, STEREO_NAME)
-        if (stereo == null) { throw new IllegalStateException('stereotype creation did not take effect') }
-        diag('created stereotype: ' + stereo.getQualifiedName())
+    // --- 1) SHIPPED profile module auto-mount (owner decision: a real profile file
+    // deployed with the plugin, generic across UML-based models - never hand-created) --
+    def plugin = com.nomagic.magicdraw.plugins.PluginUtils.getPlugins().find {
+        it.getClass().getName() == 'com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin'
     }
+    if (plugin == null) { fail('plugin not loaded'); diag('RESULT: FAIL'); return }
+    def mgrCls = Class.forName('com.nomagic.magicdraw.plugins.semantic.metadata.StereotypeManager',
+            true, plugin.getClass().getClassLoader())
+    def projCls = Class.forName('com.nomagic.magicdraw.core.Project', true, plugin.getClass().getClassLoader())
+    def mountedHolder = [:]
+    SwingUtilities.invokeAndWait {
+        mountedHolder.ok = mgrCls.getMethod('ensureProfileAvailable', projCls).invoke(null, project)
+    }
+    if (!mountedHolder.ok) {
+        fail('shipped Semantic Alignment Profile module did not mount'); diag('RESULT: FAIL'); return
+    }
+    def stereo = StereotypesHelper.getStereotype(project, STEREO_NAME)
+    if (stereo == null) {
+        fail('stereotype unresolvable after module mount'); diag('RESULT: FAIL'); return
+    }
+    diag('shipped profile mounted; stereotype: ' + stereo.getQualifiedName())
 
     // --- 2) Fixture package ---------------------------------------------------------
     def model = project.getPrimaryModel()

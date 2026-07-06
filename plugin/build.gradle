@@ -173,6 +173,8 @@ tasks.register('deployPlugin', Sync) {
         include 'start-harness.groovy', 'stop-harness.groovy', 'SysMLv2Logger.groovy'
         into 'harness'
     }
+    // The Semantic Alignment Profile ships as a real module, auto-mounted on first use
+    from(new File(projectDir, 'profiles')) { into 'profiles' }
     // Alignment catalog for the suggestion index (TBox/schema ontologies only -
     // instance/example files stay out to keep the index focused and the load fast)
     from(new File(projectDir.parentFile, 'UAF to OWL Goals/ontologies')) {

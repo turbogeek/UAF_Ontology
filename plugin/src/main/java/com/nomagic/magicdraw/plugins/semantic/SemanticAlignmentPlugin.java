@@ -68,6 +68,11 @@ public class SemanticAlignmentPlugin extends Plugin {
 
     // Built once on a background thread at init; null until the catalog is loaded.
     private static volatile SuggestionRanker suggestionRanker;
+
+    // Panel per open project so diagram-click routing reaches the right sidebar.
+    // Weak keys: a closed project must not be pinned by its panel registration.
+    private static final java.util.Map<Project, SemanticBrowserPanel> PANELS =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
     private static volatile org.apache.jena.rdf.model.Model catalogModel;
     private static volatile SemanticRestService restService;
 
@@ -95,6 +100,10 @@ public class SemanticAlignmentPlugin extends Plugin {
         DiagnosticLog.event("LIFECYCLE", "Plugin init (version " + VERSION + ")");
         if (getDescriptor() != null) {
             pluginDirectory = getDescriptor().getPluginDirectory();
+            // The Semantic Alignment Profile ships as a real .mdzip module with the
+            // plugin (owner decision) and is auto-mounted on first use in a project.
+            StereotypeManager.setShippedProfile(new File(
+                    new File(pluginDirectory, "profiles"), "Semantic Alignment Profile.mdzip"));
         }
 
         // Export/validation logic stays usable from CI and harness scripts; only the
@@ -130,6 +139,11 @@ public class SemanticAlignmentPlugin extends Plugin {
         // UX click budgets are measured, not aspirational (v3 plan section 5)
         UxMetrics.install();
 
+        // Diagram clicks must reach the sidebar too - the containment-tree listener
+        // alone misses selections made ON a diagram (live finding: clicking an Action
+        // in an activity diagram did nothing).
+        installDiagramSelectionRelay();
+
         // Plugin-owned REST surface (8766): /sparql for scenarios and future LLM
         // assistants, /metrics for the click budgets. Dataset = catalog TBox + live
         // project ABox snapshotted on the EDT per request.
@@ -152,6 +166,7 @@ public class SemanticAlignmentPlugin extends Plugin {
             @Override
             public void init(Browser browser, Project project) {
                 SemanticBrowserPanel panel = new SemanticBrowserPanel(project);
+                PANELS.put(project, panel);
                 browser.addPanel(panel);
                 panel.hookSelectionListener(browser);
                 browser.addPanel(new OntologyViewPanel(project,
@@ -215,6 +230,64 @@ public class SemanticAlignmentPlugin extends Plugin {
     public boolean isSupported() {
         return true;
     }
+
+    /**
+     * Routes diagram selections into the sidebar. There is no public diagram-selection
+     * listener API, so this is state-based: after any mouse click completes, read the
+     * active diagram's selection through documented calls (Project.getActiveDiagram,
+     * DiagramPresentationElement.getSelected via guarded reflection per the project's
+     * introspection rule) and hand the element to the owning project's panel.
+     */
+    private static void installDiagramSelectionRelay() {
+        java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+            if (event.getID() != java.awt.event.MouseEvent.MOUSE_CLICKED) {
+                return;
+            }
+            // invokeLater: run AFTER the click's own selection processing has finished
+            SwingUtilities.invokeLater(SemanticAlignmentPlugin::relayActiveDiagramSelection);
+        }, java.awt.AWTEvent.MOUSE_EVENT_MASK);
+        DiagnosticLog.event("LIFECYCLE", "Diagram selection relay installed");
+    }
+
+    private static void relayActiveDiagramSelection() {
+        if (relayBroken) {
+            return;
+        }
+        try {
+            Project project = com.nomagic.magicdraw.core.Application.getInstance().getProject();
+            if (project == null || project.isProjectClosed() || project.isProjectDisposed()) {
+                return;
+            }
+            SemanticBrowserPanel panel = PANELS.get(project);
+            if (panel == null) {
+                return;
+            }
+            Object diagram = project.getActiveDiagram();
+            if (diagram == null) {
+                return;
+            }
+            Object selected = diagram.getClass().getMethod("getSelected").invoke(diagram);
+            if (!(selected instanceof java.util.List<?> list) || list.isEmpty()) {
+                return;
+            }
+            Object first = list.get(0);
+            Object element = first.getClass().getMethod("getElement").invoke(first);
+            if (element instanceof Element modelElement
+                    && modelElement != panel.selectedElement) {
+                panel.handleSelection(modelElement);
+            }
+        } catch (NoSuchMethodException e) {
+            // API drift on this Cameo version - journal once and stop trying
+            DiagnosticLog.event("WARN", "Diagram selection relay disabled: " + e);
+            relayBroken = true;
+        } catch (Throwable t) {
+            if (!relayBroken) {
+                log.error("Diagram selection relay failed", t);
+            }
+        }
+    }
+
+    private static volatile boolean relayBroken;
 
     /**
      * SHACL shapes resolve from -Dsemantic.plugin.shapes first (test override), then from
@@ -566,6 +639,12 @@ public class SemanticAlignmentPlugin extends Plugin {
                     DiagnosticLog.event("MAPPING", element.getHumanName()
                             + " -> " + conceptURI + " | status=REJECTED read-only element");
                     appendConsole("[FAIL] Element is read-only (library or locked element).");
+                    return;
+                }
+                // Mount the shipped profile module on first use - OUTSIDE the session
+                if (!StereotypeManager.ensureProfileAvailable(project)) {
+                    DiagnosticLog.event("MAPPING", "Rejected: Semantic Alignment Profile module unavailable");
+                    appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
                     return;
                 }
                 Project owner = Project.getProject(element);
