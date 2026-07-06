@@ -85,14 +85,52 @@ ontologies. Re-resolution never depends on a live OLS call.
   suite with outbound network blocked = air-gapped proof.
 - P5 Considerate-use hardening (debounce, User-Agent, pin the OLS4 commit).
 
-## Decisions for the owner
+## Decisions — RESOLVED with owner (2026-07-05)
 
-1. **Self-hosted OLS4 volume vs. in-JVM OWL (Jena) for the offline path?** Recommend
-   local OLS4 for the search/hierarchy UX; in-JVM OWL only for the tiny BFO/CCO/gUFO
-   capability fragments as the floor.
-2. **Canonical serialization of the realizes edge** (neutral internal predicate + both
-   BFO and gUFO IRIs, vs pick one)? Recommend neutral + both; owner owns the persisted
-   audit format.
-3. **CCO sourcing + ontology licenses** — approve vendoring CCO's `AgentOntology.ttl`
-   (not in OLS4) and clear per-ontology redistribution licenses before any pre-loaded
-   volume ships. Legal gate, not technical.
+1. Offline path: local OLS4 for search/hierarchy UX + in-JVM OWL for the tiny fragments,
+   **reshaped by the loading & licensing policy below (remote-first).**
+2. Realizes-edge serialization: **neutral internal predicate + both BFO and gUFO IRIs;**
+   owner owns the persisted audit format.
+3. CCO + licenses: **do NOT redistribute; notify the user on licensing issues instead.**
+
+## Owner loading & licensing policy — REMOTE-FIRST, NEVER REDISTRIBUTE
+
+Decisive principle: **reference, don't host.** Querying a remote service (OLS4 public
+API, or an ontology's own host) is fine — not redistribution. Hosting / baking an
+already-hosted ontology into our shipped artifacts or git is where licensing gets
+"weird," so we avoid it.
+
+- **Cast a wide net remotely.** OLS4's public API already indexes ~280 ontologies /
+  8.7M classes — that IS the wide net, no hosting. Search across all; **filter by
+  domain** (ontology scope). Covers "load many more ontologies to be useful" without
+  hosting anything.
+- **Never commit ontologies to git** (license exposure + repo bloat).
+- **On-demand, build-time loading** for the self-hosted/air-gapped instance: a build
+  process fetches the chosen set from canonical sources at load time; the repo stores
+  only the *config* (list of ontology URLs), never the data. Never host an ontology
+  already hosted elsewhere.
+- **General users get specific, on-demand loading** — pull only what a program needs.
+- **Users add their OWN restrictively-licensed ontologies** (SNOMED/MedDRA/LOINC…) into
+  the user catalog dir already built; we never ship those.
+- **License NOTIFICATION, not enforcement.** Surface a license note per aligned
+  term/ontology and warn when a term comes from a restrictively-licensed source,
+  especially if the action would store/redistribute it. Remote reference = OK
+  (informational only). OLS4 does not reliably expose per-ontology license text
+  (verified: `ncit` license empty), so notification uses a curated known-restrictive
+  prefix list (SNOMED, MedDRA, LOINC, ICD, GMDN…) plus whatever the source provides.
+
+Implication: **P1 (public OLS4 API) is the primary, fully license-clean path** (remote
+reference, wide net, domain-filterable, nothing hosted/committed). Self-hosted OLS4
+narrows to (a) air-gapped/regulated and (b) the user's own licensed ontologies — both
+loaded on demand from sources at build time. Every aligned term persists source prefix +
+IRI + versionInfo + license flag.
+
+## Verified API facts (2026-07-05)
+
+- `GET /api/search?q=Search&rows=3` → `numFound=1551`; docs carry `iri, ontology_name,
+  ontology_prefix, short_form, description, label, obo_id, type, exact_synonyms`. Top hit
+  `NCIT:C54117` (class).
+- `GET /api/ontologies/ncit/terms?iri=<enc>` → `annotation.Semantic_Type="Activity"` for
+  NCIT Search — the signal the Capability-slot validation reads.
+- OLS4 `ncit` metadata did not populate a license string → notification uses a curated
+  prefix list, not OLS4 metadata.
