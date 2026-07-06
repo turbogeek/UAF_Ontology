@@ -1,5 +1,18 @@
 # Profile Storage & Asset Loading — mechanism established, authoring blocked (2026-07-05)
 
+> **Use cases:** see [use_cases.md](use_cases.md) §2 for what this storage feature is *for*.
+>
+> **Owner refinements (2026-07-06):**
+> - **Instrument is an explicit user action**, not silent mount-on-first-use — a
+>   **Tools ▸ Semantic Alignment ▸ Instrument Model** command adds the profile to the model.
+> - **Add a model-level stereotype** (`SemanticModel`, extends `Package`) that maintains the
+>   **ontology root IRI + version** (+ instrumented-by/-date provenance). It anchors the
+>   derived ontology and lets audits compare versions.
+> - **Un-instrument** (Remove Instrumentation) removes all `SemanticAlignment` applications
+>   *and* the model-level stereotype, after a warning — returns the model to its clean state.
+> - The derived ontology is **maintained from the annotations** (a projection rebuilt by the
+>   exporter, anchored at the root IRI/version) so SBVR/SPARQL/reasoner/LLM read current data.
+
 Owner requirement: ship the SemanticAlignment stereotype as a REAL profile via the
 plugin's proper asset mechanism (not runtime `useModule` of a scratch module); make it
 INVISIBLE (never changes how a UAF/UML element renders) with a Customization so data is

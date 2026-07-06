@@ -1,5 +1,17 @@
 # OLS4 Integration & Capability Alignment — Recommendation (2026-07-05)
 
+> **Use cases:** see [use_cases.md](use_cases.md) §3 for what this feature is *for*.
+>
+> **Owner refinements (2026-07-06):**
+> - **OLS4 is one of *many* sources.** The near-term goal is **breadth of domains** to map
+>   models against; federate OLS4 with the user's imported ontologies and local fragments.
+> - **Survey the ontology landscape** (creators & hosts) so we know where to reach for
+>   breadth — see [use_cases.md](use_cases.md) §3.1 (OBO/BioPortal, BFO/gUFO/CCO, IOF/EMMO,
+>   W3C/OMG/QUDT, device/regulatory).
+> - **New use case: extend or correct an existing ontology** — capture proposed additions as
+>   a **local overlay** (never mutate upstream), validated across **several use-case models**
+>   and by the reasoner before proposing upstream.
+
 Owner surfaced OLS4 (https://www.ebi.ac.uk/ols4/) and asked: use the website / its API /
 its MCP, or run it locally (can we)? And: "Search is a Capability — what is Search *as a
 Capability*?" (NCIT:C54117 "Search" is the activity, not the capability.)
