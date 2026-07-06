@@ -14,7 +14,7 @@ def diag = { String m -> String l = TS.format(new Date()) + '  ' + m; println l;
 def fails = []
 def check = { String name, boolean cond -> diag((cond ? '[PASS] ' : '[FAIL] ') + name); if (!cond) fails << name }
 
-final String QUERY = 'Weather'
+final String QUERY = 'gearbox'  // engineering term: present in TIB (e.g. OEO), absent from EBI OLS4 - proves TIB federation
 final File JOURNAL = new File(new File(System.getProperty('user.home'), '.semantic_alignment_plugin'), 'semantic-plugin.log')
 def waitForJournal = { long from, List<String> tokens, int timeoutMs ->
     long deadline = System.currentTimeMillis() + timeoutMs
@@ -55,13 +55,14 @@ if (searchField == null || ols4Button == null || suggestionList == null) { diag(
 long mark = JOURNAL.exists() ? JOURNAL.length() : 0L
 SwingUtilities.invokeAndWait { searchField.setText(QUERY); ols4Button.doClick() }
 diag('clicked OLS4 for "' + QUERY + '"; awaiting network...')
-def line = waitForJournal(mark, ['| TERMSOURCE |', "OLS4 '" + QUERY + "'"], 25000)
+def line = waitForJournal(mark, ['| TERMSOURCE |', "online '" + QUERY + "'"], 25000)
 if (line == null) {
     check('OLS4 TERMSOURCE journal event fired', false)
 } else {
     diag('journal: ' + line.trim())
     check('OLS4 TERMSOURCE journal event fired', true)
-    check('OLS4 returned candidates (appended > 0)', line.contains('appended') && !line.contains('-> 0'))
+    check('online returned candidates (count > 0)', (line =~ /-> [1-9]/) as boolean)
+    check('results came from >= 2 federated sources', line.contains('source(s)'))
 }
 // Inspect the suggestion list for OLS4-sourced rows (ontologyId starts with "OLS4:").
 def ols4Rows = new AtomicReference(0)

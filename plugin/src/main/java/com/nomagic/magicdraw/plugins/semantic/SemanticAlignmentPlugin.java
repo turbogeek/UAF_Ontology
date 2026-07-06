@@ -75,10 +75,29 @@ public class SemanticAlignmentPlugin extends Plugin {
     private static volatile SuggestionRanker suggestionRanker;
     // Automatic UAF-stereotype -> ontology-concept resolver (derived from uaf_ontology).
     private static volatile UafConceptResolver uafResolver;
-    // Remote OLS4 term source (EBI public API by default; -Dsemantic.plugin.ols4.baseurl
-    // points it at a self-hosted / air-gapped instance). Stateless + thread-safe; one
-    // instance shared across panels. Queried only on explicit user action (considerate use).
-    private static final Ols4TermSource OLS4 = new Ols4TermSource();
+    // OLS-family online term sources (same REST API shape). Default: EBI OLS4 (~280
+    // life-science ontologies) + the TIB Terminology Service (100+ engineering/physics/
+    // chemistry/materials ontologies - the systems-engineering breadth OLS4 lacks). Both
+    // keyless, remote-reference (license-clean). Override the whole list with
+    // -Dsemantic.plugin.ols.endpoints (comma-separated base URLs); each also honors
+    // -Dsemantic.plugin.ols4.baseurl for a single air-gapped instance. Stateless + thread-safe.
+    private static final java.util.List<Ols4TermSource> ONLINE_SOURCES = buildOnlineSources();
+
+    private static java.util.List<Ols4TermSource> buildOnlineSources() {
+        java.util.List<Ols4TermSource> sources = new java.util.ArrayList<>();
+        String cfg = System.getProperty("semantic.plugin.ols.endpoints");
+        if (cfg != null && !cfg.isBlank()) {
+            for (String base : cfg.split(",")) {
+                if (!base.isBlank()) {
+                    sources.add(new Ols4TermSource(base.trim()));
+                }
+            }
+        } else {
+            sources.add(new Ols4TermSource()); // EBI OLS4 (its own default / -Dsemantic.plugin.ols4.baseurl)
+            sources.add(new Ols4TermSource("https://api.terminology.tib.eu/api")); // TIB (engineering)
+        }
+        return sources;
+    }
 
     // Panel per open project so diagram-click routing reaches the right sidebar.
     // Weak keys: a closed project must not be pinned by its panel registration.
@@ -407,7 +426,7 @@ public class SemanticAlignmentPlugin extends Plugin {
         private final JLabel suggestStatus = new JLabel(" ");
         private final JButton applySelectedButton = new JButton("Apply Selected Concept(s)");
         private final JTextField searchField = new JTextField();
-        private final JButton ols4Button = new JButton("Search OLS4 (online)");
+        private final JButton ols4Button = new JButton("Search Online Ontologies");
         private final JButton auditButton = new JButton("Run Audit");
         private final JLabel statusBadge = new JLabel("STATUS: NOT AUDITED");
         private final JTextArea consoleArea = new JTextArea();
@@ -587,14 +606,15 @@ public class SemanticAlignmentPlugin extends Plugin {
             });
             root.add(searchField);
             root.add(Box.createVerticalStrut(4));
-            // Explicit online search: OLS4 (~280 EBI ontologies) is one of MANY sources and
-            // is queried only on click (considerate use). Results append to the list, marked
-            // with their source ontology + a license flag when restrictively licensed.
+            // Explicit online search across the OLS-family sources (EBI OLS4 + TIB engineering
+            // terminology) - one of MANY source families, queried only on click (considerate
+            // use). Results append to the list, marked with their source ontology + a license
+            // flag when restrictively licensed.
             ols4Button.setName("semantic.ols4Button");
             ols4Button.setAlignmentX(Component.LEFT_ALIGNMENT);
-            ols4Button.setToolTipText("Search the EBI Ontology Lookup Service for the term above "
-                    + "(one of many sources; results are appended)");
-            ols4Button.addActionListener(e -> searchOls4());
+            ols4Button.setToolTipText("Search the online ontology services (EBI OLS4 + TIB "
+                    + "engineering terminology) for the term above; results are appended");
+            ols4Button.addActionListener(e -> searchOnline());
             root.add(ols4Button);
             root.add(Box.createVerticalStrut(10));
 
@@ -892,50 +912,57 @@ public class SemanticAlignmentPlugin extends Plugin {
         }
 
         /**
-         * Explicit OLS4 search for the current search-box text. Runs OFF the EDT (network),
-         * then appends the remote candidates to the suggestion list, each marked with its
-         * source ontology and a license flag. OLS4 is ONE of many sources and is queried only
-         * on this user action (considerate use). Trace: design/use_cases.md UC-2.1
+         * Explicit online search across all OLS-family sources (EBI OLS4 + TIB engineering
+         * terminology) for the current search-box text. Runs OFF the EDT (network), merges +
+         * de-duplicates by IRI, then appends the candidates to the suggestion list, each marked
+         * with its source ontology and a license flag. These are among MANY sources and are
+         * queried only on this user action (considerate use). Trace: design/use_cases.md UC-2.1
          */
-        private void searchOls4() {
+        private void searchOnline() {
             String raw = searchField.getText();
             if (raw == null || raw.isBlank()) {
-                appendConsole("[..] Type a term in the search box first, then Search OLS4.");
+                appendConsole("[..] Type a term in the search box first, then Search Online Ontologies.");
                 return;
             }
             final String query = raw.trim();
             final String ontologyFilter = System.getProperty("semantic.plugin.ols4.ontologies");
             ols4Button.setEnabled(false);
-            suggestStatus.setText("Searching OLS4 for \"" + query + "\"…");
+            suggestStatus.setText("Searching online ontologies for \"" + query + "\"…");
             Thread worker = new Thread(() -> {
-                List<AlignmentCandidate> hits;
-                try {
-                    hits = OLS4.search(query, ontologyFilter, 12);
-                } catch (Throwable t) {
-                    hits = List.of();
+                // Merge across sources, de-dup by IRI (first source wins), so EBI + TIB overlap
+                // collapses to one row per concept.
+                java.util.LinkedHashMap<String, AlignmentCandidate> merged = new java.util.LinkedHashMap<>();
+                for (Ols4TermSource src : ONLINE_SOURCES) {
+                    try {
+                        for (AlignmentCandidate c : src.search(query, ontologyFilter, 8)) {
+                            if (c.iri() != null && !c.iri().isBlank()) {
+                                merged.putIfAbsent(c.iri(), c);
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                        // one source failing must not sink the rest
+                    }
                 }
-                final List<AlignmentCandidate> results = hits;
+                final List<AlignmentCandidate> results = new java.util.ArrayList<>(merged.values());
                 SwingUtilities.invokeLater(() -> {
                     ols4Button.setEnabled(true);
                     if (results.isEmpty()) {
-                        suggestStatus.setText("OLS4: no results for \"" + query + "\" (offline or no match).");
-                        DiagnosticLog.event("TERMSOURCE", "OLS4 '" + query + "' -> 0 (offline or no match)");
+                        suggestStatus.setText("Online: no results for \"" + query + "\" (offline or no match).");
+                        DiagnosticLog.event("TERMSOURCE", "online '" + query + "' -> 0 (offline or no match)");
                         return;
                     }
                     int added = 0;
                     for (AlignmentCandidate c : results) {
-                        if (c.iri() == null || c.iri().isBlank()) {
-                            continue;
-                        }
                         suggestionModel.addElement(ols4Suggestion(c));
                         added++;
                     }
-                    suggestStatus.setText(added + " OLS4 result(s) appended — Ctrl-click + Apply Selected.");
-                    DiagnosticLog.event("TERMSOURCE", "OLS4 '" + query + "' -> " + added + " appended : "
+                    suggestStatus.setText(added + " online result(s) appended — Ctrl-click + Apply Selected.");
+                    DiagnosticLog.event("TERMSOURCE", "online '" + query + "' -> " + added + " from "
+                            + ONLINE_SOURCES.size() + " source(s) : "
                             + results.stream().map(AlignmentCandidate::oboId)
                                     .filter(java.util.Objects::nonNull).collect(Collectors.joining(", ")));
                 });
-            }, "semantic-ols4-search");
+            }, "semantic-online-search");
             worker.setDaemon(true);
             worker.start();
         }
@@ -975,7 +1002,13 @@ public class SemanticAlignmentPlugin extends Plugin {
             Thread worker = new Thread(() -> {
                 for (String iri : iris) {
                     try {
-                        java.util.Optional<AlignmentCandidate> opt = OLS4.lookup(iri);
+                        java.util.Optional<AlignmentCandidate> opt = java.util.Optional.empty();
+                        for (Ols4TermSource src : ONLINE_SOURCES) {
+                            opt = src.lookup(iri);
+                            if (opt.isPresent()) {
+                                break;
+                            }
+                        }
                         if (opt.isEmpty()) {
                             continue;
                         }
