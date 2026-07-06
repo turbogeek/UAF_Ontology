@@ -3,11 +3,15 @@ package com.nomagic.magicdraw.plugins.semantic;
 import com.nomagic.magicdraw.core.Project;
 import com.nomagic.magicdraw.plugins.Plugin;
 import com.nomagic.magicdraw.plugins.semantic.align.CatalogLoader;
+import com.nomagic.magicdraw.plugins.semantic.align.ConceptEntry;
 import com.nomagic.magicdraw.plugins.semantic.align.ConceptIndex;
 import com.nomagic.magicdraw.plugins.semantic.align.ConceptSuggestion;
 import com.nomagic.magicdraw.plugins.semantic.align.StereotypeRouter;
 import com.nomagic.magicdraw.plugins.semantic.align.SuggestionRanker;
 import com.nomagic.magicdraw.plugins.semantic.align.UafConceptResolver;
+import com.nomagic.magicdraw.plugins.semantic.align.terms.AlignmentCandidate;
+import com.nomagic.magicdraw.plugins.semantic.align.terms.CapabilityGuard;
+import com.nomagic.magicdraw.plugins.semantic.align.terms.Ols4TermSource;
 import com.nomagic.magicdraw.plugins.semantic.commands.TransactionWrapper;
 import com.nomagic.magicdraw.plugins.semantic.metadata.StereotypeManager;
 import com.nomagic.magicdraw.plugins.semantic.rest.SemanticRestService;
@@ -71,6 +75,10 @@ public class SemanticAlignmentPlugin extends Plugin {
     private static volatile SuggestionRanker suggestionRanker;
     // Automatic UAF-stereotype -> ontology-concept resolver (derived from uaf_ontology).
     private static volatile UafConceptResolver uafResolver;
+    // Remote OLS4 term source (EBI public API by default; -Dsemantic.plugin.ols4.baseurl
+    // points it at a self-hosted / air-gapped instance). Stateless + thread-safe; one
+    // instance shared across panels. Queried only on explicit user action (considerate use).
+    private static final Ols4TermSource OLS4 = new Ols4TermSource();
 
     // Panel per open project so diagram-click routing reaches the right sidebar.
     // Weak keys: a closed project must not be pinned by its panel registration.
@@ -399,6 +407,7 @@ public class SemanticAlignmentPlugin extends Plugin {
         private final JLabel suggestStatus = new JLabel(" ");
         private final JButton applySelectedButton = new JButton("Apply Selected Concept(s)");
         private final JTextField searchField = new JTextField();
+        private final JButton ols4Button = new JButton("Search OLS4 (online)");
         private final JButton auditButton = new JButton("Run Audit");
         private final JLabel statusBadge = new JLabel("STATUS: NOT AUDITED");
         private final JTextArea consoleArea = new JTextArea();
@@ -577,6 +586,16 @@ public class SemanticAlignmentPlugin extends Plugin {
                 }
             });
             root.add(searchField);
+            root.add(Box.createVerticalStrut(4));
+            // Explicit online search: OLS4 (~280 EBI ontologies) is one of MANY sources and
+            // is queried only on click (considerate use). Results append to the list, marked
+            // with their source ontology + a license flag when restrictively licensed.
+            ols4Button.setName("semantic.ols4Button");
+            ols4Button.setAlignmentX(Component.LEFT_ALIGNMENT);
+            ols4Button.setToolTipText("Search the EBI Ontology Lookup Service for the term above "
+                    + "(one of many sources; results are appended)");
+            ols4Button.addActionListener(e -> searchOls4());
+            root.add(ols4Button);
             root.add(Box.createVerticalStrut(10));
 
             // Bottom section: validation dashboard
@@ -833,6 +852,7 @@ public class SemanticAlignmentPlugin extends Plugin {
                 appendConsole("[OK] Applied " + (picks.isEmpty() ? "base concept" : picks.size()
                         + " concept(s)") + (pinnedBaseURI == null ? "" : " (base locked)"));
                 handleSelection(element); // refresh the sidebar with the new alignment
+                maybeWarnCapabilityActivity(picks); // advisory capability/activity guard
             } catch (Exception e) {
                 log.error("Semantic mapping failed", e);
                 DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + summary
@@ -869,6 +889,113 @@ public class SemanticAlignmentPlugin extends Plugin {
                 return "";
             }
             return s.length() <= max ? s : s.substring(0, max) + "…";
+        }
+
+        /**
+         * Explicit OLS4 search for the current search-box text. Runs OFF the EDT (network),
+         * then appends the remote candidates to the suggestion list, each marked with its
+         * source ontology and a license flag. OLS4 is ONE of many sources and is queried only
+         * on this user action (considerate use). Trace: design/use_cases.md UC-2.1
+         */
+        private void searchOls4() {
+            String raw = searchField.getText();
+            if (raw == null || raw.isBlank()) {
+                appendConsole("[..] Type a term in the search box first, then Search OLS4.");
+                return;
+            }
+            final String query = raw.trim();
+            final String ontologyFilter = System.getProperty("semantic.plugin.ols4.ontologies");
+            ols4Button.setEnabled(false);
+            suggestStatus.setText("Searching OLS4 for \"" + query + "\"…");
+            Thread worker = new Thread(() -> {
+                List<AlignmentCandidate> hits;
+                try {
+                    hits = OLS4.search(query, ontologyFilter, 12);
+                } catch (Throwable t) {
+                    hits = List.of();
+                }
+                final List<AlignmentCandidate> results = hits;
+                SwingUtilities.invokeLater(() -> {
+                    ols4Button.setEnabled(true);
+                    if (results.isEmpty()) {
+                        suggestStatus.setText("OLS4: no results for \"" + query + "\" (offline or no match).");
+                        DiagnosticLog.event("TERMSOURCE", "OLS4 '" + query + "' -> 0 (offline or no match)");
+                        return;
+                    }
+                    int added = 0;
+                    for (AlignmentCandidate c : results) {
+                        if (c.iri() == null || c.iri().isBlank()) {
+                            continue;
+                        }
+                        suggestionModel.addElement(ols4Suggestion(c));
+                        added++;
+                    }
+                    suggestStatus.setText(added + " OLS4 result(s) appended — Ctrl-click + Apply Selected.");
+                    DiagnosticLog.event("TERMSOURCE", "OLS4 '" + query + "' -> " + added + " appended : "
+                            + results.stream().map(AlignmentCandidate::oboId)
+                                    .filter(java.util.Objects::nonNull).collect(Collectors.joining(", ")));
+                });
+            }, "semantic-ols4-search");
+            worker.setDaemon(true);
+            worker.start();
+        }
+
+        /** Converts an OLS4 candidate into a suggestion row (source + license in the context). */
+        private ConceptSuggestion ols4Suggestion(AlignmentCandidate c) {
+            String curie = (c.oboId() != null && !c.oboId().isBlank()) ? c.oboId() : c.iri();
+            String prefix = c.ontologyPrefix() == null ? "ols4" : c.ontologyPrefix();
+            StringBuilder ctx = new StringBuilder("via OLS4 [").append(prefix).append(']');
+            if (c.restrictivelyLicensed()) {
+                ctx.append("  license: ").append(c.licenseNote());
+            }
+            if (c.description() != null && !c.description().isBlank()) {
+                ctx.append("  -  ").append(c.description());
+            }
+            ConceptEntry entry = new ConceptEntry(c.iri(), curie,
+                    c.label() == null ? curie : c.label(), List.of(),
+                    c.description() == null ? "" : c.description(),
+                    "OLS4:" + prefix, prefix, ConceptIndex.tokenize(c.label()));
+            String subject = (selectedName == null || selectedName.isBlank()) ? entry.label() : selectedName;
+            String sbvr = SBVR_ENGINE.generatePlainSBVR(subject, c.iri(), null, null);
+            return new ConceptSuggestion(entry, 0.72, "OLS4", ctx.toString(), sbvr);
+        }
+
+        /**
+         * Advisory capability/activity guard: when a Capability element is aligned to an OLS4
+         * term that is actually an Activity (e.g. UAF Capability "Search" -> NCIT Search), warn
+         * the user (notify, don't block). Runs off the EDT (an OLS4 lookup per IRI).
+         * Trace: design/use_cases.md UC-2.3
+         */
+        private void maybeWarnCapabilityActivity(java.util.List<String> iris) {
+            boolean isCapability = selectedStereotypes.stream()
+                    .anyMatch(s -> s != null && s.equalsIgnoreCase("Capability"));
+            if (!isCapability || iris == null || iris.isEmpty()) {
+                return;
+            }
+            Thread worker = new Thread(() -> {
+                for (String iri : iris) {
+                    try {
+                        java.util.Optional<AlignmentCandidate> opt = OLS4.lookup(iri);
+                        if (opt.isEmpty()) {
+                            continue;
+                        }
+                        java.util.Optional<String> warn = CapabilityGuard.validate(
+                                CapabilityGuard.Slot.CAPABILITY, opt.get().semanticType());
+                        if (warn.isPresent()) {
+                            String msg = opt.get().label() + " (" + opt.get().oboId() + "):\n\n" + warn.get();
+                            DiagnosticLog.event("GUARD", "capability/activity: " + iri
+                                    + " semanticType=" + opt.get().semanticType());
+                            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                                    com.nomagic.magicdraw.core.Application.getInstance().getMainFrame(),
+                                    msg, "Capability vs Activity", JOptionPane.WARNING_MESSAGE));
+                        }
+                    } catch (Throwable ignored) {
+                        // advisory only - never disrupt the alignment
+                    }
+                }
+            }, "semantic-capability-guard");
+            worker.setDaemon(true);
+            worker.start();
         }
 
         /**
