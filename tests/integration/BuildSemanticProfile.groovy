@@ -1,14 +1,10 @@
-// BuildSemanticProfile.groovy — one-time artifact builder (not a test)
-// =====================================================================================
-// Owner decision: the Semantic Alignment profile must be a REAL, shipped profile module
-// (not created programmatically inside user projects), and GENERIC - usable in UML,
-// SysML 1.x, UAF, or any UML-based model. This script builds it once as its own
-// project, shares the profile package, and saves it to the repo:
-//   plugin/profiles/Semantic Alignment Profile.mdzip
-// Stereotype: SemanticAlignment (extends the UML Element metaclass = applies anywhere)
-// Tags: mappedConceptURI:String, ontologySource:String, mappingConfidence:String
-// =====================================================================================
+// BuildSemanticProfile.groovy — author the shipped profile module CORRECTLY.
+// The missing piece: ModulesService.shareOnTask(IProject, Package, path) marks the
+// profile package SHARED so useModule imports it (unshared packages never cross into the
+// using project - that was the delta-0 cause). Builds the invisible stereotype +
+// «Customization», shares the profile package, saves the project as the module .mdzip.
 import com.nomagic.magicdraw.core.Application
+import com.nomagic.magicdraw.core.modules.ModulesService
 import com.nomagic.magicdraw.core.project.ProjectDescriptorsFactory
 import com.nomagic.magicdraw.openapi.uml.SessionManager
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper
@@ -22,110 +18,64 @@ LOG.getParentFile().mkdirs()
 try { LOG.bytes = new byte[0] } catch (Throwable ignored) {}
 final SimpleDateFormat TS = new SimpleDateFormat('HH:mm:ss.SSS')
 def diag = { String m -> String l = TS.format(new Date()) + '  ' + m; println l; try { LOG << (l + '\n') } catch (Throwable ignored) {} }
-def diagT = { String m, Throwable t ->
-    def sw = new StringWriter(); t.printStackTrace(new PrintWriter(sw)); diag(m + '\n' + sw.toString())
-}
+def diagT = { String m, Throwable t -> def sw = new StringWriter(); t.printStackTrace(new PrintWriter(sw)); diag(m + '\n' + sw.toString()) }
 
 diag('=== build-semantic-profile START ===')
 def app = Application.getInstance()
 def pm = app.getProjectsManager()
-def previous = pm.getActiveProject()
-
-// exportModule raises a modal "Save" JFileChooser to pick the destination; auto-drive
-// it (set the file, approve) so the build is fully non-interactive. Runs as a Timer on
-// the EDT, which keeps firing because a modal dialog pumps the event queue.
-def chooserDriver = new javax.swing.Timer(200, null)
-chooserDriver.addActionListener({ e ->
-    java.awt.Window.getWindows().findAll { it.isVisible() && it instanceof java.awt.Dialog }.each { dlg ->
-        def chooser = null
-        def find
-        find = { java.awt.Component c ->
-            if (c instanceof javax.swing.JFileChooser) { chooser = c }
-            if (chooser == null && c instanceof java.awt.Container) { c.getComponents().each { find(it) } }
-        }
-        find(dlg)
-        if (chooser != null) {
-            try {
-                chooser.setSelectedFile(OUT)
-                chooser.approveSelection()
-                diag('auto-approved Save chooser -> ' + OUT)
-            } catch (Throwable t) { diag('chooser drive failed: ' + t) }
-        }
-    }
-} as java.awt.event.ActionListener)
-chooserDriver.start()
-
 try {
     OUT.getParentFile().mkdirs()
-    def result = [ok: false]
-    def error = null
+    if (OUT.exists()) { OUT.delete() }
+    def ok = false
     SwingUtilities.invokeAndWait {
         try {
-            def project = pm.createProject()
-            diag('fresh project created: ' + project.getName())
+            def prj = pm.createProject()
+            if (prj == null) { diag('createProject null'); return }
+            diag('project: ' + prj.getName())
             def sm = SessionManager.getInstance()
-            sm.createSession(project, 'Build Semantic Alignment Profile')
+            sm.createSession(prj, 'author profile')
+            def profile = null
             try {
-                def ef = project.getElementsFactory()
-                def profile = ef.createProfileInstance()
+                def ef = prj.getElementsFactory()
+                profile = ef.createProfileInstance()
                 profile.setName('Semantic Alignment Profile')
-                profile.setOwner(project.getPrimaryModel())
-
-                def metaElement = StereotypesHelper.getAllMetaClasses(project).find { it.getName() == 'Element' }
-                if (metaElement == null) { throw new IllegalStateException('UML metaclass Element not found') }
-                def stereo = StereotypesHelper.createStereotype(project, 'SemanticAlignment', [metaElement])
+                profile.setOwner(prj.getPrimaryModel())
+                def elementMeta = StereotypesHelper.getAllMetaClasses(prj).find { it.getName() == 'Element' }
+                def stereo = StereotypesHelper.createStereotype(prj, 'SemanticAlignment', [elementMeta])
                 stereo.setOwner(profile)
-
-                def strType = null
-                try {
-                    def byQn = Class.forName('com.nomagic.magicdraw.uml.Finder')
-                            .getMethod('byQualifiedName').invoke(null)
-                    strType = byQn.find(project, 'UML Standard Profile::UML2 Metamodel::PrimitiveTypes::String')
-                } catch (Throwable t) { diag('note: String primitive lookup failed (' + t + ')') }
-
-                ['mappedConceptURI', 'ontologySource', 'mappingConfidence'].each { tagName ->
-                    def prop = ef.createPropertyInstance()
-                    prop.setName(tagName)
-                    if (strType != null) { prop.setType(strType) }
-                    stereo.getOwnedAttribute().add(prop)
+                ['mappedConceptURI', 'ontologySource', 'mappingConfidence'].each { t ->
+                    def p = ef.createPropertyInstance(); p.setName(t); stereo.getOwnedAttribute().add(p)
                 }
-                sm.closeSession(project)
-            } catch (Throwable t) {
-                try { sm.cancelSession(project) } catch (Throwable ignored) {}
-                throw t
-            }
+                def cust = StereotypesHelper.getStereotype(prj, 'Customization')
+                if (cust != null) {
+                    def cc = ef.createClassInstance(); cc.setName('SemanticAlignment Customization'); cc.setOwner(profile)
+                    StereotypesHelper.addStereotype(cc, cust)
+                    StereotypesHelper.setStereotypePropertyValue(cc, cust, 'customizationTarget', stereo)
+                    StereotypesHelper.setStereotypePropertyValue(cc, cust, 'hideMetatype', Boolean.TRUE)
+                    StereotypesHelper.setStereotypePropertyValue(cc, cust, 'representationText', 'Semantic Alignment')
+                    StereotypesHelper.setStereotypePropertyValue(cc, cust, 'category', 'Semantic Alignment')
+                    def spec = ['mappedConceptURI','ontologySource','mappingConfidence'].collect {
+                        '<html><head><title>SPF</title></head><body><p>' + it + '</p></body></html>' }
+                    StereotypesHelper.setStereotypePropertyValue(cc, cust, 'standardExpertConfiguration', spec)
+                    diag('customization created')
+                }
+                sm.closeSession(prj)
+                diag('profile authored')
+            } catch (Throwable t) { sm.cancelSession(prj); throw t }
 
-            // Export the profile package AS A SHARED MODULE .mdzip so any project can
-            // useModule() it. exportModule is the canonical "make a reusable module"
-            // API; a plainly-saved project cannot be mounted (that was the mount error).
-            def profilePkg = project.getPrimaryModel().getOwnedElement().find {
-                it.respondsTo('getName') && it.getName() == 'Semantic Alignment Profile'
-            }
-            if (profilePkg == null) { throw new IllegalStateException('profile package not found after creation') }
-            if (OUT.exists()) { OUT.delete() }
-            def moduleDescriptor = ProjectDescriptorsFactory.createProjectDescriptor(OUT.toURI())
-            pm.exportModule(project, [profilePkg], 'Semantic Alignment Profile', moduleDescriptor)
-            diag('exportModule -> ' + OUT)
-            pm.closeProjectNoSave()
-            result.ok = OUT.exists() && OUT.length() > 0
-        } catch (Throwable t) { error = t }
+            // THE FIX: mark the profile package SHARED (outside a model session).
+            def primary = prj.getPrimaryProject()
+            def sharePoint = ModulesService.shareOnTask(primary, profile, 'Semantic Alignment Profile')
+            diag('shareOnTask -> ' + sharePoint)
+
+            // Save the project (now with a shared profile package) as the module file.
+            def desc = ProjectDescriptorsFactory.createLocalProjectDescriptor(prj, OUT)
+            boolean saved = pm.saveProject(desc, true)
+            diag('saveProject -> ' + saved + ' (' + (OUT.exists() ? OUT.length() : 0) + ' bytes)')
+            pm.closeProjectNoSave(prj)
+            ok = OUT.exists() && OUT.length() > 0
+        } catch (Throwable t) { diagT('author threw', t) }
     }
-    if (error != null) { throw error }
-    if (result.ok && OUT.exists()) {
-        diag('RESULT: PASS (' + OUT.length() + ' bytes)')
-    } else {
-        diag('RESULT: FAIL')
-    }
-} catch (Throwable t) {
-    diagT('UNCAUGHT', t)
-    diag('RESULT: FAIL')
-} finally {
-    try { chooserDriver.stop() } catch (Throwable ignored) {}
-    // Reopen the host project for subsequent tests if we displaced it
-    try {
-        if (previous != null && Application.getInstance().getProject() == null) {
-            diag('note: previous project was displaced; reopen manually or rerun launcher')
-        }
-    } catch (Throwable ignored) {}
-}
+    diag('RESULT: ' + (ok ? 'PASS' : 'FAIL'))
+} catch (Throwable t) { diagT('UNCAUGHT', t); diag('RESULT: FAIL') }
 diag('=== build-semantic-profile DONE ===')
