@@ -146,6 +146,14 @@ public class SemanticRDFExporter {
 
         Resource elementResource = model.createResource(elementURI(element));
         elementResource.addProperty(RDF.type, model.createResource(conceptURI));
+        // mappedConceptURI is multi-valued: index 0 is the base concept (above); emit one
+        // rdf:type per additional narrowing concept so the derived ontology reflects every
+        // annotation (design/use_cases.md UC-2.2).
+        for (String extra : getAllAlignedConceptURIs(element)) {
+            if (!extra.equals(conceptURI)) {
+                elementResource.addProperty(RDF.type, model.createResource(extra));
+            }
+        }
 
         // Bare element name, not getHumanName()'s "Class EchoBase" - the label feeds
         // the SBVR English view where the metatype prefix reads as noise.
@@ -214,6 +222,30 @@ public class SemanticRDFExporter {
             return null;
         }
         return conceptCache.computeIfAbsent(element, this::resolveAlignment).orElse(null);
+    }
+
+    /** All resolvable mapped concept IRIs for the element (base first), de-duplicated. */
+    private java.util.List<String> getAllAlignedConceptURIs(Element element) {
+        if (alignmentStereotype == null || element == null
+                || !StereotypesHelper.hasStereotype(element, alignmentStereotype)) {
+            return java.util.List.of();
+        }
+        List<?> values = StereotypesHelper.getStereotypePropertyValue(
+                element, alignmentStereotype, PROPERTY_NAME);
+        if (values == null) {
+            return java.util.List.of();
+        }
+        java.util.List<String> resolved = new java.util.ArrayList<>();
+        for (Object v : values) {
+            if (v == null) {
+                continue;
+            }
+            String r = resolveConceptURI(v.toString());
+            if (r != null && !resolved.contains(r)) {
+                resolved.add(r);
+            }
+        }
+        return resolved;
     }
 
     private Optional<String> resolveAlignment(Element element) {

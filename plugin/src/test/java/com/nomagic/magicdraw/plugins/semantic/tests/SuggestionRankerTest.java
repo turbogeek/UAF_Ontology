@@ -99,4 +99,73 @@ public class SuggestionRankerTest {
         SuggestionRanker ranker = new SuggestionRanker(new ConceptIndex(), router());
         assertTrue(ranker.suggestForElement("Anything", List.of("ActualOrganization"), 5).isEmpty());
     }
+
+    // ---- Multi-term decomposition (searchVariants) ----------------------------------------
+
+    private ConceptIndex weatherIndex() {
+        ConceptIndex index = new ConceptIndex();
+        index.add(entry("cg", "ExtremeWeatherConditions", "Extreme Weather Conditions")); // exact full phrase
+        index.add(entry("met", "ExtremeWeather", "Extreme Weather"));                      // sub-phrase
+        index.add(entry("gen", "Weather", "Weather"));                                     // single word
+        index.add(entry("gen", "Extreme", "Extreme"));                                     // single word
+        index.add(entry("gen", "Conditions", "Conditions"));                               // single word
+        index.add(entry("cg", "Challenge", "Challenge"));                                  // stereotype term
+        index.add(entry("noise", "Membership", "Membership"));                             // unrelated
+        return index;
+    }
+
+    private static int indexOf(List<ConceptSuggestion> list, String curie) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).entry().curie().equals(curie)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Test
+    public void testSearchVariantsFullPhraseOutranksSubphraseOutranksWord() {
+        SuggestionRanker ranker = new SuggestionRanker(weatherIndex(), null);
+        List<ConceptSuggestion> top = ranker.searchVariants(
+                "Extreme Weather Conditions", List.of(), null, 10);
+        assertTrue("expected several results", top.size() >= 3);
+        // The exact full-phrase concept (e.g. a Coast Guard ontology) wins - best match first.
+        assertEquals("cg:ExtremeWeatherConditions", top.get(0).entry().curie());
+        int subIdx = indexOf(top, "met:ExtremeWeather");
+        int wordIdx = indexOf(top, "gen:Weather");
+        assertTrue("sub-phrase concept present", subIdx >= 0);
+        assertTrue("single-word concept present", wordIdx >= 0);
+        assertTrue("sub-phrase must outrank single word", subIdx < wordIdx);
+    }
+
+    @Test
+    public void testSearchVariantsPopulatesMatchedVariantAndContext() {
+        SuggestionRanker ranker = new SuggestionRanker(weatherIndex(), null);
+        List<ConceptSuggestion> top = ranker.searchVariants(
+                "Extreme Weather Conditions", List.of(), null, 10);
+        assertTrue(!top.isEmpty());
+        // Variants are built from normalized (lowercased) tokens, so the matched-variant hint
+        // is case-insensitive to the original phrase.
+        assertTrue("matched variant is the full phrase for the exact hit",
+                "extreme weather conditions".equalsIgnoreCase(top.get(0).matchedVariant()));
+        assertTrue("context snippet attached", top.get(0).context() != null
+                && !top.get(0).context().isBlank());
+    }
+
+    @Test
+    public void testSearchVariantsSearchesStereotypeTermAsText() {
+        SuggestionRanker ranker = new SuggestionRanker(weatherIndex(), null);
+        // The stereotype term "Challenge" is decomposed into the query, so cg:Challenge surfaces.
+        List<ConceptSuggestion> top = ranker.searchVariants(
+                "Extreme Weather Conditions", List.of("Challenge"), null, 10);
+        assertTrue("stereotype-term concept must surface",
+                top.stream().anyMatch(s -> s.entry().curie().equals("cg:Challenge")));
+    }
+
+    @Test
+    public void testSearchVariantsEmptyOnNoMatch() {
+        SuggestionRanker ranker = new SuggestionRanker(weatherIndex(), null);
+        // Nothing in the weather index tokenizes to "quantum", so an honest empty result.
+        assertTrue(ranker.searchVariants("Quantum", List.of(), null, 10).isEmpty());
+    }
 }

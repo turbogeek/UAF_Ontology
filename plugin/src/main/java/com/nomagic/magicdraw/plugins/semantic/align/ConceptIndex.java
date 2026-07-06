@@ -25,7 +25,17 @@ public final class ConceptIndex {
 
     /** Lowercased tokens from an identifier or label: camelCase and separators split. */
     public static Set<String> tokenize(String text) {
-        Set<String> tokens = new HashSet<>();
+        return new HashSet<>(tokensOrdered(text));
+    }
+
+    /**
+     * Lowercased tokens in READING ORDER (camelCase and separators split). Unlike
+     * {@link #tokenize} this preserves word order so callers can extract contiguous
+     * sub-phrases (n-grams) from a multi-word element name.
+     * Trace: design/use_cases.md UC-2.2 (multi-term suggestion decomposition)
+     */
+    public static List<String> tokensOrdered(String text) {
+        List<String> tokens = new ArrayList<>();
         if (text == null) {
             return tokens;
         }

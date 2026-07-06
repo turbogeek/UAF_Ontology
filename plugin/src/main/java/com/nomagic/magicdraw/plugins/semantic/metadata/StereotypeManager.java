@@ -58,25 +58,29 @@ public final class StereotypeManager {
             log.error("Shipped profile module not found: " + file);
             return false;
         }
-        // Preferred path: mount the shipped module. It is silent WHEN it resolves; a
-        // programmatically-exported module can reference its origin project's UML
-        // Standard Profile and fail portability ("Module not found") - the watcher
-        // dismisses that error popup so we can fall back rather than hang the EDT.
+        // Mount the shipped module as a read-only USED module - exactly how UAF/SoaML ship
+        // their profiles. useModule's boolean return is the AUTHORITATIVE success signal
+        // (a stereotype re-query can lag module indexing). The .mdzip is a proper shared
+        // module (ModulesService.shareOnTask), so on a healthy install this succeeds and the
+        // profile is NEVER materialized inside the user's project. Any modal error dialog is
+        // LOGGED (title + message) before being dismissed so a real failure is diagnosable,
+        // not silently swallowed.
         java.util.Set<java.awt.Window> baseline = new java.util.HashSet<>(
                 java.util.Arrays.asList(java.awt.Window.getWindows()));
         javax.swing.Timer watcher = new javax.swing.Timer(150, null);
-        watcher.addActionListener(e -> dismissNewDialogs(baseline));
+        watcher.addActionListener(e -> logAndDismissNewDialogs(baseline));
         watcher.start();
+        boolean[] used = {false};
         Runnable mount = () -> {
             try {
                 com.nomagic.magicdraw.core.project.ProjectDescriptor descriptor =
                         com.nomagic.magicdraw.core.project.ProjectDescriptorsFactory
                                 .createProjectDescriptor(file.toURI());
-                boolean used = com.nomagic.magicdraw.core.Application.getInstance()
+                used[0] = com.nomagic.magicdraw.core.Application.getInstance()
                         .getProjectsManager().useModule(project, descriptor);
-                log.info("Mounted Semantic Alignment Profile module: " + used);
+                log.info("useModule(Semantic Alignment Profile) -> " + used[0] + " from " + file);
             } catch (Throwable t) {
-                log.error("Shipped profile module did not mount (portability issue)", t);
+                log.error("Shipped profile module did not mount", t);
             }
         };
         try {
@@ -90,31 +94,55 @@ public final class StereotypeManager {
         } finally {
             watcher.stop();
         }
-        if (StereotypesHelper.getStereotype(project, STEREOTYPE_NAME) != null) {
+        boolean resolved = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME) != null;
+        if (used[0] || resolved) {
+            if (used[0] && !resolved) {
+                log.info("Semantic Alignment Profile mounted (useModule=true); stereotype resolution "
+                        + "may lag one indexing pass.");
+            }
             return true;
         }
 
-        // Fallback: instantiate the profile from its shipped definition so the tool never
-        // breaks. This is NOT hand-authoring by the user - it materializes the SAME
-        // generic profile the plugin ships (SemanticAlignment on the UML Element metaclass
-        // with the three tags), resolving against THIS project's own UML metamodel. Logged
-        // prominently so the portable-module path can replace it later.
-        log.warn("Falling back to in-project instantiation of the shipped Semantic Alignment Profile "
-                + "definition (portable module mount unavailable).");
-        instantiateShippedProfile(project);
-        return StereotypesHelper.getStereotype(project, STEREOTYPE_NAME) != null;
+        // Mount failed. We do NOT silently materialize the profile inside the user's project
+        // (the owner's requirement: it must be a USED module like the other profiles, never
+        // embedded). Surface a hard failure so the caller's error path runs. The in-project
+        // author remains available ONLY as an explicit developer/CI opt-in.
+        if (Boolean.getBoolean("semantic.plugin.allow.inproject.profile")) {
+            log.warn("mount failed; -Dsemantic.plugin.allow.inproject.profile=true -> "
+                    + "materializing the profile IN-PROJECT (developer/CI mode only).");
+            instantiateShippedProfile(project);
+            return StereotypesHelper.getStereotype(project, STEREOTYPE_NAME) != null;
+        }
+        log.error("Semantic Alignment Profile module did not mount (useModule=" + used[0]
+                + ") from " + file + ". Not embedding the profile in the project; "
+                + "check that the shared module is deployed to <install>/profiles.");
+        return false;
     }
 
-    /** Disposes any dialog that appeared after the baseline (e.g. a mount error popup). */
-    private static void dismissNewDialogs(java.util.Set<java.awt.Window> baseline) {
+    /** Logs (title + message text) and disposes any dialog that appeared after the baseline. */
+    private static void logAndDismissNewDialogs(java.util.Set<java.awt.Window> baseline) {
         for (java.awt.Window window : java.awt.Window.getWindows()) {
             if (window instanceof java.awt.Dialog dialog && dialog.isVisible()
                     && !baseline.contains(window)) {
-                log.warn("Auto-dismissing dialog during profile mount: " + dialog.getTitle());
+                log.warn("Mount-time dialog captured then dismissed: title='" + dialog.getTitle()
+                        + "' text='" + extractDialogText(dialog) + "'");
                 dialog.setVisible(false);
                 dialog.dispose();
             }
         }
+    }
+
+    /** Best-effort scrape of a dialog's visible text (labels) for diagnostics. */
+    private static String extractDialogText(java.awt.Container container) {
+        StringBuilder sb = new StringBuilder();
+        for (java.awt.Component c : container.getComponents()) {
+            if (c instanceof javax.swing.JLabel label && label.getText() != null) {
+                sb.append(label.getText()).append(' ');
+            } else if (c instanceof java.awt.Container inner) {
+                sb.append(extractDialogText(inner));
+            }
+        }
+        return sb.toString().trim();
     }
 
     /**
@@ -224,41 +252,92 @@ public final class StereotypeManager {
      * @param conceptURI The IRI representing the aligned concept in the ontology.
      */
     public static void applySemanticMapping(Element element, String conceptURI) {
-        if (element == null) {
-            throw new IllegalArgumentException("Element cannot be null.");
-        }
         if (conceptURI == null || conceptURI.trim().isEmpty()) {
             throw new IllegalArgumentException("Concept URI cannot be empty.");
         }
+        setSemanticConcepts(element, java.util.List.of(conceptURI));
+    }
 
+    /**
+     * Applies the SemanticAlignment stereotype and stores an ORDERED, de-duplicated list of
+     * mapped concept IRIs (index 0 is the pinned base concept - typically the UAF-stereotype
+     * concept - and 1..n are additive narrowings). The mappedConceptURI tag is multi-valued;
+     * passing a List sets all values at once. MUST run inside a write session.
+     * Trace: design/use_cases.md UC-1.3, UC-2.2
+     */
+    public static void setSemanticConcepts(Element element, java.util.List<String> conceptURIs) {
+        if (element == null) {
+            throw new IllegalArgumentException("Element cannot be null.");
+        }
+        // De-duplicate preserving first-occurrence order (base concept stays at index 0).
+        java.util.LinkedHashSet<String> ordered = new java.util.LinkedHashSet<>();
+        if (conceptURIs != null) {
+            for (String c : conceptURIs) {
+                if (c != null && !c.trim().isEmpty()) {
+                    ordered.add(c.trim());
+                }
+            }
+        }
+        if (ordered.isEmpty()) {
+            throw new IllegalArgumentException("At least one concept URI is required.");
+        }
         Project project = Project.getProject(element);
         if (project == null) {
             throw new IllegalStateException("Element is not attached to an active project.");
         }
+        Stereotype stereotype = resolveAlignmentStereotype(project);
+        if (!StereotypesHelper.hasStereotype(element, stereotype)) {
+            StereotypesHelper.addStereotype(element, stereotype);
+            log.debug("Applied stereotype '" + STEREOTYPE_NAME + "' to element: " + element.getHumanName());
+        }
+        // A List value sets all values on the multi-valued tag at once (TagsHelper).
+        StereotypesHelper.setStereotypePropertyValue(
+                element, stereotype, PROPERTY_NAME, new java.util.ArrayList<>(ordered));
+        log.info("Mapped element '" + element.getHumanName() + "' to concepts: " + ordered);
+    }
 
-        // Fetch the stereotype definition from the active profile
+    /** All mapped concept IRIs on the element (base first), or an empty list if unaligned. */
+    public static java.util.List<String> getMappedConcepts(Element element) {
+        if (element == null) {
+            return java.util.List.of();
+        }
+        Project project = Project.getProject(element);
+        if (project == null) {
+            return java.util.List.of();
+        }
+        Stereotype stereotype = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME);
+        if (stereotype == null || !StereotypesHelper.hasStereotype(element, stereotype)) {
+            return java.util.List.of();
+        }
+        java.util.List<?> values = StereotypesHelper.getStereotypePropertyValue(
+                element, stereotype, PROPERTY_NAME);
+        if (values == null) {
+            return java.util.List.of();
+        }
+        java.util.List<String> result = new java.util.ArrayList<>();
+        for (Object v : values) {
+            if (v != null) {
+                String s = v.toString().trim();
+                if (!s.isEmpty()) {
+                    result.add(s);
+                }
+            }
+        }
+        return result;
+    }
+
+    /** Resolves the SemanticAlignment stereotype (profile-qualified first), or throws. */
+    private static Stereotype resolveAlignmentStereotype(Project project) {
         Stereotype stereotype = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME, PROFILE_NAME);
-
         if (stereotype == null) {
-            // Attempt general stereotype search in case profile prefix varies
             stereotype = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME);
         }
-
         if (stereotype == null) {
             log.error("Stereotype '" + STEREOTYPE_NAME + "' not found. Call ensureProfileAvailable "
                     + "(outside the session) so the shipped profile module gets mounted.");
             throw new IllegalStateException("Semantic Alignment Profile must be mounted in this project.");
         }
-
-        // Apply stereotype if not already present
-        if (!StereotypesHelper.hasStereotype(element, stereotype)) {
-            StereotypesHelper.addStereotype(element, stereotype);
-            log.debug("Applied stereotype '" + STEREOTYPE_NAME + "' to element: " + element.getHumanName());
-        }
-
-        // Set the tagged value property
-        StereotypesHelper.setStereotypePropertyValue(element, stereotype, PROPERTY_NAME, conceptURI);
-        log.info("Mapped element '" + element.getHumanName() + "' to concept URI: " + conceptURI);
+        return stereotype;
     }
 
     /** The model/package root that carries model-level instrumentation. */

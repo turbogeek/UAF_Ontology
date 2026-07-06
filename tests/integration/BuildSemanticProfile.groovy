@@ -40,12 +40,36 @@ try {
                 profile = ef.createProfileInstance()
                 profile.setName('Semantic Alignment Profile')
                 profile.setOwner(prj.getPrimaryModel())
+
+                // Base Classifier = InvisibleStereotype (UML Standard Profile::MagicDraw
+                // Profile::InvisibleStereotype). A stereotype generalizing it becomes invisible
+                // when applied - the proper mechanism shipped profiles use (verified: SysML +
+                // UAF_Customization do exactly this). StereotypesHelper.isInvisible asserts it.
+                def inv = StereotypesHelper.getStereotype(prj, 'InvisibleStereotype')
+                def makeInvisible = { st ->
+                    if (inv != null) {
+                        def gen = ef.createGeneralizationInstance()
+                        gen.setGeneral(inv)
+                        gen.setSpecific(st)
+                        if (!st.getGeneralization().contains(gen)) { st.getGeneralization().add(gen) }
+                    } else {
+                        diag('WARN: InvisibleStereotype not resolvable; ' + st.getName() + ' not marked invisible')
+                    }
+                }
+
                 def elementMeta = StereotypesHelper.getAllMetaClasses(prj).find { it.getName() == 'Element' }
                 def stereo = StereotypesHelper.createStereotype(prj, 'SemanticAlignment', [elementMeta])
                 stereo.setOwner(profile)
                 ['mappedConceptURI', 'ontologySource', 'mappingConfidence'].each { t ->
                     def p = ef.createPropertyInstance(); p.setName(t); stereo.getOwnedAttribute().add(p)
+                    if (t == 'mappedConceptURI') {
+                        // Multi-valued 0..* so an element carries a base concept + additive
+                        // narrowing concepts (upper = -1 == unlimited '*').
+                        def lower = ef.createLiteralIntegerInstance(); lower.setValue(0); p.setLowerValue(lower)
+                        def upper = ef.createLiteralUnlimitedNaturalInstance(); upper.setValue(-1); p.setUpperValue(upper)
+                    }
                 }
+                makeInvisible(stereo)
                 def cust = StereotypesHelper.getStereotype(prj, 'Customization')
                 if (cust != null) {
                     def cc = ef.createClassInstance(); cc.setName('SemanticAlignment Customization'); cc.setOwner(profile)
@@ -69,6 +93,7 @@ try {
                 ['ontologyRootIRI', 'ontologyVersion', 'instrumentedBy', 'instrumentedDate'].each { t ->
                     def p = ef.createPropertyInstance(); p.setName(t); modelStereo.getOwnedAttribute().add(p)
                 }
+                makeInvisible(modelStereo)
                 if (cust != null) {
                     def mc = ef.createClassInstance(); mc.setName('SemanticModel Customization'); mc.setOwner(profile)
                     StereotypesHelper.addStereotype(mc, cust)
@@ -83,6 +108,9 @@ try {
                 }
                 sm.closeSession(prj)
                 diag('profile authored')
+                // Assert the Base Classifier mechanism took (repeatable-test requirement).
+                diag('isInvisible(SemanticAlignment)=' + StereotypesHelper.isInvisible(stereo))
+                diag('isInvisible(SemanticModel)=' + StereotypesHelper.isInvisible(modelStereo))
             } catch (Throwable t) { sm.cancelSession(prj); throw t }
 
             // THE FIX: mark the profile package SHARED (outside a model session).

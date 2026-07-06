@@ -390,9 +390,14 @@ public class SemanticAlignmentPlugin extends Plugin {
 
         private final JLabel selectionLabel = new JLabel("Selected Element: (none)");
         private final JLabel typeLabel = new JLabel("Stereotype: -");
+        // Read-only, pinned base concept derived from the UAF stereotype (the intent of the
+        // stereotype; never editable, never replaceable by a disjoint term). UC-1.3.
+        private final JLabel baseConceptLabel = new JLabel("Base concept: -");
         private final JTextArea sbvrArea = new JTextArea("Select an element in the containment tree.");
         private final DefaultListModel<ConceptSuggestion> suggestionModel = new DefaultListModel<>();
         private final JList<ConceptSuggestion> suggestionList = new JList<>(suggestionModel);
+        private final JLabel suggestStatus = new JLabel(" ");
+        private final JButton applySelectedButton = new JButton("Apply Selected Concept(s)");
         private final JTextField searchField = new JTextField();
         private final JButton auditButton = new JButton("Run Audit");
         private final JLabel statusBadge = new JLabel("STATUS: NOT AUDITED");
@@ -403,6 +408,8 @@ public class SemanticAlignmentPlugin extends Plugin {
         private volatile List<String> selectedStereotypes = List.of();
         // Auto-known UAF concept label the suggestions narrow FROM (null = free search).
         private volatile String narrowFrom;
+        // The pinned base concept IRI (from the UAF stereotype), always written at index 0.
+        private volatile String pinnedBaseURI;
         private final Timer searchDebounce = new Timer(150, e -> refreshSuggestions());
 
         SemanticBrowserPanel(Project project) {
@@ -426,6 +433,11 @@ public class SemanticAlignmentPlugin extends Plugin {
             selectionLabel.setFont(selectionLabel.getFont().deriveFont(Font.BOLD, 13f));
             typeLabel.setName("semantic.typeLabel");
             typeLabel.setForeground(FG_MUTED);
+            // Pinned, read-only base concept (the stereotype's intent). Rendered in the accent
+            // colour with a lock hint so it is clearly not user-editable.
+            baseConceptLabel.setName("semantic.baseConcept");
+            baseConceptLabel.setForeground(FG_ACCENT);
+            baseConceptLabel.setFont(baseConceptLabel.getFont().deriveFont(Font.BOLD, 11f));
             JPanel metaCard = new JPanel();
             metaCard.setLayout(new BoxLayout(metaCard, BoxLayout.Y_AXIS));
             metaCard.setBackground(BG_CARD);
@@ -435,6 +447,7 @@ public class SemanticAlignmentPlugin extends Plugin {
             metaCard.setAlignmentX(Component.LEFT_ALIGNMENT);
             metaCard.add(selectionLabel);
             metaCard.add(typeLabel);
+            metaCard.add(baseConceptLabel);
             root.add(metaCard);
             root.add(Box.createVerticalStrut(10));
 
@@ -456,9 +469,10 @@ public class SemanticAlignmentPlugin extends Plugin {
             root.add(sbvrScroll);
             root.add(Box.createVerticalStrut(10));
 
-            // Suggested mappings: ranked for the selected element with zero keystrokes;
-            // ONE CLICK on a row applies the mapping (v3 plan click budget).
-            JLabel suggestHeader = new JLabel("Suggested Mappings (click to apply)");
+            // Suggested mappings: ranked for the selected element with zero keystrokes.
+            // Ctrl/Shift-click to pick ONE OR MORE; double-click, Enter, or the button applies
+            // them additively on top of the pinned base concept.
+            JLabel suggestHeader = new JLabel("Suggested Mappings (Ctrl-click several; Enter / double-click applies)");
             suggestHeader.setForeground(FG_MUTED);
             suggestHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
             root.add(suggestHeader);
@@ -467,36 +481,74 @@ public class SemanticAlignmentPlugin extends Plugin {
             suggestionList.setForeground(FG_MAIN);
             suggestionList.setSelectionBackground(new Color(0x0369a1));
             suggestionList.setSelectionForeground(Color.WHITE);
-            suggestionList.setVisibleRowCount(5);
+            suggestionList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            suggestionList.setVisibleRowCount(4);
             suggestionList.setCellRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value,
                         int idx, boolean sel, boolean focus) {
                     Component c = super.getListCellRendererComponent(list, value, idx, sel, focus);
                     if (value instanceof ConceptSuggestion s) {
-                        setText(String.format("%s   %s   %d%%",
-                                s.entry().label(), s.entry().curie(), Math.round(s.score() * 100)));
-                        setToolTipText(s.entry().comment().isBlank() ? s.entry().iri() : s.entry().comment());
+                        // Multi-line HTML: label + curie + score + ontology, then a context
+                        // snippet, then the SBVR sentence - so the user can choose informed.
+                        String ctx = s.context() == null ? "" : htmlEscape(truncate(s.context(), 140));
+                        String sbvr = s.sbvr() == null ? "" : htmlEscape(s.sbvr());
+                        StringBuilder html = new StringBuilder("<html><div style='width:300px'>");
+                        html.append("<b>").append(htmlEscape(s.entry().label())).append("</b> &nbsp; ")
+                                .append(htmlEscape(s.entry().curie())).append(" &nbsp; ")
+                                .append(Math.round(s.score() * 100)).append('%');
+                        if (s.entry().ontologyId() != null && !s.entry().ontologyId().isBlank()) {
+                            html.append(" &nbsp;<span style='color:#64748b'>[")
+                                    .append(htmlEscape(s.entry().ontologyId())).append("]</span>");
+                        }
+                        if (!ctx.isEmpty()) {
+                            html.append("<br><span style='color:#94a3b8'>").append(ctx).append("</span>");
+                        }
+                        if (!sbvr.isEmpty()) {
+                            html.append("<br><span style='color:#64748b'>").append(sbvr).append("</span>");
+                        }
+                        html.append("</div></html>");
+                        setText(html.toString());
+                        // Width-capped, escaped tooltip so long ontology comments don't render
+                        // as one very wide popup (owner report).
+                        String tip = s.entry().comment() == null || s.entry().comment().isBlank()
+                                ? s.entry().iri() : s.entry().comment();
+                        setToolTipText("<html><div style='width:320px'>" + htmlEscape(tip) + "</div></html>");
                     }
                     return c;
                 }
             });
+            // Double-click applies the selection (single click just selects, per multi-select).
             suggestionList.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
                 public void mouseClicked(java.awt.event.MouseEvent event) {
-                    int row = suggestionList.locationToIndex(event.getPoint());
-                    if (row >= 0 && row < suggestionModel.size()) {
-                        ConceptSuggestion suggestion = suggestionModel.get(row);
-                        DiagnosticLog.event("SUGGEST", "clicked " + suggestion.entry().curie()
-                                + " (" + Math.round(suggestion.score() * 100) + "%) for " + selectedName);
-                        applyMappingFromUI(suggestion.entry().iri());
+                    if (event.getClickCount() == 2) {
+                        applySelectedSuggestions();
                     }
                 }
             });
+            // Enter on the list applies the selection too.
+            suggestionList.getInputMap().put(
+                    javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0), "applySemantic");
+            suggestionList.getActionMap().put("applySemantic", new javax.swing.AbstractAction() {
+                @Override
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    applySelectedSuggestions();
+                }
+            });
             JScrollPane suggestScroll = new JScrollPane(suggestionList);
-            suggestScroll.setPreferredSize(new Dimension(280, 96));
+            suggestScroll.setPreferredSize(new Dimension(280, 150));
             suggestScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
             root.add(suggestScroll);
+            suggestStatus.setName("semantic.suggestStatus");
+            suggestStatus.setForeground(FG_MUTED);
+            suggestStatus.setFont(suggestStatus.getFont().deriveFont(10f));
+            suggestStatus.setAlignmentX(Component.LEFT_ALIGNMENT);
+            root.add(suggestStatus);
+            applySelectedButton.setName("semantic.applySelectedButton");
+            applySelectedButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            applySelectedButton.addActionListener(e -> applySelectedSuggestions());
+            root.add(applySelectedButton);
             root.add(Box.createVerticalStrut(10));
 
             // Search narrows the suggestion list live; Enter keeps the expert path
@@ -640,6 +692,14 @@ public class SemanticAlignmentPlugin extends Plugin {
                 selectedName = sbvrSubject;
                 selectedStereotypes = stereotypes.stream().map(Stereotype::getName).toList();
                 narrowFrom = auto == null ? null : auto.label();
+                // Pin the UAF-derived base concept: it is the intent of the stereotype, shown
+                // read-only, always written at index 0, never replaceable by a disjoint term.
+                pinnedBaseURI = auto == null ? null : auto.iri();
+                final String baseText = auto == null
+                        ? "Base concept: (none - free alignment)"
+                        : "Base concept (locked): " + auto.label()
+                                + (auto.foundationalLabel() != null ? "  /  " + auto.foundationalLabel() : "");
+                SwingUtilities.invokeLater(() -> baseConceptLabel.setText(baseText));
                 refreshSuggestions();
             } catch (Exception e) {
                 log.error("Selection handling failed", e);
@@ -667,34 +727,44 @@ public class SemanticAlignmentPlugin extends Plugin {
             return null;
         }
 
+        /** The primary (index-0) stored concept, or null if the element is unaligned. */
         private String readMappedConceptURI(Element element) {
-            Stereotype stereotype = StereotypesHelper.getStereotype(
-                    project, StereotypeManager.STEREOTYPE_NAME);
-            if (stereotype == null || !StereotypesHelper.hasStereotype(element, stereotype)) {
-                return null;
-            }
-            // Tagged values come back as a List regardless of multiplicity; unwrap the first.
-            List<?> values = StereotypesHelper.getStereotypePropertyValue(
-                    element, stereotype, StereotypeManager.PROPERTY_NAME);
-            if (values == null || values.isEmpty() || values.get(0) == null) {
-                return null;
-            }
-            String raw = values.get(0).toString().trim();
-            return raw.isEmpty() ? null : raw;
+            List<String> all = StereotypeManager.getMappedConcepts(element);
+            return all.isEmpty() ? null : all.get(0);
+        }
+
+        /** Single-concept apply (typed CURIE/IRI); additive - keeps the pinned base + prior concepts. */
+        private void applyMappingFromUI(String conceptURI) {
+            applyMappingsFromUI(java.util.List.of(conceptURI));
         }
 
         /**
-         * Called on the EDT (concept field action): applies the typed concept IRI to the
-         * selected element inside a session on the element's own project.
-         * Trace: PLG-REQ-03, PLG-REQ-06
+         * Applies ONE OR MORE concepts to the selected element, ADDITIVELY. The pinned base
+         * concept (the UAF-stereotype concept, if any) is always kept at index 0 and can never
+         * be replaced by a disjoint term; the new picks are appended to whatever is already
+         * stored. Runs the alive/editable/instrumented guards once, then a single write
+         * transaction. Trace: design/use_cases.md UC-1.3, UC-2.2
          */
-        private void applyMappingFromUI(String conceptURI) {
+        private void applyMappingsFromUI(java.util.List<String> newConcepts) {
             Element element = selectedElement;
             if (element == null) {
                 DiagnosticLog.event("MAPPING", "Rejected: no element selected");
                 appendConsole("[FAIL] Select an element in the containment tree first.");
                 return;
             }
+            java.util.List<String> picks = new java.util.ArrayList<>();
+            if (newConcepts != null) {
+                for (String c : newConcepts) {
+                    if (c != null && !c.isBlank()) {
+                        picks.add(c.trim());
+                    }
+                }
+            }
+            if (picks.isEmpty() && (pinnedBaseURI == null || pinnedBaseURI.isBlank())) {
+                appendConsole("[FAIL] Nothing to apply - select a suggestion or type a concept.");
+                return;
+            }
+            String summary = String.join(", ", picks);
             try {
                 if (project.isProjectClosed() || project.isProjectDisposed()
                         || project.isDisposed(element)) {
@@ -704,7 +774,7 @@ public class SemanticAlignmentPlugin extends Plugin {
                 }
                 if (!element.isEditable()) {
                     DiagnosticLog.event("MAPPING", element.getHumanName()
-                            + " -> " + conceptURI + " | status=REJECTED read-only element");
+                            + " -> " + summary + " | status=REJECTED read-only element");
                     appendConsole("[FAIL] Element is read-only (library or locked element).");
                     return;
                 }
@@ -745,19 +815,60 @@ public class SemanticAlignmentPlugin extends Plugin {
                     appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
                     return;
                 }
+                // Build the ordered concept list: pinned base first, then prior concepts, then
+                // the new picks. setSemanticConcepts de-duplicates preserving order, so the
+                // base stays at index 0 and never gets overwritten by a disjoint pick.
+                final java.util.List<String> ordered = new java.util.ArrayList<>();
+                if (pinnedBaseURI != null && !pinnedBaseURI.isBlank()) {
+                    ordered.add(pinnedBaseURI);
+                }
+                ordered.addAll(StereotypeManager.getMappedConcepts(element));
+                ordered.addAll(picks);
                 Project owner = Project.getProject(element);
                 TransactionWrapper.executeWrite(owner != null ? owner : project,
                         "Apply Semantic Mapping",
-                        () -> StereotypeManager.applySemanticMapping(element, conceptURI));
-                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI + " | status=OK");
-                appendConsole("[OK] Mapped to " + conceptURI);
+                        () -> StereotypeManager.setSemanticConcepts(element, ordered));
+                DiagnosticLog.event("MAPPING", element.getHumanName() + " += " + summary
+                        + " | base=" + (pinnedBaseURI == null ? "-" : pinnedBaseURI) + " | status=OK");
+                appendConsole("[OK] Applied " + (picks.isEmpty() ? "base concept" : picks.size()
+                        + " concept(s)") + (pinnedBaseURI == null ? "" : " (base locked)"));
                 handleSelection(element); // refresh the sidebar with the new alignment
             } catch (Exception e) {
                 log.error("Semantic mapping failed", e);
-                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + conceptURI
+                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + summary
                         + " | status=FAILED | " + e.getMessage());
                 appendConsole("[FAIL] " + e.getMessage());
             }
+        }
+
+        /** Applies the currently-selected suggestion rows, additively (base stays pinned). */
+        private void applySelectedSuggestions() {
+            java.util.List<ConceptSuggestion> picks = suggestionList.getSelectedValuesList();
+            if (picks.isEmpty()) {
+                appendConsole("[FAIL] Select one or more suggestions first (Ctrl-click for several).");
+                return;
+            }
+            java.util.List<String> iris = new java.util.ArrayList<>();
+            for (ConceptSuggestion s : picks) {
+                iris.add(s.entry().iri());
+            }
+            DiagnosticLog.event("SUGGEST", "apply " + iris.size() + " selected for " + selectedName
+                    + " : " + picks.stream().map(p -> p.entry().curie()).collect(Collectors.joining(", ")));
+            applyMappingsFromUI(iris);
+        }
+
+        private static String htmlEscape(String s) {
+            if (s == null) {
+                return "";
+            }
+            return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        }
+
+        private static String truncate(String s, int max) {
+            if (s == null) {
+                return "";
+            }
+            return s.length() <= max ? s : s.substring(0, max) + "…";
         }
 
         /**
@@ -846,28 +957,47 @@ public class SemanticAlignmentPlugin extends Plugin {
             SwingUtilities.invokeLater(() -> {
                 SuggestionRanker ranker = suggestionRanker;
                 suggestionModel.clear();
-                if (ranker == null) {
-                    return; // catalog still loading (or missing - journaled by the loader)
-                }
                 String query = searchField.getText();
+                boolean typed = query != null && !query.isBlank();
+                if (ranker == null) {
+                    suggestStatus.setText("Ontology catalog not loaded yet.");
+                    DiagnosticLog.event("SUGGEST", "catalog not loaded (ranker null)");
+                    return;
+                }
                 List<ConceptSuggestion> top;
-                if (query != null && !query.isBlank()) {
-                    top = ranker.search(query.trim(), selectedName, selectedStereotypes, 8);
-                } else if (narrowFrom != null) {
-                    // Narrow from the auto-known UAF concept: seed the search with its
-                    // label so subclasses / domain refinements rank first (owner model).
-                    top = ranker.search(narrowFrom, selectedName, selectedStereotypes, 8);
+                if (typed) {
+                    // Free search: decompose the TYPED phrase into variants (no stereotype term
+                    // forced in, so a bare "Weather" search stays a weather search).
+                    top = ranker.searchVariants(query.trim(), List.of(), null, 12);
                 } else {
-                    top = ranker.suggestForElement(selectedName, selectedStereotypes, 5);
+                    // Element-driven: decompose the element name + stereotype term(s), seeded
+                    // by the auto-resolved UAF concept - best-match-first across ontologies.
+                    top = ranker.searchVariants(selectedName, selectedStereotypes, narrowFrom, 12);
                 }
-                top.forEach(suggestionModel::addElement);
-                if (!top.isEmpty()) {
-                    DiagnosticLog.event("SUGGEST", selectedName
-                            + " | query=" + (query == null || query.isBlank() ? "-" : query.trim())
-                            + " | top=" + top.stream()
-                                    .map(s -> s.entry().curie() + ":" + Math.round(s.score() * 100))
-                                    .collect(Collectors.joining(", ")));
+                // Attach an SBVR sentence to each DISPLAYED suggestion (top-N only, cheap).
+                String subject = (selectedName == null || selectedName.isBlank()) ? null : selectedName;
+                for (ConceptSuggestion s : top) {
+                    String sbvr = SBVR_ENGINE.generatePlainSBVR(
+                            subject == null ? s.entry().label() : subject, s.entry().iri(), null, null);
+                    suggestionModel.addElement(s.withSbvr(sbvr));
                 }
+                // Always give visible feedback, especially on zero matches (owner report:
+                // typing "Weather" produced no visible change when nothing matched).
+                if (top.isEmpty()) {
+                    suggestStatus.setText(typed
+                            ? "No matching concepts for \"" + query.trim() + "\"."
+                            : (subject == null ? "Select an element, or type to search."
+                                    : "No suggestions for \"" + subject + "\"."));
+                } else {
+                    suggestStatus.setText(top.size()
+                            + " suggestion(s) — Ctrl-click several, Enter/double-click to apply.");
+                }
+                DiagnosticLog.event("SUGGEST", (subject == null ? "-" : subject)
+                        + " | query=" + (typed ? query.trim() : "-")
+                        + " | count=" + top.size()
+                        + " | top=" + (top.isEmpty() ? "-" : top.stream()
+                                .map(s -> s.entry().curie() + ":" + Math.round(s.score() * 100))
+                                .collect(Collectors.joining(", "))));
             });
         }
 
