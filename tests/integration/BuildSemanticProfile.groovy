@@ -59,6 +59,28 @@ try {
                     StereotypesHelper.setStereotypePropertyValue(cc, cust, 'standardExpertConfiguration', spec)
                     diag('customization created')
                 }
+
+                // Model-level stereotype: carries the derived ontology's root IRI + version
+                // (+ provenance). Applied to the model/package root when a model is
+                // instrumented (extends Package so it applies to the Model root or any package).
+                def pkgMeta = StereotypesHelper.getAllMetaClasses(prj).find { it.getName() == 'Package' }
+                def modelStereo = StereotypesHelper.createStereotype(prj, 'SemanticModel', [pkgMeta])
+                modelStereo.setOwner(profile)
+                ['ontologyRootIRI', 'ontologyVersion', 'instrumentedBy', 'instrumentedDate'].each { t ->
+                    def p = ef.createPropertyInstance(); p.setName(t); modelStereo.getOwnedAttribute().add(p)
+                }
+                if (cust != null) {
+                    def mc = ef.createClassInstance(); mc.setName('SemanticModel Customization'); mc.setOwner(profile)
+                    StereotypesHelper.addStereotype(mc, cust)
+                    StereotypesHelper.setStereotypePropertyValue(mc, cust, 'customizationTarget', modelStereo)
+                    StereotypesHelper.setStereotypePropertyValue(mc, cust, 'hideMetatype', Boolean.TRUE)
+                    StereotypesHelper.setStereotypePropertyValue(mc, cust, 'representationText', 'Semantic Model')
+                    StereotypesHelper.setStereotypePropertyValue(mc, cust, 'category', 'Semantic Alignment')
+                    def mspec = ['ontologyRootIRI','ontologyVersion','instrumentedBy','instrumentedDate'].collect {
+                        '<html><head><title>SPF</title></head><body><p>' + it + '</p></body></html>' }
+                    StereotypesHelper.setStereotypePropertyValue(mc, cust, 'standardExpertConfiguration', mspec)
+                    diag('SemanticModel customization created')
+                }
                 sm.closeSession(prj)
                 diag('profile authored')
             } catch (Throwable t) { sm.cancelSession(prj); throw t }

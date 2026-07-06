@@ -153,6 +153,17 @@ public class SemanticAlignmentPlugin extends Plugin {
         // in an activity diagram did nothing).
         installDiagramSelectionRelay();
 
+        // Tools > Semantic Alignment submenu: explicit Instrument / Remove Instrumentation
+        // (owner requirement - instrumenting a model is a deliberate, reversible action).
+        try {
+            com.nomagic.magicdraw.actions.ActionsConfiguratorsManager.getInstance()
+                    .addMainMenuConfigurator(new SemanticMenuConfigurator());
+            DiagnosticLog.event("LIFECYCLE", "Tools > Semantic Alignment menu configurator registered");
+        } catch (Throwable t) {
+            log.error("Could not register Tools menu configurator", t);
+            DiagnosticLog.event("ERROR", "Menu configurator registration failed: " + t);
+        }
+
         // Plugin-owned REST surface (8766): /sparql for scenarios and future LLM
         // assistants, /metrics for the click budgets. Dataset = catalog TBox + live
         // project ABox snapshotted on the EDT per request.
@@ -697,8 +708,39 @@ public class SemanticAlignmentPlugin extends Plugin {
                     appendConsole("[FAIL] Element is read-only (library or locked element).");
                     return;
                 }
-                // Mount the shipped profile module on first use - OUTSIDE the session
-                if (!StereotypeManager.ensureProfileAvailable(project)) {
+                // Alignment requires the model to be instrumented (explicit opt-in, owner
+                // requirement). If it isn't, offer to instrument now rather than silently
+                // mounting the profile behind the user's back.
+                if (!StereotypeManager.isInstrumented(project)) {
+                    int choice = JOptionPane.showConfirmDialog(
+                            com.nomagic.magicdraw.core.Application.getInstance().getMainFrame(),
+                            "This model is not yet instrumented for semantics.\n"
+                                    + "Instrument it now (adds the Semantic Alignment profile\n"
+                                    + "and a model-level ontology root IRI + version)?",
+                            "Instrument Model",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (choice != JOptionPane.YES_OPTION) {
+                        DiagnosticLog.event("MAPPING", "Rejected: model not instrumented (user declined)");
+                        appendConsole("[FAIL] Model is not instrumented. "
+                                + "Use Tools > Semantic Alignment > Instrument Model.");
+                        return;
+                    }
+                    // Mount the shipped profile module - OUTSIDE the session.
+                    if (!StereotypeManager.ensureProfileAvailable(project)) {
+                        DiagnosticLog.event("MAPPING", "Rejected: Semantic Alignment Profile module unavailable");
+                        appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
+                        return;
+                    }
+                    final String rootIri = StereotypeManager.defaultRootIri(project);
+                    TransactionWrapper.executeWrite(project, "Instrument Model for Semantics",
+                            () -> StereotypeManager.applyModelInstrumentation(project, rootIri, "1.0.0",
+                                    "semantic-alignment-plugin/" + VERSION));
+                    DiagnosticLog.event("INSTRUMENT", project.getName()
+                            + " (auto from align) rootIRI=" + rootIri);
+                    appendConsole("[OK] Model instrumented (root IRI " + rootIri + ").");
+                } else if (!StereotypeManager.ensureProfileAvailable(project)) {
+                    // Instrumented models still need the profile module resolvable (e.g. a
+                    // model instrumented in a prior session, reopened fresh).
                     DiagnosticLog.event("MAPPING", "Rejected: Semantic Alignment Profile module unavailable");
                     appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
                     return;

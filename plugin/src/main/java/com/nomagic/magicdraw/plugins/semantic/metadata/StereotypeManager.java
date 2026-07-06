@@ -20,6 +20,15 @@ public final class StereotypeManager {
     public static final String STEREOTYPE_NAME = "SemanticAlignment";
     public static final String PROPERTY_NAME = "mappedConceptURI";
 
+    // Model-level stereotype: carries the derived ontology's root IRI + version and the
+    // instrumentation provenance. Applied to the model/package root when a model is
+    // instrumented (owner requirement 2026-07-06 - see design/use_cases.md UC-1.2).
+    public static final String MODEL_STEREOTYPE_NAME = "SemanticModel";
+    public static final String TAG_ROOT_IRI = "ontologyRootIRI";
+    public static final String TAG_VERSION = "ontologyVersion";
+    public static final String TAG_INSTRUMENTED_BY = "instrumentedBy";
+    public static final String TAG_INSTRUMENTED_DATE = "instrumentedDate";
+
     // Location of the SHIPPED profile module (deployed under <plugin>/profiles);
     // set once by the plugin at init. The profile is a real .mdzip, never hand-built.
     private static volatile java.io.File shippedProfile;
@@ -250,5 +259,99 @@ public final class StereotypeManager {
         // Set the tagged value property
         StereotypesHelper.setStereotypePropertyValue(element, stereotype, PROPERTY_NAME, conceptURI);
         log.info("Mapped element '" + element.getHumanName() + "' to concept URI: " + conceptURI);
+    }
+
+    /** The model/package root that carries model-level instrumentation. */
+    public static Element getModelRoot(Project project) {
+        return project.getPrimaryModel();
+    }
+
+    /** True when this project's model root already carries the SemanticModel stereotype. */
+    public static boolean isInstrumented(Project project) {
+        if (project == null) {
+            return false;
+        }
+        Stereotype modelStereo = StereotypesHelper.getStereotype(project, MODEL_STEREOTYPE_NAME);
+        if (modelStereo == null) {
+            return false;
+        }
+        Element root = getModelRoot(project);
+        return root != null && StereotypesHelper.hasStereotype(root, modelStereo);
+    }
+
+    /** A stable default ontology root IRI derived from the project name. */
+    public static String defaultRootIri(Project project) {
+        String name = (project == null || project.getName() == null) ? "model" : project.getName();
+        String slug = name.trim().replaceAll("[^A-Za-z0-9]+", "-").replaceAll("(^-|-$)", "");
+        if (slug.isEmpty()) {
+            slug = "model";
+        }
+        return "http://semantic.alignment/model/" + slug + "#";
+    }
+
+    /**
+     * Applies the model-level SemanticModel stereotype to the project's model root with the
+     * ontology root IRI + version + provenance. MUST run inside a write session (wrap with
+     * TransactionWrapper.executeWrite); the profile must already be mounted (call
+     * ensureProfileAvailable OUTSIDE the session first). Idempotent on the stereotype itself
+     * (won't double-apply), but always refreshes the tag values.
+     * Trace: design/use_cases.md UC-1.1, UC-1.2
+     */
+    public static void applyModelInstrumentation(Project project, String rootIri, String version,
+            String instrumentedBy) {
+        Stereotype modelStereo = StereotypesHelper.getStereotype(project, MODEL_STEREOTYPE_NAME);
+        if (modelStereo == null) {
+            throw new IllegalStateException("SemanticModel stereotype not found - mount the "
+                    + "Semantic Alignment Profile first (ensureProfileAvailable).");
+        }
+        Element root = getModelRoot(project);
+        if (root == null) {
+            throw new IllegalStateException("Project has no model root to instrument.");
+        }
+        if (!StereotypesHelper.hasStereotype(root, modelStereo)) {
+            StereotypesHelper.addStereotype(root, modelStereo);
+        }
+        StereotypesHelper.setStereotypePropertyValue(root, modelStereo, TAG_ROOT_IRI, rootIri);
+        StereotypesHelper.setStereotypePropertyValue(root, modelStereo, TAG_VERSION, version);
+        StereotypesHelper.setStereotypePropertyValue(root, modelStereo, TAG_INSTRUMENTED_BY, instrumentedBy);
+        StereotypesHelper.setStereotypePropertyValue(root, modelStereo, TAG_INSTRUMENTED_DATE,
+                java.time.LocalDateTime.now().withNano(0).toString());
+        log.info("Instrumented model '" + project.getName() + "' rootIRI=" + rootIri + " version=" + version);
+    }
+
+    /**
+     * Removes ALL semantic instrumentation from the project: every SemanticAlignment
+     * application on any element, plus the model-level SemanticModel stereotype. MUST run
+     * inside a write session. Returns the number of stereotype applications removed.
+     * Trace: design/use_cases.md UC-1.5
+     */
+    public static int removeAllInstrumentation(Project project) {
+        int removed = 0;
+        Stereotype alignStereo = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME);
+        if (alignStereo != null) {
+            // Copy first: removeStereotype mutates the underlying stereotyped-elements set.
+            for (Element el : new java.util.ArrayList<>(
+                    StereotypesHelper.getStereotypedElements(alignStereo))) {
+                StereotypesHelper.removeStereotype(el, alignStereo);
+                removed++;
+            }
+        }
+        Stereotype modelStereo = StereotypesHelper.getStereotype(project, MODEL_STEREOTYPE_NAME);
+        if (modelStereo != null) {
+            for (Element el : new java.util.ArrayList<>(
+                    StereotypesHelper.getStereotypedElements(modelStereo))) {
+                StereotypesHelper.removeStereotype(el, modelStereo);
+                removed++;
+            }
+        }
+        log.info("Removed " + removed + " semantic stereotype applications from '"
+                + project.getName() + "'");
+        return removed;
+    }
+
+    /** Count of elements currently carrying the SemanticAlignment stereotype. */
+    public static int alignedElementCount(Project project) {
+        Stereotype alignStereo = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME);
+        return alignStereo == null ? 0 : StereotypesHelper.getStereotypedElements(alignStereo).size();
     }
 }
