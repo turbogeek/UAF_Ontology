@@ -67,6 +67,33 @@ shared/standard profile to `profiles\`). Then the plugin wiring (descriptor +
 mandatory.profiles + code cleanup + verification) is straightforward and I can complete it.
 An expert can do this in a few minutes; alternatively I can drive it via teach mode.
 
+## Customization mechanism — LEARNED from the shipped profiles (live inspection)
+
+The `«Customization»` stereotype is `UML Standard Profile::MagicDraw Profile::DSL
+Customization::Customization` (always available; part of the UML Standard Profile). To
+make a stereotype invisible-on-diagrams but Specification-configurable, create a
+Customization element (a Class with `«Customization»` applied) targeting the stereotype.
+Real values observed on shipped customizations (SysML TestCase/BusinessRequirement/Copy):
+
+- `customizationTarget : Class` = **the target stereotype** (e.g. SemanticAlignment)
+- `hideMetatype : boolean` = **true**  → the `«Stereotype»` label is NOT drawn = invisible
+- `representationText : String` = display name (e.g. "Semantic Alignment")
+- `category : String` = the Specification tab/group name
+- `standardExpertConfiguration : String[]` = HTML fragments controlling Specification
+  property visibility per property: `<html><head><title>SPF</title></head><body><p>NAME</p></body></html>`
+  where the title code = Show/Hide × Property/section: `SP`/`SPF`=show property, `HP`/`HPF`
+  =hide property, `SN`/`EN`=show/expand section. To show only our 3 tags: emit `SPF` for
+  mappedConceptURI/ontologySource/mappingConfidence and `HPF` for the noise.
+- Other useful: `hiddenOwnedTypes`, `possibleOwners`, `helpID`, `checkSpelling`,
+  `showPropertiesWhenNotApplied`.
+
+`StereotypesHelper.isInvisible(Stereotype)` is a separate flag (10/1517 UAF stereotypes
+are invisible, e.g. view/package stereotypes) — but for "no label when applied to a user
+element", `hideMetatype=true` on the Customization is the operative mechanism.
+
+This is authorable programmatically: apply `«Customization»` to a Class in the profile
+and set these tagged values. No GUI step strictly required for the customization itself.
+
 ## Plugin code cleanup queued (once the profile is valid)
 
 - Delete `StereotypeManager.instantiateShippedProfile` + `dismissNewDialogs` + the

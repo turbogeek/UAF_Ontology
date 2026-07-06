@@ -138,6 +138,9 @@ public final class StereotypeManager {
                     prop.setName(tag);
                     stereotype.getOwnedAttribute().add(prop);
                 }
+                // Make the stereotype INVISIBLE on diagrams and Specification-configured
+                // via a «Customization» (the shipped-profile pattern: hideMetatype=true).
+                createCustomization(project, ef, profile, stereotype);
                 sm.closeSession(project);
             } catch (Throwable t) {
                 try {
@@ -162,6 +165,46 @@ public final class StereotypeManager {
     // Private constructor to prevent instantiation of utility class
     private StereotypeManager() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated.");
+    }
+
+    /**
+     * Creates a «Customization» targeting the SemanticAlignment stereotype so that:
+     * applying it never draws a «SemanticAlignment» label on diagrams (hideMetatype=true),
+     * and the three tags surface as a "Semantic Alignment" group in the element's
+     * Specification dialog. Mirrors the shipped-profile pattern learned from SysML/UAF
+     * customizations (customizationTarget + hideMetatype + standardExpertConfiguration).
+     * Must run inside the profile-building session.
+     * Trace: owner requirement - invisible stereotype + Customization
+     */
+    private static void createCustomization(Project project,
+            com.nomagic.uml2.impl.ElementsFactory ef,
+            com.nomagic.uml2.ext.magicdraw.mdprofiles.Profile profile,
+            Stereotype target) {
+        Stereotype customization = StereotypesHelper.getStereotype(project, "Customization");
+        if (customization == null) {
+            log.warn("«Customization» stereotype unavailable; SemanticAlignment label will not be auto-hidden.");
+            return;
+        }
+        try {
+            com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Class custClass = ef.createClassInstance();
+            custClass.setName("SemanticAlignment Customization");
+            custClass.setOwner(profile);
+            StereotypesHelper.addStereotype(custClass, customization);
+            // Point the customization at our stereotype and hide its diagram label.
+            StereotypesHelper.setStereotypePropertyValue(custClass, customization, "customizationTarget", target);
+            StereotypesHelper.setStereotypePropertyValue(custClass, customization, "hideMetatype", Boolean.TRUE);
+            StereotypesHelper.setStereotypePropertyValue(custClass, customization, "representationText", "Semantic Alignment");
+            StereotypesHelper.setStereotypePropertyValue(custClass, customization, "category", "Semantic Alignment");
+            // Surface exactly our three tags in the Specification (SPF = show property).
+            java.util.List<String> spec = new java.util.ArrayList<>();
+            for (String tag : new String[]{PROPERTY_NAME, "ontologySource", "mappingConfidence"}) {
+                spec.add("<html><head><title>SPF</title></head><body><p>" + tag + "</p></body></html>");
+            }
+            StereotypesHelper.setStereotypePropertyValue(custClass, customization, "standardExpertConfiguration", spec);
+            log.info("Created invisible Customization for " + STEREOTYPE_NAME);
+        } catch (Throwable t) {
+            log.error("Customization creation failed (stereotype still usable, just not auto-hidden)", t);
+        }
     }
 
     /**
