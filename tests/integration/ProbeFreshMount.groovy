@@ -31,17 +31,8 @@ try {
 
             diag('mounting: ' + MODULE + ' exists=' + MODULE.exists())
             def desc = ProjectDescriptorsFactory.createProjectDescriptor(MODULE.toURI())
-            def MS = com.nomagic.magicdraw.core.modules.ModulesService
-            // importModule mounts a module READ-ONLY (reference), unlike useModule (editable use).
-            def attached = MS.findOrLoadModule(prj, desc, true)
-            diag('findOrLoadModule -> ' + attached)
-            if (attached != null) {
-                MS.importModuleOnTask(prj.getPrimaryProject(), attached)
-                diag('importModuleOnTask done')
-            } else {
-                def used = pm.useModule(prj, desc)
-                diag('fallback useModule -> ' + used)
-            }
+            def used = pm.useModule(prj, desc)  // production mount path
+            diag('useModule -> ' + used)
 
             def sa = StereotypesHelper.getStereotype(prj, 'SemanticAlignment')
             check('SemanticAlignment stereotype resolves', sa != null)

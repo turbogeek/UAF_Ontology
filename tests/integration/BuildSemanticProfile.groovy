@@ -106,6 +106,21 @@ try {
                     StereotypesHelper.setStereotypePropertyValue(mc, cust, 'standardExpertConfiguration', mspec)
                     diag('SemanticModel customization created')
                 }
+
+                // Mark the module's ROOT MODEL as «auxiliaryResource» (MagicDraw_Profile) so the
+                // mounted content is READ-ONLY, exactly like UAF/SoaML/UML Standard Profile
+                // (verified: all three stock profiles carry this stereotype on their root Model;
+                // ours lacked it - that, not shareOnTask, is why the package mounted editable).
+                def mdp = com.nomagic.uml2.MagicDrawProfile.getInstance(prj.getPrimaryModel())
+                def auxStereo = mdp.getAuxiliaryResource()
+                if (auxStereo != null && !StereotypesHelper.hasStereotype(prj.getPrimaryModel(), auxStereo)) {
+                    StereotypesHelper.addStereotype(prj.getPrimaryModel(), auxStereo)
+                    try {
+                        mdp.auxiliaryResource().setTreatAsAuxiliaryInOwningProject(prj.getPrimaryModel(), Boolean.TRUE)
+                    } catch (Throwable t) { diag('setTreatAsAux failed: ' + t) }
+                    diag('applied auxiliaryResource to root model; isAux='
+                            + com.nomagic.uml2.MagicDrawProfile.isAuxiliaryResource(prj.getPrimaryModel()))
+                }
                 sm.closeSession(prj)
                 diag('profile authored')
                 // Assert the Base Classifier mechanism took (repeatable-test requirement).
@@ -118,13 +133,13 @@ try {
             def sharePoint = ModulesService.shareOnTask(primary, profile, 'Semantic Alignment Profile')
             diag('shareOnTask -> ' + sharePoint)
 
-            // NOTE (2026-07-06): the mounted profile PACKAGE shows editable=true because a
-            // shared package is collaboratively editable by design; the STEREOTYPE inside is
-            // read-only + invisible (verified). No mount-side API (useModule/importModule/
-            // setReadOnly/setReShared) nor setStandardSystemProfile flips the package to
-            // read-only - a fully read-only used-module would need UAF-style authoring (the
-            // profile as the module's own primary content, not a shared sub-package). Tracked
-            // as an open packaging refinement; the functional behavior is correct.
+            // Flag the module as a STANDARD SYSTEM PROFILE (standardProfile=true) - the other
+            // half of the read-only recipe the stock profiles use, alongside «auxiliaryResource»
+            // on the root Model above.
+            try {
+                ModulesService.setStandardSystemProfile(primary, true)
+                diag('setStandardSystemProfile(true) done')
+            } catch (Throwable t) { diag('setStandardSystemProfile failed: ' + t) }
 
             // Save the project (now with a shared profile package) as the module file.
             def desc = ProjectDescriptorsFactory.createLocalProjectDescriptor(prj, OUT)
