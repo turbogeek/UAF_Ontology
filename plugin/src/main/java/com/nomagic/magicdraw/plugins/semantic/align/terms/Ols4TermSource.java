@@ -49,6 +49,11 @@ public final class Ols4TermSource implements TermSource {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         this.http = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
+                // Force HTTP/1.1: verified live that Java's default HTTP/2 handshake to
+                // the EBI endpoint dies with "EOF reached while reading" behind this
+                // network's firewall/middlebox, while HTTP/1.1 returns 200. PowerShell
+                // works for the same reason (it defaults to 1.1).
+                .version(HttpClient.Version.HTTP_1_1)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
     }
