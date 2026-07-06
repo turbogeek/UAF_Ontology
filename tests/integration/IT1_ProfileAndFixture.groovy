@@ -91,6 +91,17 @@ try {
     def created = [:]
     onEdtInSession('IT1 build fixture') {
         def ef = project.getElementsFactory()
+        // New workflow (2026-07-06): alignment requires an INSTRUMENTED model. Apply the
+        // model-level SemanticModel stereotype (root IRI + version) so the sidebar GUI
+        // mapping path in IT3 sees the model already instrumented and skips the confirm
+        // prompt. Mirrors StereotypeManager.applyModelInstrumentation.
+        def modelStereo = StereotypesHelper.getStereotype(project, 'SemanticModel')
+        if (modelStereo != null && !StereotypesHelper.hasStereotype(model, modelStereo)) {
+            StereotypesHelper.addStereotype(model, modelStereo)
+            StereotypesHelper.setStereotypePropertyValue(model, modelStereo, 'ontologyRootIRI',
+                    'http://semantic.alignment/model/' + project.getName() + '#')
+            StereotypesHelper.setStereotypePropertyValue(model, modelStereo, 'ontologyVersion', '1.0.0')
+        }
         def pkg = model.getOwnedElement().find { it.respondsTo('getName') && it.getName() == PKG_NAME }
         if (pkg == null) {
             pkg = ef.createPackageInstance()

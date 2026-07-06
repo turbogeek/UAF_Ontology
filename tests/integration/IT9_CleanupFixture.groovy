@@ -53,6 +53,24 @@ try {
         if (error != null) { throw error }
         diag('fixture package removed')
     }
+    // Un-instrument the model root (remove the SemanticModel marker) - the reversible half
+    // of the instrument/un-instrument workflow. The profile module itself is left mounted
+    // (reusable infrastructure), matching the plugin's un-instrument behavior.
+    def modelStereo = com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper.getStereotype(project, 'SemanticModel')
+    if (modelStereo != null
+            && com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper.hasStereotype(model, modelStereo)) {
+        def err2 = null
+        def sm2 = SessionManager.getInstance()
+        SwingUtilities.invokeAndWait {
+            sm2.createSession(project, 'IT9 un-instrument')
+            try {
+                com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper.removeStereotype(model, modelStereo)
+                sm2.closeSession(project)
+            } catch (Throwable t) { try { sm2.cancelSession(project) } catch (Throwable ignored) {}; err2 = t }
+        }
+        if (err2 != null) { throw err2 }
+        diag('model un-instrumented (SemanticModel removed from root)')
+    }
     def still = model.getOwnedElement().find { it.respondsTo('getName') && it.getName() == PKG_NAME }
     if (still != null) {
         pass = false
