@@ -7,6 +7,7 @@ import com.nomagic.magicdraw.plugins.semantic.align.ConceptIndex;
 import com.nomagic.magicdraw.plugins.semantic.align.ConceptSuggestion;
 import com.nomagic.magicdraw.plugins.semantic.align.StereotypeRouter;
 import com.nomagic.magicdraw.plugins.semantic.align.SuggestionRanker;
+import com.nomagic.magicdraw.plugins.semantic.align.UafConceptResolver;
 import com.nomagic.magicdraw.plugins.semantic.commands.TransactionWrapper;
 import com.nomagic.magicdraw.plugins.semantic.metadata.StereotypeManager;
 import com.nomagic.magicdraw.plugins.semantic.rest.SemanticRestService;
@@ -68,6 +69,8 @@ public class SemanticAlignmentPlugin extends Plugin {
 
     // Built once on a background thread at init; null until the catalog is loaded.
     private static volatile SuggestionRanker suggestionRanker;
+    // Automatic UAF-stereotype -> ontology-concept resolver (derived from uaf_ontology).
+    private static volatile UafConceptResolver uafResolver;
 
     // Panel per open project so diagram-click routing reaches the right sidebar.
     // Weak keys: a closed project must not be pinned by its panel registration.
@@ -203,6 +206,9 @@ public class SemanticAlignmentPlugin extends Plugin {
         CatalogLoader.LoadedCatalog catalog = CatalogLoader.loadMerged(pluginDirectory);
         catalogModel = catalog.model();
         suggestionRanker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDirectory));
+        // Automatic UAF-layer alignment: derived from the ontology's label/xmiID/subClassOf.
+        uafResolver = UafConceptResolver.fromModel(catalog.model());
+        DiagnosticLog.event("CATALOG", "UAF auto-match concepts: " + uafResolver.size());
         return "{\"concepts\":" + catalog.index().size()
                 + ",\"tboxTriples\":" + catalog.model().size()
                 + ",\"userCatalog\":\"" + CatalogLoader.resolveUserCatalogDirectory()
@@ -378,6 +384,8 @@ public class SemanticAlignmentPlugin extends Plugin {
         // Context the ranker scores against; updated on every tree selection.
         private volatile String selectedName = "";
         private volatile List<String> selectedStereotypes = List.of();
+        // Auto-known UAF concept label the suggestions narrow FROM (null = free search).
+        private volatile String narrowFrom;
         private final Timer searchDebounce = new Timer(150, e -> refreshSuggestions());
 
         SemanticBrowserPanel(Project project) {
@@ -582,22 +590,64 @@ public class SemanticAlignmentPlugin extends Plugin {
                 String typeText = stereotypes.isEmpty()
                         ? element.getHumanType()
                         : stereotypes.stream().map(Stereotype::getName).collect(Collectors.joining(", "));
-                String conceptURI = readMappedConceptURI(element);
-                String sbvr = conceptURI != null
-                        ? SBVR_ENGINE.generatePlainSBVR(sbvrSubject, conceptURI, null, null)
-                        : "No semantic alignment applied. Enter a concept IRI below and press Enter to map.";
-                DiagnosticLog.event("SELECTION", name + " | stereotypes=" + typeText
-                        + " | concept=" + (conceptURI == null ? "-" : conceptURI) + " | sbvr=" + sbvr);
-                showSelection(name, typeText, sbvr);
 
-                // Zero-keystroke suggestions for the new selection (v3 plan section 1)
+                // AUTOMATIC UAF-layer alignment: match the applied stereotype to its UAF
+                // ontology concept by name/GUID - no user action (owner correction).
+                UafConceptResolver.UafConcept auto = resolveUafConcept(stereotypes);
+                String userConceptURI = readMappedConceptURI(element);
+
+                String sbvr;
+                if (userConceptURI != null) {
+                    sbvr = SBVR_ENGINE.generatePlainSBVR(sbvrSubject, userConceptURI, null, null);
+                } else if (auto != null) {
+                    // Auto-known concept + its foundational (gUFO) equivalent, no clicks
+                    sbvr = SBVR_ENGINE.generatePlainSBVR(sbvrSubject, auto.iri(), null, null)
+                            + (auto.foundationalLabel() != null
+                                    ? "  (foundational: " + auto.foundationalLabel() + ")" : "");
+                } else {
+                    sbvr = "No semantic alignment. Pick a concept below to align.";
+                }
+                DiagnosticLog.event("SELECTION", name + " | stereotypes=" + typeText
+                        + " | autoConcept=" + (auto == null ? "-" : auto.label()
+                                + " (" + (auto.foundationalLabel() == null ? "-" : auto.foundationalLabel()) + ")")
+                        + " | userConcept=" + (userConceptURI == null ? "-" : userConceptURI)
+                        + " | sbvr=" + sbvr);
+                String autoText = auto == null ? typeText
+                        : typeText + "  ->  " + auto.label()
+                                + (auto.foundationalLabel() != null ? " / " + auto.foundationalLabel() : "");
+                showSelection(name, autoText, sbvr);
+
+                // Suggestions now NARROW from the auto-known concept (owner correction):
+                // seed the ranker query with the UAF concept label so subclasses/domain
+                // refinements surface first. Empty when no auto concept (free search).
                 selectedName = sbvrSubject;
                 selectedStereotypes = stereotypes.stream().map(Stereotype::getName).toList();
+                narrowFrom = auto == null ? null : auto.label();
                 refreshSuggestions();
             } catch (Exception e) {
                 log.error("Selection handling failed", e);
                 DiagnosticLog.event("ERROR", "Selection handling failed: " + e);
             }
+        }
+
+        /**
+         * Most specific UAF concept among the applied stereotypes. UAF elements often
+         * carry several stereotypes; the resolver maps each and we prefer the one whose
+         * concept is deepest (Actual* over generic) - here, simply the first that maps.
+         */
+        private UafConceptResolver.UafConcept resolveUafConcept(List<Stereotype> stereotypes) {
+            UafConceptResolver resolver = uafResolver;
+            if (resolver == null) {
+                return null;
+            }
+            for (Stereotype stereotype : stereotypes) {
+                UafConceptResolver.UafConcept concept =
+                        resolver.resolve(stereotype.getName(), stereotype.getID());
+                if (concept != null) {
+                    return concept;
+                }
+            }
+            return null;
         }
 
         private String readMappedConceptURI(Element element) {
@@ -752,9 +802,16 @@ public class SemanticAlignmentPlugin extends Plugin {
                     return; // catalog still loading (or missing - journaled by the loader)
                 }
                 String query = searchField.getText();
-                List<ConceptSuggestion> top = (query == null || query.isBlank())
-                        ? ranker.suggestForElement(selectedName, selectedStereotypes, 5)
-                        : ranker.search(query.trim(), selectedName, selectedStereotypes, 8);
+                List<ConceptSuggestion> top;
+                if (query != null && !query.isBlank()) {
+                    top = ranker.search(query.trim(), selectedName, selectedStereotypes, 8);
+                } else if (narrowFrom != null) {
+                    // Narrow from the auto-known UAF concept: seed the search with its
+                    // label so subclasses / domain refinements rank first (owner model).
+                    top = ranker.search(narrowFrom, selectedName, selectedStereotypes, 8);
+                } else {
+                    top = ranker.suggestForElement(selectedName, selectedStereotypes, 5);
+                }
                 top.forEach(suggestionModel::addElement);
                 if (!top.isEmpty()) {
                     DiagnosticLog.event("SUGGEST", selectedName
