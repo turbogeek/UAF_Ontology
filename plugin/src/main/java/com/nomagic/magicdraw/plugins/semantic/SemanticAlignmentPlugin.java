@@ -103,10 +103,16 @@ public class SemanticAlignmentPlugin extends Plugin {
         DiagnosticLog.event("LIFECYCLE", "Plugin init (version " + VERSION + ")");
         if (getDescriptor() != null) {
             pluginDirectory = getDescriptor().getPluginDirectory();
-            // The Semantic Alignment Profile ships as a real .mdzip module with the
-            // plugin (owner decision) and is auto-mounted on first use in a project.
+        }
+        // The Semantic Alignment Profile ships as a real SHARED module in the install
+        // profiles dir (deployProfileAsset), where useModule resolves it. mandatory.profiles
+        // normally auto-attaches it; this is the mount-on-first-use fallback path.
+        try {
             StereotypeManager.setShippedProfile(new File(
-                    new File(pluginDirectory, "profiles"), "Semantic Alignment Profile.mdzip"));
+                    com.nomagic.magicdraw.core.ApplicationEnvironment.getProfilesDirectory(),
+                    "Semantic Alignment Profile.mdzip"));
+        } catch (Throwable t) {
+            log.error("Could not resolve install profiles directory", t);
         }
 
         // Export/validation logic stays usable from CI and harness scripts; only the

@@ -173,8 +173,6 @@ tasks.register('deployPlugin', Sync) {
         include 'start-harness.groovy', 'stop-harness.groovy', 'SysMLv2Logger.groovy'
         into 'harness'
     }
-    // The Semantic Alignment Profile ships as a real module, auto-mounted on first use
-    from(new File(projectDir, 'profiles')) { into 'profiles' }
     // Alignment catalog for the suggestion index (TBox/schema ontologies only -
     // instance/example files stay out to keep the index focused and the load fast)
     from(new File(projectDir.parentFile, 'UAF to OWL Goals/ontologies')) {
@@ -185,3 +183,21 @@ tasks.register('deployPlugin', Sync) {
     // tbox/ is runtime-writable (integration tests drop consistency axioms there)
     preserve { include 'tbox/**' }
 }
+
+// The Semantic Alignment Profile is a SHARED module (authored via BuildSemanticProfile
+// with ModulesService.shareOnTask) and must live in <install>/profiles/, NOT the plugin
+// dir - that's where useModule/mandatory.profiles resolve it. A per-plugin
+// mandatory.profiles auto-attaches it into every project (the UAF pattern).
+tasks.register('deployProfileAsset', Copy) {
+    description = "Installs the shared Semantic Alignment Profile + mandatory.profiles into the Cameo install."
+    group = 'distribution'
+    into cameoHome
+    from(new File(projectDir, 'profiles')) {
+        include 'Semantic Alignment Profile.mdzip'
+        into 'profiles'
+    }
+    from(new File(projectDir, 'assets/mandatory.profiles')) {
+        into "plugins/${pluginId}"
+    }
+}
+tasks.named('deployPlugin') { finalizedBy 'deployProfileAsset' }
