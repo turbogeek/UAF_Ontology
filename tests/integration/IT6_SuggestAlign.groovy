@@ -151,20 +151,20 @@ try {
         diag('narrowed: ' + narrowed.trim())
     }
 
-    // --- 4. One genuine click on suggestion row 0 applies the mapping ----------------
+    // --- 4. Select suggestion row 0 and apply it (multi-select UX: select then apply) ---
+    // The list is now MULTIPLE_INTERVAL_SELECTION; a single click only selects, so apply is
+    // driven by the "Apply Selected Concept(s)" button (or double-click / Enter).
+    def applyBtn = findByName('semantic.applySelectedButton')
+    if (applyBtn == null) { fail('apply-selected button not found'); diag('RESULT: FAIL'); return }
     mark = JOURNAL.exists() ? JOURNAL.length() : 0L
     SwingUtilities.invokeAndWait {
-        def bounds = suggestionList.getCellBounds(0, 0)
-        if (bounds == null) { throw new IllegalStateException('suggestion list is empty') }
-        int x = (int) bounds.getCenterX()
-        int y = (int) bounds.getCenterY()
-        def click = new MouseEvent(suggestionList, MouseEvent.MOUSE_CLICKED,
-                System.currentTimeMillis(), 0, x, y, 1, false)
-        suggestionList.dispatchEvent(click)
+        if (suggestionList.getModel().getSize() == 0) { throw new IllegalStateException('suggestion list is empty') }
+        suggestionList.setSelectedIndex(0)
+        applyBtn.doClick()
     }
     def mapped = waitForJournalLine(mark, ['| MAPPING |', 'SuggestProbe', 'status=OK'], 8000)
     if (mapped == null) {
-        fail('suggestion click did not apply a mapping')
+        fail('suggestion apply did not map the element')
     } else {
         diag('mapping: ' + mapped.trim())
     }

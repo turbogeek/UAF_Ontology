@@ -86,53 +86,56 @@ public final class SuggestionRanker {
             }
         }
 
-        List<ConceptSuggestion> scored = new ArrayList<>();
+        List<Scored> scored = new ArrayList<>();
         for (ConceptEntry entry : candidates) {
-            double bestText = 0.0;
+            double bestWeighted = 0.0;
+            double bestRaw = 0.0;
+            double bestTier = 0.0;
             String bestVariant = null;
             for (QueryVariants.Variant v : variants) {
                 String nq = v.text().toLowerCase(Locale.ROOT);
-                double ts = textScore(entry, nq, ConceptIndex.tokenize(v.text())) * v.tierWeight();
-                if (ts > bestText) {
-                    bestText = ts;
+                double rawText = textScore(entry, nq, ConceptIndex.tokenize(v.text()));
+                double weighted = rawText * v.tierWeight();
+                if (weighted > bestWeighted) {
+                    bestWeighted = weighted;
+                    bestRaw = rawText;
+                    bestTier = v.tierWeight();
                     bestVariant = v.text();
                 }
             }
             double pin = pinned.contains(entry.curie().toLowerCase(Locale.ROOT)) ? 0.35 : 0.0;
             double routed = boosted.contains(entry.prefix().toLowerCase(Locale.ROOT)) ? 0.25 : 0.0;
             double overlap = 0.2 * jaccard(nameTokens, entry.tokens());
-            double raw = bestText + pin + routed + overlap;
+            double raw = bestWeighted + pin + routed + overlap;
             if (raw > 0.05) {
-                scored.add(new ConceptSuggestion(entry, Math.min(1.0, raw / MAX_RAW),
-                        bestVariant, contextOf(entry), null));
+                // A genuine EXACT primary-label match on a FULL-phrase-level variant
+                // (FULL / FULL+stereotype / narrowFrom, weight >= 0.90) ranks in its own
+                // class ABOVE any pin/route-boosted partial in another ontology, so the
+                // Coast-Guard-exact match always wins (owner requirement; the previous
+                // same-ontology coherence bonus could wrongly demote it - removed).
+                boolean exact = bestRaw >= 0.999 && bestTier >= 0.90;
+                scored.add(new Scored(new ConceptSuggestion(entry, Math.min(1.0, raw / MAX_RAW),
+                        bestVariant, contextOf(entry), null), exact));
             }
         }
-        scored.sort(BY_SCORE);
-
-        // Same-ontology coherence: a small, capped bonus to concepts sharing the top hit's
-        // ontology. Kept tiny (0.03) so it never overturns a genuine exact match elsewhere.
-        if (scored.size() > 1) {
-            String topOntology = scored.get(0).entry().ontologyId();
-            if (topOntology != null && !topOntology.isBlank()) {
-                List<ConceptSuggestion> adjusted = new ArrayList<>(scored.size());
-                for (ConceptSuggestion cs : scored) {
-                    if (topOntology.equals(cs.entry().ontologyId())) {
-                        adjusted.add(cs.withScore(Math.min(1.0, cs.score() + 0.03)));
-                    } else {
-                        adjusted.add(cs);
-                    }
-                }
-                adjusted.sort(BY_SCORE);
-                scored = adjusted;
+        scored.sort((a, b) -> {
+            if (a.exact != b.exact) {
+                return a.exact ? -1 : 1;
             }
+            int byScore = Double.compare(b.suggestion.score(), a.suggestion.score());
+            return byScore != 0 ? byScore
+                    : a.suggestion.entry().curie().compareTo(b.suggestion.entry().curie());
+        });
+        List<ConceptSuggestion> result = new ArrayList<>(scored.size());
+        for (Scored s : scored) {
+            result.add(s.suggestion);
         }
-        return scored.size() > limit ? new ArrayList<>(scored.subList(0, limit)) : scored;
+        return result.size() > limit ? new ArrayList<>(result.subList(0, limit)) : result;
     }
 
-    private static final java.util.Comparator<ConceptSuggestion> BY_SCORE = (a, b) -> {
-        int byScore = Double.compare(b.score(), a.score());
-        return byScore != 0 ? byScore : a.entry().curie().compareTo(b.entry().curie());
-    };
+    /** Internal: a scored suggestion plus whether it was a full-phrase exact match. */
+    private record Scored(ConceptSuggestion suggestion, boolean exact) {
+    }
 
     /** A short context/annotation snippet for display: comment, else alt labels, else ontology. */
     private static String contextOf(ConceptEntry entry) {

@@ -305,7 +305,12 @@ public final class StereotypeManager {
         if (project == null) {
             return java.util.List.of();
         }
-        Stereotype stereotype = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME);
+        // Resolve the SAME stereotype object the write path uses (profile-qualified first),
+        // so reads and writes never target two same-named stereotypes from different profiles.
+        Stereotype stereotype = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME, PROFILE_NAME);
+        if (stereotype == null) {
+            stereotype = StereotypesHelper.getStereotype(project, STEREOTYPE_NAME);
+        }
         if (stereotype == null || !StereotypesHelper.hasStereotype(element, stereotype)) {
             return java.util.List.of();
         }
