@@ -158,8 +158,16 @@ try {
     if (applyBtn == null) { fail('apply-selected button not found'); diag('RESULT: FAIL'); return }
     mark = JOURNAL.exists() ? JOURNAL.length() : 0L
     SwingUtilities.invokeAndWait {
-        if (suggestionList.getModel().getSize() == 0) { throw new IllegalStateException('suggestion list is empty') }
-        suggestionList.setSelectedIndex(0)
+        def m = suggestionList.getModel()
+        if (m.getSize() == 0) { throw new IllegalStateException('suggestion list is empty') }
+        // Select the org:Organization row deterministically (ranking order is not fixed:
+        // exact-label matches like sumo/uaf:Organization may rank above org:Organization).
+        int targetRow = -1
+        for (int i = 0; i < m.getSize(); i++) {
+            if (m.getElementAt(i).entry().iri() == 'http://www.w3.org/ns/org#Organization') { targetRow = i; break }
+        }
+        if (targetRow < 0) { throw new IllegalStateException('org:Organization not among suggestions') }
+        suggestionList.setSelectedIndex(targetRow)
         applyBtn.doClick()
     }
     def mapped = waitForJournalLine(mark, ['| MAPPING |', 'SuggestProbe', 'status=OK'], 8000)

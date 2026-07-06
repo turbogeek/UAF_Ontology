@@ -118,6 +118,14 @@ try {
             def sharePoint = ModulesService.shareOnTask(primary, profile, 'Semantic Alignment Profile')
             diag('shareOnTask -> ' + sharePoint)
 
+            // NOTE (2026-07-06): the mounted profile PACKAGE shows editable=true because a
+            // shared package is collaboratively editable by design; the STEREOTYPE inside is
+            // read-only + invisible (verified). No mount-side API (useModule/importModule/
+            // setReadOnly/setReShared) nor setStandardSystemProfile flips the package to
+            // read-only - a fully read-only used-module would need UAF-style authoring (the
+            // profile as the module's own primary content, not a shared sub-package). Tracked
+            // as an open packaging refinement; the functional behavior is correct.
+
             // Save the project (now with a shared profile package) as the module file.
             def desc = ProjectDescriptorsFactory.createLocalProjectDescriptor(prj, OUT)
             boolean saved = pm.saveProject(desc, true)
