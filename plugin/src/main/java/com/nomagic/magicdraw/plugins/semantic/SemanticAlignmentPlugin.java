@@ -1051,52 +1051,54 @@ public class SemanticAlignmentPlugin extends Plugin {
                         "Compose Concept", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            // Prefer explicitly Ctrl-selected rows; otherwise fall back to the displayed
-            // suggestions (capped) so the dialog ALWAYS opens - the user can Ctrl-select first to
-            // narrow it. Visible popups (not silent console) when there is genuinely nothing.
-            java.util.List<ConceptSuggestion> picks =
-                    new java.util.ArrayList<>(suggestionList.getSelectedValuesList());
-            if (picks.isEmpty()) {
-                for (int i = 0; i < suggestionModel.getSize() && picks.size() < 6; i++) {
-                    picks.add(suggestionModel.getElementAt(i));
-                }
+            // Seed the composer: the pinned base (if any) as the genus, and any Ctrl-selected
+            // suggestions as starting differentia. The user then SEARCHES to add/replace concepts.
+            com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef genus = null;
+            if (pinnedBaseURI != null && !pinnedBaseURI.isBlank()) {
+                genus = new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef(
+                        pinnedBaseURI, SBVR_ENGINE.getLocalName(pinnedBaseURI), "", "");
             }
-            String genusIri = pinnedBaseURI;
-            String genusLabel = null; // let the dialog derive it from the genus IRI's local name
-            java.util.List<com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef> quals =
+            java.util.List<com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef> seed =
                     new java.util.ArrayList<>();
-            if (genusIri == null || genusIri.isBlank()) {
-                if (picks.isEmpty()) {
-                    JOptionPane.showMessageDialog(owner,
-                            "No concepts to compose with yet.\nSelect an element that has suggestions "
-                                    + "(or type a search), then Compose Concept.",
-                            "Compose Concept", JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-                genusIri = picks.get(0).entry().iri();          // top suggestion becomes the genus
-                genusLabel = picks.get(0).entry().label();
-                for (int i = 1; i < picks.size(); i++) {
-                    quals.add(new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef(
-                            picks.get(i).entry().iri(), picks.get(i).entry().label()));
-                }
-            } else {
-                for (ConceptSuggestion s : picks) {
-                    quals.add(new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef(
-                            s.entry().iri(), s.entry().label()));
-                }
+            for (ConceptSuggestion s : suggestionList.getSelectedValuesList()) {
+                seed.add(refFor(s));
             }
-            if (quals.isEmpty()) {
-                JOptionPane.showMessageDialog(owner,
-                        "Pick at least one concept in the suggestions list to combine with the base "
-                                + "concept (Ctrl-click for several), then Compose Concept.",
-                        "Compose Concept", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            DiagnosticLog.event("COMPOSE", "open dialog for " + selectedName + " genus="
-                    + genusIri + " qualifiers=" + quals.size());
+            DiagnosticLog.event("COMPOSE", "open composer for " + selectedName
+                    + " (genus=" + (genus == null ? "-" : genus.iri()) + " seed=" + seed.size() + ")");
             new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog(
-                    owner, selectedName, genusIri, genusLabel, quals,
-                    ontologyRelations().phrases(), this::applyCompoundFromUI).setVisible(true);
+                    owner, selectedName, genus, seed, ontologyRelations().phrases(),
+                    this::searchConceptRefs, this::applyCompoundFromUI).setVisible(true);
+        }
+
+        /** A dialog ConceptRef for a suggestion (label + friendly ontology + its definition/comment). */
+        private com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef refFor(ConceptSuggestion s) {
+            return new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef(
+                    s.entry().iri(), s.entry().label(),
+                    ontologyRegistry().badge(s.entry().prefix(), s.entry().ontologyId()),
+                    s.context() == null ? "" : s.context());
+        }
+
+        /**
+         * Ontology search for the compose dialog: prefers the out-of-process service (local, and
+         * ONLINE when requested - OLS4/TIB/OntoPortal), else the in-JVM ranker. Runs off the EDT
+         * (the dialog calls it on a worker thread). Trace: design/compound_concepts.md
+         */
+        private java.util.List<com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef>
+                searchConceptRefs(String query, boolean online) {
+            java.util.List<ConceptSuggestion> hits;
+            com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient client = catalogClient;
+            if (client != null && client.isReady()) {
+                hits = client.search(query, null, 25, online);
+            } else {
+                SuggestionRanker r = suggestionRanker;
+                hits = (r == null) ? java.util.List.of() : r.searchVariants(query, java.util.List.of(), null, 25);
+            }
+            java.util.List<com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef> out =
+                    new java.util.ArrayList<>();
+            for (ConceptSuggestion s : hits) {
+                out.add(refFor(s));
+            }
+            return out;
         }
 
         /** Stores the encoded compound clauses (genus first, then relation|IRI), REPLACING prior concepts. */

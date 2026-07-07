@@ -1,10 +1,12 @@
-// ProbeComposeDialog.groovy
-// Reproduces the owner's report: clicking "Compose Concept" WITHOUT Ctrl-selecting rows.
-// After the fix it must still open the dialog (falling back to displayed suggestions).
+// ProbeComposeDialog.groovy — drives the redesigned Compose composer:
+// open it, SEARCH "Mosquito" (online), add a result as a differentia, read the LIVE SBVR.
+// The dialog is MODAL (holds the EDT), so once open we drive it ONLY via invokeLater and read
+// state into a shared map (invokeAndWait from the EDT's nested pump would throw).
 import com.nomagic.magicdraw.core.Application
 import com.nomagic.magicdraw.openapi.uml.SessionManager
 import javax.swing.SwingUtilities
 import java.text.SimpleDateFormat
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 
 final String LOG_DIR = System.getProperty('semantic.it.logdir', new File(System.getProperty('user.home'), '.semantic_alignment_plugin/it-logs').getAbsolutePath())
@@ -13,38 +15,19 @@ try { LOG.bytes = new byte[0] } catch (Throwable ignored) {}
 final SimpleDateFormat TS = new SimpleDateFormat('HH:mm:ss.SSS')
 def diag = { String m -> String l = TS.format(new Date()) + '  ' + m; println l; try { LOG << (l + '\n') } catch (Throwable ignored) {} }
 boolean pass = true; def fail = { String m -> pass = false; diag('FAIL: ' + m) }
-final File JOURNAL = new File(new File(System.getProperty('user.home'), '.semantic_alignment_plugin'), 'semantic-plugin.log')
 
 diag('=== ProbeComposeDialog START ===')
 def app = Application.getInstance()
 def project = app.getProject()
-if (project == null) {
-    SwingUtilities.invokeLater { try { app.getProjectsManager().createProject() } catch (Throwable ig) {} }
-    for (int i = 0; i < 75 && project == null; i++) { Thread.sleep(200); project = app.getProject() }
-    Thread.sleep(2500)
-}
-if (project == null) { fail('no project'); diag('RESULT: FAIL'); return }
+if (project == null) { fail('no project (run OpenScratchProject first)'); diag('RESULT: FAIL'); return }
 
-def findByName = { String nm ->
-    def ref = new AtomicReference(); def walk
-    walk = { java.awt.Component c -> if (ref.get() != null) return; if (nm == c.getName()) { ref.set(c); return }; if (c instanceof java.awt.Container) c.getComponents().each { walk(it) } }
-    SwingUtilities.invokeAndWait { java.awt.Window.getWindows().each { w -> if (ref.get() == null) walk(w) } }
-    return ref.get()
-}
-def waitLine = { long from, List toks, int ms ->
-    long dl = System.currentTimeMillis() + ms
-    while (System.currentTimeMillis() < dl) {
-        if (JOURNAL.exists() && JOURNAL.length() > from) {
-            def raf = new RandomAccessFile(JOURNAL, 'r'); try { raf.seek(from); byte[] b = new byte[(int)(JOURNAL.length()-from)]; raf.readFully(b)
-                def ln = new String(b,'UTF-8').readLines().find { l -> toks.every { l.contains(it) } }; if (ln) return ln } finally { raf.close() }
-        }
-        Thread.sleep(200)
-    }
-    return null
-}
+// EDT-safe recursive find (call only while ON the EDT, e.g. inside invokeLater)
+def findOnEdt
+findOnEdt = { String nm, java.awt.Component c -> if (nm == c.getName()) return c; if (c instanceof java.awt.Container) { for (ch in c.getComponents()) { def r = findOnEdt(nm, ch); if (r) return r } }; return null }
+def findWin = { String nm -> for (w in java.awt.Window.getWindows()) { def r = findOnEdt(nm, w); if (r) return r }; return null }
 
 try {
-    // create + select a plain "engine" element (no base concept, no row selection) -> suggestions show
+    // create + select an element (needs the tree; do this BEFORE the modal opens, invokeAndWait ok)
     def holder = [:]; def err = null
     SwingUtilities.invokeAndWait {
         def sm = SessionManager.getInstance(); sm.createSession(project, 'compose probe')
@@ -52,50 +35,64 @@ try {
             def ef = project.getElementsFactory(); def root = project.getPrimaryModel()
             def pkg = root.getOwnedElement().find { it.respondsTo('getName') && it.getName() == 'ComposeProbeIT' }
             if (pkg == null) { pkg = ef.createPackageInstance(); pkg.setName('ComposeProbeIT'); pkg.setOwner(root) }
-            def el = ef.createClassInstance(); el.setName('engine'); el.setOwner(pkg); holder.el = el
+            def el = ef.createClassInstance(); el.setName('MosquitoKillingDrone'); el.setOwner(pkg); holder.el = el
             sm.closeSession(project)
         } catch (Throwable t) { try { sm.cancelSession(project) } catch (Throwable ig) {}; err = t }
     }
     if (err != null) throw err
-    // Wait for the containment tree to be ready (a freshly-created project's browser lags).
     def treeRef = new AtomicReference()
-    for (int i = 0; i < 60 && treeRef.get() == null; i++) {
-        SwingUtilities.invokeAndWait { try { treeRef.set(app.getMainFrame().getBrowser().getContainmentTree()) } catch (Throwable t) {} }
-        if (treeRef.get() == null) Thread.sleep(250)
-    }
-    def tree = treeRef.get()
-    if (tree == null) { fail('containment tree not ready'); diag('RESULT: FAIL'); return }
-    long mark = JOURNAL.exists() ? JOURNAL.length() : 0L
-    SwingUtilities.invokeAndWait {
-        def path = tree.openNode(holder.el)
-        if (path != null) tree.getTree().setSelectionPath(path)
-    }
-    def sug = waitLine(mark, ['| SUGGEST |', 'engine'], 12000)
-    diag('suggestions populated: ' + (sug != null))
+    for (int i = 0; i < 60 && treeRef.get() == null; i++) { SwingUtilities.invokeAndWait { try { treeRef.set(app.getMainFrame().getBrowser().getContainmentTree()) } catch (Throwable t) {} }; if (treeRef.get() == null) Thread.sleep(250) }
+    if (treeRef.get() == null) { fail('tree not ready'); diag('RESULT: FAIL'); return }
+    SwingUtilities.invokeAndWait { def p = treeRef.get().openNode(holder.el); if (p != null) treeRef.get().getTree().setSelectionPath(p) }
+    Thread.sleep(1500)
 
-    def list = findByName('semantic.suggestionList')
-    int shown = 0; if (list != null) SwingUtilities.invokeAndWait { shown = list.getModel().getSize() }
-    diag('displayed suggestions: ' + shown + ' (NOT selecting any row - reproducing the report)')
-
-    def btn = findByName('semantic.composeButton')
-    if (btn == null) { fail('compose button not found'); diag('RESULT: FAIL'); return }
-    long cmark = JOURNAL.exists() ? JOURNAL.length() : 0L
-    // click via invokeLater so the MODAL dialog does not block this harness thread
-    SwingUtilities.invokeLater { btn.doClick() }
+    def R = new ConcurrentHashMap()
+    def doSearch = { String q, boolean online -> SwingUtilities.invokeLater {
+        def sf = findWin('semantic.compose.searchField'); def oc = findWin('semantic.compose.onlineCheck'); def sb = findWin('semantic.compose.searchButton')
+        if (sf) sf.setText(q); if (oc) oc.setSelected(online); if (sb) sb.doClick()
+    } }
+    // 1. open the composer (modal)
+    SwingUtilities.invokeLater { def b = findWin('semantic.composeButton'); R.opened = (b != null); if (b) b.doClick() }
     Thread.sleep(2500)
-
-    def dlg = findByName('semantic.composeDialog')
-    def composeLine = waitLine(cmark, ['COMPOSE'], 3000)
-    diag('COMPOSE journal: ' + (composeLine == null ? '<none>' : composeLine.trim()))
-    if (dlg == null) { fail('compose dialog did NOT open') }
-    else {
-        boolean vis = false; String sbvr = ''
-        SwingUtilities.invokeAndWait { vis = dlg.isVisible(); def pv = findByName('semantic.compose.sbvrPreview'); if (pv != null) sbvr = pv.getText() }
-        diag('dialog OPEN, visible=' + vis + '  preview="' + sbvr + '"')
-        if (!vis) fail('dialog created but not visible')
-        SwingUtilities.invokeLater { dlg.dispose() } // clean up (modal) so the harness can finish
-        Thread.sleep(500)
+    // 2. search a GENUS ("aircraft") and add it as the genus
+    doSearch('aircraft', false); Thread.sleep(4000)
+    SwingUtilities.invokeLater {
+        def rl = findWin('semantic.compose.resultsList'); R.dialogFound = (rl != null)
+        R.genusResults = rl ? rl.getModel().getSize() : -1
+        if (rl && rl.getModel().getSize() > 0) { rl.setSelectedIndex(0); R.genus = rl.getSelectedValue()?.toString() }
+        def g = findWin('semantic.compose.addGenusButton'); if (g) g.doClick()
     }
+    Thread.sleep(1500)
+    // 3. search the QUALIFIER ("Mosquito", online) and add it as a differentia
+    doSearch('Mosquito', true); Thread.sleep(6000)
+    SwingUtilities.invokeLater {
+        def rl = findWin('semantic.compose.resultsList')
+        R.results = rl ? rl.getModel().getSize() : -1
+        if (rl && rl.getModel().getSize() > 0) { rl.setSelectedIndex(0); R.first = rl.getSelectedValue()?.toString() }
+        def meaning = findWin('semantic.compose.conceptSbvr'); R.meaning = meaning ? meaning.getText() : '?'
+        def add = findWin('semantic.compose.addDiffButton'); if (add) add.doClick()
+    }
+    Thread.sleep(1500)
+    // 4. set the relation to "kills", read final SBVR + dispose
+    SwingUtilities.invokeLater {
+        def rel = findWin('semantic.compose.relation.0'); if (rel) { rel.setSelectedItem('kills') }
+    }
+    Thread.sleep(800)
+    SwingUtilities.invokeLater {
+        def sv = findWin('semantic.compose.sbvrPreview'); R.sbvr = sv ? sv.getText() : '?'
+        def dlg = findWin('semantic.composeDialog'); if (dlg) { dlg.setVisible(false); dlg.dispose() }
+    }
+    Thread.sleep(1200)
+
+    diag('opened=' + R.opened + ' dialogFound=' + R.dialogFound)
+    diag('genus search "aircraft" -> results=' + R.genusResults + '  genus="' + R.genus + '"')
+    diag('qualifier search "Mosquito" online -> results=' + R.results + '  first="' + R.first + '"')
+    diag('selected concept meaning: ' + (R.meaning ?: '').toString().replace('\n',' | '))
+    diag('COMPOUND SBVR: ' + R.sbvr)
+    if (!(R.opened)) fail('compose button not found')
+    if (!((R.results ?: 0) > 0)) fail('online search returned no results')
+    String s = (R.sbvr ?: '').toString().toLowerCase()
+    if (!(s.contains('aircraft') && s.contains('mosquito'))) fail('compound SBVR missing genus+qualifier: ' + R.sbvr)
 } catch (Throwable t) {
     def sw = new StringWriter(); t.printStackTrace(new PrintWriter(sw)); diag('UNCAUGHT\n' + sw.toString()); pass = false
 }
