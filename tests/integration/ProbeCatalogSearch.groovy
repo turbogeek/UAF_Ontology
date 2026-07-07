@@ -45,6 +45,11 @@ try {
     check('governance vocab surfaces for "Permission"',
             govIris.any { (it ?: '').contains('odrl') || (it ?: '').contains('/prov') || (it ?: '').contains('dpv') })
 
+    // openCAESAR IMCE systems-engineering foundation (from .owl).
+    def imceIris = search('Component')
+    check('IMCE SE concept surfaces for "Component"',
+            imceIris.any { (it ?: '').contains('imce.jpl.nasa.gov') })
+
     diag('RESULT: ' + (fails.isEmpty() ? 'PASS' : ('FAIL ' + fails)))
 } catch (Throwable t) { diagT('UNCAUGHT', t); diag('RESULT: FAIL') }
 diag('=== probe-catalog-search DONE ===')
