@@ -1043,22 +1043,37 @@ public class SemanticAlignmentPlugin extends Plugin {
          * concepts (they define its full compound meaning). Trace: design/compound_concepts.md
          */
         private void composeSelectedSuggestions() {
+            java.awt.Frame owner = com.nomagic.magicdraw.core.Application.getInstance().getMainFrame();
             Element element = selectedElement;
             if (element == null) {
-                appendConsole("[FAIL] Select an element first.");
+                JOptionPane.showMessageDialog(owner,
+                        "Select an element in the containment tree first, then Compose Concept.",
+                        "Compose Concept", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            java.util.List<ConceptSuggestion> picks = suggestionList.getSelectedValuesList();
+            // Prefer explicitly Ctrl-selected rows; otherwise fall back to the displayed
+            // suggestions (capped) so the dialog ALWAYS opens - the user can Ctrl-select first to
+            // narrow it. Visible popups (not silent console) when there is genuinely nothing.
+            java.util.List<ConceptSuggestion> picks =
+                    new java.util.ArrayList<>(suggestionList.getSelectedValuesList());
+            if (picks.isEmpty()) {
+                for (int i = 0; i < suggestionModel.getSize() && picks.size() < 6; i++) {
+                    picks.add(suggestionModel.getElementAt(i));
+                }
+            }
             String genusIri = pinnedBaseURI;
-            String genusLabel = null;
+            String genusLabel = null; // let the dialog derive it from the genus IRI's local name
             java.util.List<com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef> quals =
                     new java.util.ArrayList<>();
             if (genusIri == null || genusIri.isBlank()) {
                 if (picks.isEmpty()) {
-                    appendConsole("[FAIL] Select the genus + qualifier concepts (Ctrl-click several).");
+                    JOptionPane.showMessageDialog(owner,
+                            "No concepts to compose with yet.\nSelect an element that has suggestions "
+                                    + "(or type a search), then Compose Concept.",
+                            "Compose Concept", JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
-                genusIri = picks.get(0).entry().iri();
+                genusIri = picks.get(0).entry().iri();          // top suggestion becomes the genus
                 genusLabel = picks.get(0).entry().label();
                 for (int i = 1; i < picks.size(); i++) {
                     quals.add(new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef(
@@ -1071,10 +1086,12 @@ public class SemanticAlignmentPlugin extends Plugin {
                 }
             }
             if (quals.isEmpty()) {
-                appendConsole("[FAIL] Select at least one qualifier concept to compose with the base.");
+                JOptionPane.showMessageDialog(owner,
+                        "Pick at least one concept in the suggestions list to combine with the base "
+                                + "concept (Ctrl-click for several), then Compose Concept.",
+                        "Compose Concept", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            java.awt.Frame owner = com.nomagic.magicdraw.core.Application.getInstance().getMainFrame();
             DiagnosticLog.event("COMPOSE", "open dialog for " + selectedName + " genus="
                     + genusIri + " qualifiers=" + quals.size());
             new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog(
