@@ -21,12 +21,33 @@ public final class SuggestionRanker {
 
     private static final double MAX_RAW = 1.0 + 0.35 + 0.25 + 0.2;
 
+    // Scope-aware scoring weights (UC-2.8). Kept small relative to text/tier so a strong text
+    // match still leads, but large enough to reorder same-base siblings and to let a construct
+    // kind override a wrong-category exact match. Context is capped so a pile of weak owner/
+    // sibling terms cannot swamp the text signal.
+    private static final double CONTEXT_UNIT = 0.5;
+    private static final double CONTEXT_CAP = 0.7;
+    private static final double CATEGORY_BONUS = 0.35;
+    private static final double CATEGORY_PENALTY = 0.30;
+    private static final double LAYER_BONUS = 0.25;
+
     private final ConceptIndex index;
     private final StereotypeRouter router;
+    private final ConceptCategoryIndex categories;
+    private final LayerRouter layerRouter;
 
     public SuggestionRanker(ConceptIndex index, StereotypeRouter router) {
+        this(index, router, ConceptCategoryIndex.empty(), LayerRouter.fromProperties(new java.util.Properties()));
+    }
+
+    /** Scope-aware constructor: adds BFO construct-kind classification and UAF-layer routing. */
+    public SuggestionRanker(ConceptIndex index, StereotypeRouter router,
+                            ConceptCategoryIndex categories, LayerRouter layerRouter) {
         this.index = index;
         this.router = router;
+        this.categories = categories == null ? ConceptCategoryIndex.empty() : categories;
+        this.layerRouter = layerRouter == null
+                ? LayerRouter.fromProperties(new java.util.Properties()) : layerRouter;
     }
 
     /** Zero-keystroke suggestions for a freshly selected element. */
@@ -56,9 +77,32 @@ public final class SuggestionRanker {
      */
     public List<ConceptSuggestion> searchVariants(String seedText, Collection<String> stereotypes,
                                                   String narrowFromLabel, int limit) {
+        return searchVariants(seedText, stereotypes, narrowFromLabel, limit, ScopeContext.EMPTY);
+    }
+
+    /**
+     * Scope-aware variant search (UC-2.8). Everything the 4-arg overload does, PLUS three
+     * context signals layered onto each candidate's raw score:
+     * <ul>
+     *   <li><b>context terms</b> (owner / type / sibling) boost concepts whose label, alt-labels
+     *       or comment overlap them - a part {@code engine} owned by an SUV surfaces the vehicle
+     *       engine, not a pump engine;</li>
+     *   <li><b>construct kind</b> biases toward the matching BFO category (BEHAVIOR->occurrent,
+     *       STRUCTURE->object, VALUE->quality) and, crucially, REVOKES the exact-match-first
+     *       privilege when an exact name match is the WRONG category (so an {@code Activity}
+     *       named like an object still prefers the process);</li>
+     *   <li><b>UAF layer</b> boosts concepts in the layer's preferred namespaces
+     *       (Resource->cco/sumo/qudt, Operational->uaf, Strategic->bmm).</li>
+     * </ul>
+     * With {@link ScopeContext#EMPTY} and an empty category/layer index it reproduces the
+     * non-scoped ranking exactly.
+     */
+    public List<ConceptSuggestion> searchVariants(String seedText, Collection<String> stereotypes,
+                                                  String narrowFromLabel, int limit, ScopeContext scope) {
         if (index == null || index.isEmpty()) {
             return List.of();
         }
+        ScopeContext sc = scope == null ? ScopeContext.EMPTY : scope;
         List<QueryVariants.Variant> variants = new ArrayList<>(QueryVariants.generate(seedText, stereotypes));
         if (narrowFromLabel != null && !narrowFromLabel.isBlank()) {
             variants.add(0, new QueryVariants.Variant(narrowFromLabel.trim(), 0.90, "NARROW_FROM"));
@@ -70,11 +114,17 @@ public final class SuggestionRanker {
         Set<String> nameTokens = ConceptIndex.tokenize(seedText);
         Set<String> boosted = router == null ? Set.of() : router.boostedPrefixes(stereotypes);
         Set<String> pinned = router == null ? Set.of() : router.pinnedCuries(stereotypes);
+        Set<String> layerPrefixes = layerRouter.prefixesFor(sc.layerKey());
+        ConceptCategoryIndex.Category preferred = ConceptCategoryIndex.preferredFor(sc.kindKey());
 
-        // Candidate gathering: union of tokens across every variant, plus routed/pinned.
+        // Candidate gathering: union of tokens across every variant, plus routed/pinned, plus
+        // the context terms' tokens (so a purely context-driven disambiguator is still scored).
         Set<String> allTokens = new HashSet<>();
         for (QueryVariants.Variant v : variants) {
             allTokens.addAll(ConceptIndex.tokenize(v.text()));
+        }
+        for (ScopeContext.ContextTerm t : sc.contextTerms()) {
+            allTokens.addAll(ConceptIndex.tokenize(t.text()));
         }
         Set<ConceptEntry> candidates = new HashSet<>(index.candidates(allTokens));
         if (!boosted.isEmpty() || !pinned.isEmpty()) {
@@ -106,16 +156,31 @@ public final class SuggestionRanker {
             double pin = pinned.contains(entry.curie().toLowerCase(Locale.ROOT)) ? 0.35 : 0.0;
             double routed = boosted.contains(entry.prefix().toLowerCase(Locale.ROOT)) ? 0.25 : 0.0;
             double overlap = 0.2 * jaccard(nameTokens, entry.tokens());
-            double raw = bestWeighted + pin + routed + overlap;
+
+            // --- scope-aware terms -----------------------------------------------------------
+            double contextBoost = contextBoost(entry, sc);
+            ConceptCategoryIndex.Category cat = categories.categoryOf(entry.iri());
+            boolean categoryConflict = preferred != null
+                    && cat != ConceptCategoryIndex.Category.UNKNOWN && cat != preferred;
+            double categoryBias = 0.0;
+            if (preferred != null && cat != ConceptCategoryIndex.Category.UNKNOWN) {
+                categoryBias = (cat == preferred) ? CATEGORY_BONUS : -CATEGORY_PENALTY;
+            }
+            double layerBoost = layerPrefixes.contains(entry.prefix().toLowerCase(Locale.ROOT))
+                    ? LAYER_BONUS : 0.0;
+
+            double raw = bestWeighted + pin + routed + overlap + contextBoost + categoryBias + layerBoost;
             if (raw > 0.05) {
                 // A genuine EXACT primary-label match on a FULL-phrase-level variant
                 // (FULL / FULL+stereotype / narrowFrom, weight >= 0.90) ranks in its own
                 // class ABOVE any pin/route-boosted partial in another ontology, so the
                 // Coast-Guard-exact match always wins (owner requirement; the previous
                 // same-ontology coherence bonus could wrongly demote it - removed).
-                boolean exact = bestRaw >= 0.999 && bestTier >= 0.90;
+                // BUT: a construct-kind conflict revokes the privilege, so an Activity named
+                // like an object does not get pinned to the object (UC-2.8).
+                boolean exact = bestRaw >= 0.999 && bestTier >= 0.90 && !categoryConflict;
                 scored.add(new Scored(new ConceptSuggestion(entry, Math.min(1.0, raw / MAX_RAW),
-                        bestVariant, contextOf(entry), null), exact));
+                        bestVariant, scopedContextOf(entry, sc, cat, contextBoost, layerBoost), null), exact));
             }
         }
         scored.sort((a, b) -> {
@@ -146,6 +211,83 @@ public final class SuggestionRanker {
             return "aka " + String.join(", ", entry.altLabels());
         }
         return entry.ontologyId() == null ? "" : ("from " + entry.ontologyId());
+    }
+
+    /**
+     * Disambiguation boost: how strongly the surrounding-context terms (owner / type / siblings)
+     * overlap this concept's own words (label + alt-labels + comment). Each term contributes
+     * {@code role.weight x CONTEXT_UNIT x (matchedTokens / termTokens)}; the total is capped so a
+     * long list of weak sibling terms cannot dominate the text signal. Empty context -> 0.
+     */
+    private static double contextBoost(ConceptEntry entry, ScopeContext scope) {
+        if (scope.contextTerms().isEmpty()) {
+            return 0.0;
+        }
+        Set<String> concept = conceptWords(entry);
+        if (concept.isEmpty()) {
+            return 0.0;
+        }
+        double total = 0.0;
+        for (ScopeContext.ContextTerm term : scope.contextTerms()) {
+            Set<String> termTokens = ConceptIndex.tokenize(term.text());
+            if (termTokens.isEmpty()) {
+                continue;
+            }
+            int matched = 0;
+            for (String t : termTokens) {
+                if (concept.contains(t)) {
+                    matched++;
+                }
+            }
+            if (matched > 0) {
+                total += term.weight() * CONTEXT_UNIT * ((double) matched / termTokens.size());
+            }
+        }
+        return Math.min(CONTEXT_CAP, total);
+    }
+
+    /** Label + alt-label + comment tokens, used to test context-term overlap (bounded per call). */
+    private static Set<String> conceptWords(ConceptEntry entry) {
+        Set<String> words = new HashSet<>(entry.tokens());
+        if (entry.altLabels() != null) {
+            for (String alt : entry.altLabels()) {
+                words.addAll(ConceptIndex.tokenize(alt));
+            }
+        }
+        if (entry.comment() != null && !entry.comment().isBlank()) {
+            words.addAll(ConceptIndex.tokenize(entry.comment()));
+        }
+        return words;
+    }
+
+    /**
+     * Context snippet augmented with the scope rationale, so the user sees WHY a concept was
+     * boosted (e.g. "Â· fits context Â· behavior Â· resource-layer"). Falls back to the plain
+     * comment/alt-label snippet when no scope signal applied.
+     */
+    private static String scopedContextOf(ConceptEntry entry, ScopeContext scope,
+                                          ConceptCategoryIndex.Category cat, double contextBoost,
+                                          double layerBoost) {
+        String base = contextOf(entry);
+        if (scope.isEmpty()) {
+            return base;
+        }
+        List<String> tags = new ArrayList<>();
+        if (contextBoost > 0.0) {
+            tags.add("fits context");
+        }
+        ConceptCategoryIndex.Category preferred = ConceptCategoryIndex.preferredFor(scope.kindKey());
+        if (preferred != null && cat == preferred) {
+            tags.add(cat.name().toLowerCase(Locale.ROOT));
+        }
+        if (layerBoost > 0.0 && scope.layerKey() != null) {
+            tags.add(scope.layerKey().toLowerCase(Locale.ROOT) + "-layer");
+        }
+        if (tags.isEmpty()) {
+            return base;
+        }
+        String rationale = String.join(" Â· ", tags);
+        return base == null || base.isBlank() ? rationale : base + "  Â· " + rationale;
     }
 
     private List<ConceptSuggestion> rank(String query, String elementName,

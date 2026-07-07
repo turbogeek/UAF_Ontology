@@ -1,6 +1,7 @@
 package com.nomagic.magicdraw.plugins.semantic.tests;
 
 import com.nomagic.magicdraw.plugins.semantic.align.ConceptSuggestion;
+import com.nomagic.magicdraw.plugins.semantic.align.ScopeContext;
 import com.nomagic.magicdraw.plugins.semantic.align.UafConceptResolver;
 import com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient;
 import org.junit.Assume;
@@ -49,6 +50,53 @@ public class CatalogServiceClientTest {
         assertTrue("QUDT/CCO Force concept should surface",
                 hits.stream().anyMatch(s -> s.entry().iri() != null
                         && s.entry().iri().contains("qudt.org")));
+    }
+
+    @Test
+    public void testScopeAwareContextDisambiguatesEngine() {
+        CatalogServiceClient c = client();
+        // Same query word "engine", two different owner/type contexts -> different top sibling.
+        ScopeContext aircraft = new ScopeContext(null, ScopeContext.STRUCTURE,
+                List.of(new ScopeContext.ContextTerm("aircraft", ScopeContext.Role.OWNER),
+                        new ScopeContext.ContextTerm("jet", ScopeContext.Role.TYPE)));
+        List<ConceptSuggestion> air = c.suggest("engine", List.of(), null, 10, aircraft);
+        int jet = indexOfLabelContains(air, "jet engine");
+        int steam = indexOfLabelContains(air, "steam engine");
+        assertTrue("Jet Engine present in an aircraft context", jet >= 0);
+        assertTrue("Jet Engine outranks Steam Engine in an aircraft context",
+                steam < 0 || jet < steam);
+    }
+
+    @Test
+    public void testScopeAwareConstructKindPrefersProcess() {
+        CatalogServiceClient c = client();
+        ScopeContext behavior = new ScopeContext(null, ScopeContext.BEHAVIOR, List.of());
+        List<ConceptSuggestion> b = c.suggest("government", List.of(), null, 12, behavior);
+        int act = indexOfLabelContains(b, "act of government");
+        int gov = indexOfExactLabel(b, "government");
+        assertTrue("Act of Government present for a behavior", act >= 0);
+        assertTrue("Act of Government (process) outranks the exact object Government for a behavior",
+                gov < 0 || act < gov);
+    }
+
+    private static int indexOfLabelContains(List<ConceptSuggestion> hits, String needle) {
+        for (int i = 0; i < hits.size(); i++) {
+            String label = hits.get(i).entry().label();
+            if (label != null && label.toLowerCase().contains(needle)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static int indexOfExactLabel(List<ConceptSuggestion> hits, String label) {
+        for (int i = 0; i < hits.size(); i++) {
+            String l = hits.get(i).entry().label();
+            if (l != null && l.equalsIgnoreCase(label)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Test

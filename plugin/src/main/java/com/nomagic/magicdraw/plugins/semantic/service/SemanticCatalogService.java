@@ -3,7 +3,10 @@ package com.nomagic.magicdraw.plugins.semantic.service;
 import com.nomagic.magicdraw.plugins.semantic.SBVREngine;
 import com.nomagic.magicdraw.plugins.semantic.SHACLValidator;
 import com.nomagic.magicdraw.plugins.semantic.align.CatalogLoader;
+import com.nomagic.magicdraw.plugins.semantic.align.ConceptCategoryIndex;
 import com.nomagic.magicdraw.plugins.semantic.align.ConceptSuggestion;
+import com.nomagic.magicdraw.plugins.semantic.align.LayerRouter;
+import com.nomagic.magicdraw.plugins.semantic.align.ScopeContext;
 import com.nomagic.magicdraw.plugins.semantic.align.StereotypeRouter;
 import com.nomagic.magicdraw.plugins.semantic.align.SuggestionRanker;
 import com.nomagic.magicdraw.plugins.semantic.align.UafConceptResolver;
@@ -124,11 +127,20 @@ public final class SemanticCatalogService {
                 ? CatalogLoader.loadAll(catalogDir)
                 : CatalogLoader.loadMerged(pluginDir);
         catalogModel = catalog.model();
-        ranker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDir));
+        // Classify every concept by BFO upper category once, so /suggest can be construct-kind
+        // aware (behavior->occurrent, structure->object). Timed and logged - the four traversals
+        // are the heaviest part of load, so a regression here is visible.
+        long t0 = System.nanoTime();
+        ConceptCategoryIndex catIndex = ConceptCategoryIndex.build(catalog.model());
+        long catMs = (System.nanoTime() - t0) / 1_000_000L;
+        LayerRouter layers = LayerRouter.load(pluginDir);
+        ranker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDir), catIndex, layers);
         resolver = UafConceptResolver.fromModel(catalog.model());
         String summary = "{\"concepts\":" + catalog.index().size()
                 + ",\"tboxTriples\":" + catalog.model().size()
                 + ",\"uafConcepts\":" + resolver.size()
+                + ",\"bfoClassified\":" + catIndex.size()
+                + ",\"bfoClassifyMs\":" + catMs
                 + ",\"catalogDir\":\"" + json(String.valueOf(dir)) + "\"}";
         System.out.println("[semantic-catalog-service] catalog loaded: " + summary);
         return summary;
@@ -211,7 +223,8 @@ public final class SemanticCatalogService {
             List<String> stereotypes = strList(req, "stereotypes");
             String narrowFrom = str(req, "narrowFrom");
             int limit = req.hasKey("limit") ? (int) req.get("limit").getAsNumber().value().doubleValue() : 12;
-            List<ConceptSuggestion> hits = r.searchVariants(name, stereotypes, narrowFrom, limit);
+            ScopeContext scope = parseScope(req);
+            List<ConceptSuggestion> hits = r.searchVariants(name, stereotypes, narrowFrom, limit, scope);
             respond(ex, 200, suggestionsJson(hits, name));
         } catch (Exception e) {
             respond(ex, 400, err(e));
@@ -426,6 +439,45 @@ public final class SemanticCatalogService {
 
     private static String str(JsonObject o, String k) {
         return o != null && o.hasKey(k) && o.get(k).isString() ? o.get(k).getAsString().value() : null;
+    }
+
+    /**
+     * Parses the optional {@code context} object into a {@link ScopeContext}:
+     * {@code {"uafLayer":"RESOURCE","constructKind":"STRUCTURE","terms":[{"text":"SUV","role":"OWNER"},...]}}.
+     * Missing/blank -> {@link ScopeContext#EMPTY} (the ranker then behaves as the non-scoped path).
+     */
+    private static ScopeContext parseScope(JsonObject req) {
+        if (req == null || !req.hasKey("context") || !req.get("context").isObject()) {
+            return ScopeContext.EMPTY;
+        }
+        JsonObject c = req.get("context").getAsObject();
+        String layer = str(c, "uafLayer");
+        String kind = str(c, "constructKind");
+        List<ScopeContext.ContextTerm> terms = new ArrayList<>();
+        if (c.hasKey("terms") && c.get("terms").isArray()) {
+            for (JsonValue v : c.get("terms").getAsArray()) {
+                if (!v.isObject()) {
+                    continue;
+                }
+                JsonObject t = v.getAsObject();
+                String text = str(t, "text");
+                if (text == null || text.isBlank()) {
+                    continue;
+                }
+                ScopeContext.Role role = ScopeContext.Role.SIBLING;
+                String roleStr = str(t, "role");
+                if (roleStr != null) {
+                    try {
+                        role = ScopeContext.Role.valueOf(roleStr.trim().toUpperCase(java.util.Locale.ROOT));
+                    } catch (IllegalArgumentException ignored) {
+                        // unknown role -> default SIBLING weight
+                    }
+                }
+                terms.add(new ScopeContext.ContextTerm(text.trim(), role));
+            }
+        }
+        ScopeContext scope = new ScopeContext(layer, kind, terms);
+        return scope.isEmpty() ? ScopeContext.EMPTY : scope;
     }
 
     private static List<String> strList(JsonObject o, String k) {

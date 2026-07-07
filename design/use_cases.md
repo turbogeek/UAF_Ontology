@@ -156,6 +156,33 @@ to initial utility is **breadth of domains** to map models against.
   mutates the upstream source**. The extension is **validated across several use-case
   models** (multiple models exercising the new concept) and by the reasoner before it is
   ever proposed upstream. This is how the tool grows the ontology landscape responsibly.
+- **UC-2.8 Scope-aware context search.** The *same element name* must resolve differently
+  depending on **where it sits in the model** — the wide net is useless if a part named
+  `engine` returns a pump engine when it is bolted into an SUV. Three orthogonal signals
+  (owner requirement, 2026-07-07), all computed in the service and verifiable off-line:
+  1. **UAF layer -> abstraction.** The element's architecture layer shifts the search:
+     an **Operational** element leans logical (`uaf` operational), a **Resource** element
+     leans physical (`cco`/`sumo`/`qudt`), a **Strategic** element leans motivation (`bmm`).
+     Configurable in `layers.properties` (overridable in the deployed plugin dir).
+     *Verified:* `agent` as a **Resource** ranks `sumo:Agent`/`cco:Agent` above `prov-o:Agent`.
+  2. **Construct kind -> BFO category.** The element's metaclass category biases toward the
+     matching **BFO** upper category: a SysML **Activity/Action** (BEHAVIOR) prefers an
+     *occurrent* (a process / "Act of ..."); a **Block/Part** (STRUCTURE) prefers a
+     *continuant* (an object); a **ValueType** (VALUE) prefers a *quality*. The classifier
+     is the loaded ontology's own `rdfs:subClassOf*` grounding, not a keyword list. Crucially,
+     a construct-kind conflict **revokes the exact-name-match privilege**, so an *Activity*
+     named like an object is not pinned to the object. *Verified:* `government` as a BEHAVIOR
+     ranks "Act of Government" above the exact object "Government"; as a STRUCTURE, the reverse.
+  3. **Structural context -> disambiguation.** The surrounding structure (owner name/type, the
+     element's own type, sibling parts) becomes weighted context terms that boost concepts
+     whose label/alt-labels/comment overlap them. *Verified:* `engine` with owner `aircraft`
+     + type `jet` ranks **Jet Engine** (and the turbofan/turbojet subtree) above Steam Engine;
+     swap to `locomotive`/`steam` and **Steam Engine** leads. This is the V8-in-an-SUV case.
+
+  The plugin derives layer + construct kind from the selected element (pure
+  `ScopeContext.deriveConstructKind(metaclass)`, unit-testable without Cameo) and sends them,
+  with the context terms, to the service's `/suggest`. Empty context reproduces the prior
+  ranking exactly, so the feature is strictly additive.
 
 ### 3.1 Ontology landscape — creators & hosts to survey (breadth backlog)
 
@@ -206,5 +233,6 @@ annotations** so all downstream tooling reads correct, current data.
 | UC-2.3 capability/activity guard | `CapabilityGuard` (done) |
 | UC-2.5 offline/regulated + license notify | base-URL config + `OntologyLicenses` (done) |
 | UC-2.7 extend/correct ontology | overlay-ontology authoring + multi-model validation (backlog) |
+| UC-2.8 scope-aware context search | `ScopeContext` + `ConceptCategoryIndex` (BFO) + `LayerRouter` + scoped `SuggestionRanker`; service `/suggest` `context`; `CatalogServiceClient` (done, service-side; plugin element→context derivation = in progress) |
 | §3.1 landscape survey | breadth backlog (research) |
 | §4 ontology maintained from annotations | exporter projection anchored at root IRI/version (partly done; root IRI = in progress) |

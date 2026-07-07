@@ -2,6 +2,7 @@ package com.nomagic.magicdraw.plugins.semantic.rest;
 
 import com.nomagic.magicdraw.plugins.semantic.align.ConceptEntry;
 import com.nomagic.magicdraw.plugins.semantic.align.ConceptSuggestion;
+import com.nomagic.magicdraw.plugins.semantic.align.ScopeContext;
 import com.nomagic.magicdraw.plugins.semantic.align.UafConceptResolver;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
@@ -51,17 +52,56 @@ public final class CatalogServiceClient {
         return body != null && body.contains("\"ready\":true");
     }
 
-    /** Element-driven suggestions (scope-aware, from the service catalog). */
+    /** Element-driven suggestions (from the service catalog). */
     public List<ConceptSuggestion> suggest(String name, List<String> stereotypes,
             String narrowFrom, int limit) {
+        return suggest(name, stereotypes, narrowFrom, limit, ScopeContext.EMPTY);
+    }
+
+    /**
+     * Scope-aware element-driven suggestions (UC-2.3): serializes the {@link ScopeContext}
+     * (UAF layer, construct kind, owner/type/sibling terms) into the request so the service can
+     * disambiguate by surrounding structure. {@link ScopeContext#EMPTY} sends no context object.
+     */
+    public List<ConceptSuggestion> suggest(String name, List<String> stereotypes,
+            String narrowFrom, int limit, ScopeContext scope) {
         StringBuilder req = new StringBuilder("{\"name\":").append(q(name))
                 .append(",\"stereotypes\":[");
         for (int i = 0; stereotypes != null && i < stereotypes.size(); i++) {
             req.append(i == 0 ? "" : ",").append(q(stereotypes.get(i)));
         }
         req.append("],\"narrowFrom\":").append(narrowFrom == null ? "null" : q(narrowFrom))
-                .append(",\"limit\":").append(limit).append('}');
+                .append(",\"limit\":").append(limit);
+        if (scope != null && !scope.isEmpty()) {
+            req.append(",\"context\":").append(scopeJson(scope));
+        }
+        req.append('}');
         return suggestionsFrom(post("/suggest", req.toString(), 15));
+    }
+
+    /** Serializes a ScopeContext to the {@code context} object the service /suggest expects. */
+    private static String scopeJson(ScopeContext scope) {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        if (scope.layerKey() != null) {
+            sb.append("\"uafLayer\":").append(q(scope.layerKey()));
+            first = false;
+        }
+        if (scope.kindKey() != null) {
+            sb.append(first ? "" : ",").append("\"constructKind\":").append(q(scope.kindKey()));
+            first = false;
+        }
+        if (!scope.contextTerms().isEmpty()) {
+            sb.append(first ? "" : ",").append("\"terms\":[");
+            List<ScopeContext.ContextTerm> terms = scope.contextTerms();
+            for (int i = 0; i < terms.size(); i++) {
+                ScopeContext.ContextTerm t = terms.get(i);
+                sb.append(i == 0 ? "" : ",").append("{\"text\":").append(q(t.text()))
+                        .append(",\"role\":").append(q(t.role().name())).append('}');
+            }
+            sb.append(']');
+        }
+        return sb.append('}').toString();
     }
 
     /** Typed local search, or online (OLS/TIB/OntoPortal) when online=true. */
