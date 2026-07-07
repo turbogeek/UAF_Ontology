@@ -5,6 +5,8 @@
 has function
 performs
 targets
+kills
+eliminates
 detects
 is part of
 has part

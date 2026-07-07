@@ -141,7 +141,8 @@ public final class ComposeConceptDialog extends JDialog {
         List<CompoundConcept.Clause> diff = new ArrayList<>();
         for (int i = 0; i < qualifiers.size(); i++) {
             String rel = String.valueOf(relationBoxes.get(i).getEditor().getItem()).trim();
-            diff.add(new CompoundConcept.Clause(rel, qualifiers.get(i).iri()));
+            ConceptRef q = qualifiers.get(i);
+            diff.add(new CompoundConcept.Clause(rel, q.iri(), q.label()));
         }
         String label = nameField.getText() == null || nameField.getText().isBlank()
                 ? "Concept" : nameField.getText().trim();

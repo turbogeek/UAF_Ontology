@@ -23,8 +23,16 @@ public final class CompoundConcept {
     /** " | " separates a differentia's relation phrase from its concept IRI in a stored value. */
     public static final String SEP = " | ";
 
-    /** A differentia: a relation phrase applied to a qualifier concept. Blank relation = a type. */
-    public record Clause(String relation, String conceptIri) {
+    /**
+     * A differentia: a relation phrase applied to a qualifier concept, plus an optional display
+     * label so a concept whose IRI is opaque (e.g. an OBO id like {@code IDOMAL_0000746}) still
+     * reads as its name ("Mosquito") in SBVR. Blank relation = a plain type.
+     */
+    public record Clause(String relation, String conceptIri, String label) {
+        /** Convenience: a clause without a stored label (SBVR falls back to the IRI local name). */
+        public Clause(String relation, String conceptIri) {
+            this(relation, conceptIri, null);
+        }
     }
 
     private final String label;          // the new concept's name (usually the element name)
@@ -53,24 +61,39 @@ public final class CompoundConcept {
         return new CompoundConcept(label, genus, diff);
     }
 
-    /** Decodes one stored value: "relation | iri" -> (relation, iri); bare "iri" -> (null, iri). */
+    /**
+     * Decodes one stored value into a clause: {@code "relation | iri | label"} (3 parts),
+     * {@code "relation | iri"} (2), or a bare {@code "iri"} (1). IRIs never contain " | ", so the
+     * split is unambiguous.
+     */
     public static Clause decode(String value) {
         if (value == null) {
-            return new Clause(null, null);
+            return new Clause(null, null, null);
         }
-        int sep = value.indexOf(SEP);
-        if (sep < 0) {
-            return new Clause(null, value.trim());
+        String[] parts = value.split(java.util.regex.Pattern.quote(SEP), 3);
+        if (parts.length == 1) {
+            return new Clause(null, parts[0].trim(), null);
         }
-        return new Clause(value.substring(0, sep).trim(), value.substring(sep + SEP.length()).trim());
+        if (parts.length == 2) {
+            return new Clause(parts[0].trim(), parts[1].trim(), null);
+        }
+        return new Clause(parts[0].trim(), parts[1].trim(), parts[2].trim());
     }
 
-    /** Encodes a differentia clause into a stored value ("relation | iri", or bare iri if no rel). */
-    public static String encode(String relation, String conceptIri) {
-        if (relation == null || relation.isBlank()) {
+    /** Encodes a differentia clause into a stored value (drops empty trailing fields). */
+    public static String encode(String relation, String conceptIri, String label) {
+        boolean hasRel = relation != null && !relation.isBlank();
+        boolean hasLabel = label != null && !label.isBlank();
+        if (!hasRel && !hasLabel) {
             return conceptIri;
         }
-        return relation.trim() + SEP + conceptIri;
+        String rel = hasRel ? relation.trim() : "";
+        return hasLabel ? rel + SEP + conceptIri + SEP + label.trim() : rel + SEP + conceptIri;
+    }
+
+    /** Encodes a differentia clause without a label ("relation | iri", or bare iri if no rel). */
+    public static String encode(String relation, String conceptIri) {
+        return encode(relation, conceptIri, null);
     }
 
     /** The stored-list form: genus first, then each differentia encoded. */
@@ -80,7 +103,7 @@ public final class CompoundConcept {
             out.add(genusIri);
         }
         for (Clause c : differentia) {
-            out.add(encode(c.relation(), c.conceptIri()));
+            out.add(encode(c.relation(), c.conceptIri(), c.label()));
         }
         return out;
     }
@@ -95,11 +118,13 @@ public final class CompoundConcept {
         return false;
     }
 
-    /** Renders the SBVR Structured English sentence via the engine. */
+    /** Renders the SBVR Structured English sentence via the engine (uses labels when present). */
     public String toSbvr(SBVREngine engine) {
         List<String[]> clauses = new ArrayList<>();
         for (Clause c : differentia) {
-            clauses.add(new String[] {c.relation(), c.conceptIri()});
+            // Prefer the stored display label so an opaque IRI still reads as its name.
+            String display = c.label() != null && !c.label().isBlank() ? c.label() : c.conceptIri();
+            clauses.add(new String[] {c.relation(), display});
         }
         return engine.generateCompoundSBVR(label, genusIri, clauses);
     }

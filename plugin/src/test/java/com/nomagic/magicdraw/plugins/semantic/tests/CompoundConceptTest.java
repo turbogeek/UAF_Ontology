@@ -63,6 +63,22 @@ public class CompoundConceptTest {
     }
 
     @Test
+    public void testLabelMakesOpaqueIriReadInSbvr() {
+        // A real OBO concept (opaque IRI) with a display label must read as its NAME in SBVR.
+        List<String> stored = List.of(
+                "http://purl.obolibrary.org/obo/ENVO_Drone",
+                "kills | http://purl.obolibrary.org/obo/IDOMAL_0000746 | Mosquito");
+        CompoundConcept cc = CompoundConcept.parse("MosquitoKillingDrone", stored);
+        String s = cc.toSbvr(sbvr);
+        assertTrue(s, s.contains("that kills a Mosquito"));       // label used, not "IDOMAL 0000746"
+        assertFalse(s, s.contains("IDOMAL"));
+        assertEquals("round-trips with the label", stored, cc.toStoredList());
+        // The exporter still gets the real IRI from the clause.
+        assertEquals("http://purl.obolibrary.org/obo/IDOMAL_0000746",
+                CompoundConcept.decode(stored.get(1)).conceptIri());
+    }
+
+    @Test
     public void testDecodeEncode() {
         CompoundConcept.Clause c = CompoundConcept.decode("has function" + CompoundConcept.SEP + EX + "Suppression");
         assertEquals("has function", c.relation());
