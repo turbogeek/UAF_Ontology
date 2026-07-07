@@ -64,6 +64,67 @@ public class SBVREngine {
     }
 
     /**
+     * Composes a COMPOUND concept as one SBVR Structured English sentence: a genus ("is a kind
+     * of") plus differentia clauses, each a (relation phrase, qualifier concept) pair. This is
+     * what lets a modeler say WHAT an element is when no single ontology concept captures it -
+     * e.g. genus {@code Drone} + clauses {@code [(suppresses, Mosquito), (uses, Chemical Sprayer)]}
+     * reads: "A Mosquito Suppression Drone is a Drone that suppresses a Mosquito and uses a
+     * Chemical Sprayer." Owner request (2026-07-07): compound concepts that read correctly in SBVR.
+     *
+     * @param elementLabel the new concept's name (usually the element name)
+     * @param genusIriOrName the genus concept (IRI or name); the "is a kind of" base
+     * @param clauses ordered (relationPhrase, qualifierIriOrName) pairs; relationPhrase is a verb
+     *               phrase ("suppresses", "has function", "is part of")
+     * @return a single "A X is a Genus that r1 a Q1 and r2 a Q2." sentence
+     */
+    public String generateCompoundSBVR(String elementLabel, String genusIriOrName,
+                                       java.util.List<String[]> clauses) {
+        String subject = getLocalName(elementLabel);
+        String genus = getLocalName(genusIriOrName);
+        StringBuilder sb = new StringBuilder("Concept: ");
+        sb.append(article(subject)).append(' ').append(subject);
+        boolean genusStated = false;
+        // Always state the genus for a DEFINITION (it anchors the differentia) - suppress only
+        // when the name IS exactly the genus. Unlike a flat instance sentence we must not drop
+        // "is a Drone" just because the name ends in "Drone", or the differentia lose their verb.
+        if (genus != null && !genus.isBlank() && !subject.equalsIgnoreCase(genus)) {
+            sb.append(" is ").append(article(genus).toLowerCase(java.util.Locale.ROOT)).append(' ').append(genus);
+            genusStated = true;
+        }
+        boolean first = true;
+        if (clauses != null) {
+            for (String[] clause : clauses) {
+                if (clause == null || clause.length < 2) {
+                    continue;
+                }
+                String rel = clause[0] == null ? "" : clause[0].trim();
+                String qualifier = getLocalName(clause[1]);
+                if (qualifier.isBlank()) {
+                    continue;
+                }
+                // "that" introduces the first differentia; "and" chains the rest. When no genus
+                // was stated we still need a leading verb, so the first connector is bare.
+                String connector = first ? (genusStated ? " that " : " ") : " and ";
+                sb.append(connector);
+                // A verb is mandatory for readable SBVR; a blank relation means "is a <type>".
+                sb.append(rel.isEmpty() ? "is " : rel + " ");
+                sb.append(article(qualifier).toLowerCase(java.util.Locale.ROOT)).append(' ').append(qualifier);
+                first = false;
+            }
+        }
+        return sb.append('.').toString();
+    }
+
+    /** "A"/"An" for a display label, by leading vowel sound (simple heuristic). */
+    private String article(String name) {
+        if (name == null || name.isBlank()) {
+            return "A";
+        }
+        char c = Character.toLowerCase(name.charAt(0));
+        return ("aeiou".indexOf(c) >= 0) ? "An" : "A";
+    }
+
+    /**
      * Relation labels arrive as prose ("connected to") while concept local names arrive
      * camelCase-split ("Connected To"); spacing and case must not affect the comparison.
      */
