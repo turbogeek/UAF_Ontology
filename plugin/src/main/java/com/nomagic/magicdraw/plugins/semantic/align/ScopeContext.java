@@ -120,6 +120,59 @@ public record ScopeContext(String uafLayer, String constructKind, List<ContextTe
         return null;
     }
 
+    /**
+     * Pure UAF-layer derivation from the applied stereotype names and the owning-package names
+     * (no Cameo types referenced - unit-testable). The stereotype names win over the package
+     * names (a {@code ResourcePerformer} in an "Operational" package is a Resource element).
+     * Returns a {@link LayerRouter} key (RESOURCE / OPERATIONAL / …) or null when nothing matches.
+     */
+    public static String deriveLayer(List<String> stereotypeNames, List<String> ownerNames) {
+        String fromStereotype = scanLayer(stereotypeNames);
+        return fromStereotype != null ? fromStereotype : scanLayer(ownerNames);
+    }
+
+    private static String scanLayer(List<String> names) {
+        if (names == null) {
+            return null;
+        }
+        for (String n : names) {
+            if (n == null) {
+                continue;
+            }
+            String s = n.toLowerCase(Locale.ROOT);
+            // Order: most specific layer keywords first; "operational"/"service"/"resource" are
+            // the UAF grid rows, then the motivation/actual/security/project/parameter layers.
+            if (s.contains("operational")) {
+                return "OPERATIONAL";
+            }
+            if (s.contains("service")) {
+                return "SERVICE";
+            }
+            if (s.contains("resource")) {
+                return "RESOURCE";
+            }
+            if (s.contains("personnel")) {
+                return "PERSONNEL";
+            }
+            if (s.contains("security")) {
+                return "SECURITY";
+            }
+            if (s.contains("project")) {
+                return "PROJECT";
+            }
+            if (s.contains("parameter") || s.contains("measurement")) {
+                return "PARAMETERS";
+            }
+            if (s.contains("strategic") || s.contains("capability")) {
+                return "STRATEGIC";
+            }
+            if (s.contains("actual") || s.contains("organization") || s.contains("organisation")) {
+                return "PERSONNEL";
+            }
+        }
+        return null;
+    }
+
     private static boolean contains(String haystack, String... needles) {
         for (String n : needles) {
             if (haystack.contains(n)) {

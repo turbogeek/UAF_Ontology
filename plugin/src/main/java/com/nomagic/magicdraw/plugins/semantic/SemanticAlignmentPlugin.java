@@ -75,6 +75,13 @@ public class SemanticAlignmentPlugin extends Plugin {
     private static volatile SuggestionRanker suggestionRanker;
     // Automatic UAF-stereotype -> ontology-concept resolver (derived from uaf_ontology).
     private static volatile UafConceptResolver uafResolver;
+    // Thin client to the out-of-process Semantic Catalog Service (scope-aware suggestions live
+    // there, keeping the BFO/category heap OUT of Cameo). null until connected/started; when
+    // ready, element-driven suggestions route through it and the in-JVM ranker is the fallback.
+    private static volatile com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient catalogClient;
+    // The local child-JVM service we started (null in server-URL mode or when reusing a running
+    // one); stopped on plugin close so we never leave an orphan JVM.
+    private static volatile com.nomagic.magicdraw.plugins.semantic.rest.ServiceProcess serviceProcess;
     // OntoPortal keys are read from ~/.semantic_alignment_plugin/ontoportal.properties
     // (portal.apikey=…) so end users never edit Cameo JVM options; a -Dsemantic.plugin.
     // ontoportal.<portal>.<prop> system property overrides the file. See design/ontoportal_setup.md.
@@ -187,6 +194,15 @@ public class SemanticAlignmentPlugin extends Plugin {
         catalogLoader.setDaemon(true);
         catalogLoader.start();
 
+        // Out-of-process Semantic Catalog Service (scope-aware suggestions): connect to a shared
+        // server (-Dsemantic.plugin.service.url), reuse one already running on the local port, or
+        // auto-start a local child JVM. Off the startup path (can take ~30s to load); until ready,
+        // suggestions use the in-JVM ranker. Never blocks or fails plugin init.
+        Thread serviceStarter = new Thread(SemanticAlignmentPlugin::startCatalogService,
+                "semantic-service-starter");
+        serviceStarter.setDaemon(true);
+        serviceStarter.start();
+
         // UX click budgets are measured, not aspirational (v3 plan section 5)
         UxMetrics.install();
 
@@ -250,6 +266,11 @@ public class SemanticAlignmentPlugin extends Plugin {
         if (restService != null) {
             restService.stop();
         }
+        // Stop only the child JVM WE started (never a shared server or a reused one).
+        com.nomagic.magicdraw.plugins.semantic.rest.ServiceProcess proc = serviceProcess;
+        if (proc != null) {
+            proc.stop();
+        }
         DiagnosticLog.shutdown();
         return true;
     }
@@ -272,6 +293,49 @@ public class SemanticAlignmentPlugin extends Plugin {
                 + ",\"tboxTriples\":" + catalog.model().size()
                 + ",\"userCatalog\":\"" + CatalogLoader.resolveUserCatalogDirectory()
                         .getAbsolutePath().replace("\\", "\\\\") + "\"}";
+    }
+
+    /**
+     * Acquires the out-of-process catalog service (scope-aware suggestions). Precedence:
+     * (1) a shared server via {@code -Dsemantic.plugin.service.url}; (2) a service already
+     * listening on the local port (reuse it - lets a service be pre-started for testing/dev);
+     * (3) auto-start a local child JVM from the deployed service artifacts. On success sets
+     * {@link #catalogClient}. Never throws - if none is reachable, suggestions stay in-JVM.
+     * Trace: design/service_architecture.md
+     */
+    static void startCatalogService() {
+        try {
+            String url = System.getProperty("semantic.plugin.service.url");
+            if (url != null && !url.isBlank()) {
+                com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient c =
+                        new com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient(url.trim());
+                catalogClient = c;
+                DiagnosticLog.event("SERVICE", "Catalog service (shared) configured at " + url
+                        + " ready=" + c.isReady());
+                return;
+            }
+            int port = Integer.getInteger("semantic.plugin.service.port", 8767);
+            com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient existing =
+                    new com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient(
+                            "http://127.0.0.1:" + port);
+            if (existing.isReady()) {
+                catalogClient = existing;
+                DiagnosticLog.event("SERVICE", "Reusing catalog service already running on port " + port);
+                return;
+            }
+            com.nomagic.magicdraw.plugins.semantic.rest.ServiceProcess proc =
+                    new com.nomagic.magicdraw.plugins.semantic.rest.ServiceProcess(pluginDirectory, port);
+            if (proc.start()) {
+                serviceProcess = proc;
+                catalogClient = new com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient(proc.url());
+                DiagnosticLog.event("SERVICE", "Auto-started local catalog service on " + proc.url());
+            } else {
+                DiagnosticLog.event("SERVICE",
+                        "No catalog service available - suggestions use the in-JVM ranker (non-scoped).");
+            }
+        } catch (Throwable t) {
+            DiagnosticLog.event("ERROR", "Catalog service startup failed (falling back to in-JVM): " + t);
+        }
     }
 
     /** ABox snapshot of the active project, taken on the EDT; null when none is open. */
@@ -453,6 +517,10 @@ public class SemanticAlignmentPlugin extends Plugin {
         private volatile String narrowFrom;
         // The pinned base concept IRI (from the UAF stereotype), always written at index 0.
         private volatile String pinnedBaseURI;
+        // Scope of the selected element (UAF layer + construct kind + owner/type/sibling terms),
+        // derived on selection and fed to the scope-aware service suggestions (UC-2.8).
+        private volatile com.nomagic.magicdraw.plugins.semantic.align.ScopeContext selectedScope =
+                com.nomagic.magicdraw.plugins.semantic.align.ScopeContext.EMPTY;
         private final Timer searchDebounce = new Timer(150, e -> refreshSuggestions());
 
         SemanticBrowserPanel(Project project) {
@@ -749,6 +817,13 @@ public class SemanticAlignmentPlugin extends Plugin {
                 // Pin the UAF-derived base concept: it is the intent of the stereotype, shown
                 // read-only, always written at index 0, never replaceable by a disjoint term.
                 pinnedBaseURI = auto == null ? null : auto.iri();
+                // Derive the modeling scope (layer / construct kind / owner-type-sibling terms)
+                // so the service can rank suggestions by WHERE this element sits (UC-2.8).
+                selectedScope = com.nomagic.magicdraw.plugins.semantic.scope
+                        .ScopeContextBuilder.build(element);
+                DiagnosticLog.event("SCOPE", "layer=" + selectedScope.layerKey()
+                        + " kind=" + selectedScope.kindKey()
+                        + " terms=" + selectedScope.contextTerms().size());
                 final String baseText = auto == null
                         ? "Base concept: (none - free alignment)"
                         : "Base concept (locked): " + auto.label()
@@ -1129,51 +1204,96 @@ public class SemanticAlignmentPlugin extends Plugin {
          * the EDT. Trace: v3 plan section 1
          */
         private void refreshSuggestions() {
+            // Read Swing state on the EDT, fetch OFF the EDT (the service call is blocking HTTP -
+            // a slow/hung service must never freeze the sidebar), render back on the EDT.
             SwingUtilities.invokeLater(() -> {
-                SuggestionRanker ranker = suggestionRanker;
-                suggestionModel.clear();
-                String query = searchField.getText();
-                boolean typed = query != null && !query.isBlank();
+                final SuggestionRanker ranker = suggestionRanker;
+                final String query = searchField.getText();
+                final boolean typed = query != null && !query.isBlank();
                 if (ranker == null) {
+                    suggestionModel.clear();
                     suggestStatus.setText("Ontology catalog not loaded yet.");
                     DiagnosticLog.event("SUGGEST", "catalog not loaded (ranker null)");
                     return;
                 }
-                List<ConceptSuggestion> top;
-                if (typed) {
-                    // Free search: decompose the TYPED phrase into variants (no stereotype term
-                    // forced in, so a bare "Weather" search stays a weather search).
-                    top = ranker.searchVariants(query.trim(), List.of(), null, 12);
-                } else {
-                    // Element-driven: decompose the element name + stereotype term(s), seeded
-                    // by the auto-resolved UAF concept - best-match-first across ontologies.
-                    top = ranker.searchVariants(selectedName, selectedStereotypes, narrowFrom, 12);
-                }
-                // Attach an SBVR sentence to each DISPLAYED suggestion (top-N only, cheap).
-                String subject = (selectedName == null || selectedName.isBlank()) ? null : selectedName;
-                for (ConceptSuggestion s : top) {
-                    String sbvr = SBVR_ENGINE.generatePlainSBVR(
-                            subject == null ? s.entry().label() : subject, s.entry().iri(), null, null);
-                    suggestionModel.addElement(s.withSbvr(sbvr));
-                }
-                // Always give visible feedback, especially on zero matches (owner report:
-                // typing "Weather" produced no visible change when nothing matched).
-                if (top.isEmpty()) {
-                    suggestStatus.setText(typed
-                            ? "No matching concepts for \"" + query.trim() + "\"."
-                            : (subject == null ? "Select an element, or type to search."
-                                    : "No suggestions for \"" + subject + "\"."));
-                } else {
-                    suggestStatus.setText(top.size()
-                            + " suggestion(s) — Ctrl-click several, Enter/double-click to apply.");
-                }
-                DiagnosticLog.event("SUGGEST", (subject == null ? "-" : subject)
-                        + " | query=" + (typed ? query.trim() : "-")
-                        + " | count=" + top.size()
-                        + " | top=" + (top.isEmpty() ? "-" : top.stream()
-                                .map(s -> s.entry().curie() + ":" + Math.round(s.score() * 100))
-                                .collect(Collectors.joining(", "))));
+                final String qName = selectedName;
+                final List<String> qStereo = selectedStereotypes;
+                final String qNarrow = narrowFrom;
+                final com.nomagic.magicdraw.plugins.semantic.align.ScopeContext scope = selectedScope;
+                Thread worker = new Thread(() -> {
+                    List<ConceptSuggestion> top;
+                    String source;
+                    com.nomagic.magicdraw.plugins.semantic.rest.CatalogServiceClient client = catalogClient;
+                    boolean viaService = client != null && client.isReady();
+                    try {
+                        if (typed) {
+                            // Free search stays a search of the typed phrase (no scope forced in).
+                            top = viaService ? client.search(query.trim(), null, 12, false)
+                                    : ranker.searchVariants(query.trim(), List.of(), null, 12);
+                            source = viaService ? "service" : "in-jvm";
+                        } else if (viaService) {
+                            // Element-driven + SCOPE-AWARE via the service (layer + BFO kind + terms).
+                            top = client.suggest(qName, qStereo, qNarrow, 12, scope);
+                            source = "service(scope)";
+                            if (top.isEmpty()) { // degrade rather than show nothing
+                                top = ranker.searchVariants(qName, qStereo, qNarrow, 12, scope);
+                                source = "in-jvm(fallback)";
+                            }
+                        } else {
+                            // In-JVM fallback: the 5-arg path still applies context-term boosting
+                            // (category/layer bias is a no-op without the service's BFO index).
+                            top = ranker.searchVariants(qName, qStereo, qNarrow, 12, scope);
+                            source = "in-jvm(scope-terms)";
+                        }
+                    } catch (Throwable t) {
+                        top = typed ? ranker.searchVariants(query.trim(), List.of(), null, 12)
+                                : ranker.searchVariants(qName, qStereo, qNarrow, 12, scope);
+                        source = "in-jvm(error)";
+                    }
+                    final List<ConceptSuggestion> result = top;
+                    final String src = source;
+                    SwingUtilities.invokeLater(() -> renderSuggestions(result, typed, query, qName, src, scope));
+                }, "semantic-suggest");
+                worker.setDaemon(true);
+                worker.start();
             });
+        }
+
+        /** Renders fetched suggestions into the list + status + journal (EDT only). */
+        private void renderSuggestions(List<ConceptSuggestion> top, boolean typed, String query,
+                String qName, String source,
+                com.nomagic.magicdraw.plugins.semantic.align.ScopeContext scope) {
+            suggestionModel.clear();
+            String subject = (qName == null || qName.isBlank()) ? null : qName;
+            for (ConceptSuggestion s : top) {
+                // Prefer the SBVR the service already produced; else compute it locally (cheap).
+                String sbvr = (s.sbvr() != null && !s.sbvr().isBlank()) ? s.sbvr()
+                        : SBVR_ENGINE.generatePlainSBVR(
+                                subject == null ? s.entry().label() : subject, s.entry().iri(), null, null);
+                suggestionModel.addElement(s.withSbvr(sbvr));
+            }
+            String scopeHint = scope == null || scope.isEmpty() ? ""
+                    : "  [scope: " + (scope.kindKey() == null ? "" : scope.kindKey().toLowerCase(java.util.Locale.ROOT))
+                            + (scope.layerKey() == null ? "" : "/" + scope.layerKey().toLowerCase(java.util.Locale.ROOT))
+                            + (scope.contextTerms().isEmpty() ? "" : "/+ctx") + "]";
+            if (top.isEmpty()) {
+                suggestStatus.setText(typed
+                        ? "No matching concepts for \"" + query.trim() + "\"."
+                        : (subject == null ? "Select an element, or type to search."
+                                : "No suggestions for \"" + subject + "\"."));
+            } else {
+                suggestStatus.setText(top.size() + " suggestion(s)" + scopeHint
+                        + " — Ctrl-click several, Enter/double-click to apply.");
+            }
+            DiagnosticLog.event("SUGGEST", (subject == null ? "-" : subject)
+                    + " | query=" + (typed ? query.trim() : "-")
+                    + " | via=" + source
+                    + " | scope=" + (scope == null ? "-" : scope.kindKey() + "/" + scope.layerKey()
+                            + "/terms=" + scope.contextTerms().size())
+                    + " | count=" + top.size()
+                    + " | top=" + (top.isEmpty() ? "-" : top.stream()
+                            .map(s -> s.entry().curie() + ":" + Math.round(s.score() * 100))
+                            .collect(Collectors.joining(", "))));
         }
 
         private void appendConsole(String message) {

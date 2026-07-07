@@ -52,6 +52,29 @@ public class ScopeContextTest {
     }
 
     @Test
+    public void testDeriveLayerFromStereotypeNames() {
+        assertEquals("RESOURCE", ScopeContext.deriveLayer(List.of("ResourcePerformer"), List.of()));
+        assertEquals("OPERATIONAL", ScopeContext.deriveLayer(List.of("OperationalActivity"), List.of()));
+        assertEquals("SERVICE", ScopeContext.deriveLayer(List.of("ServiceInterface"), List.of()));
+        assertEquals("STRATEGIC", ScopeContext.deriveLayer(List.of("Capability"), List.of()));
+        assertEquals("PERSONNEL", ScopeContext.deriveLayer(List.of("ActualOrganization"), List.of()));
+        assertNull(ScopeContext.deriveLayer(List.of("Foo", "Bar"), List.of()));
+    }
+
+    @Test
+    public void testDeriveLayerStereotypeBeatsOwnerPackage() {
+        // A ResourcePerformer sitting in an "Operational" package is still a Resource element.
+        assertEquals("RESOURCE",
+                ScopeContext.deriveLayer(List.of("ResourcePerformer"), List.of("Operational")));
+    }
+
+    @Test
+    public void testDeriveLayerFallsBackToOwnerPackage() {
+        assertEquals("SERVICE", ScopeContext.deriveLayer(List.of(), List.of("Services", "Root")));
+        assertNull(ScopeContext.deriveLayer(List.of(), List.of()));
+    }
+
+    @Test
     public void testEmptyContextIsEmptyAndTermRolesWeightOrdered() {
         assertTrue(ScopeContext.EMPTY.isEmpty());
         assertTrue(new ScopeContext(null, null, List.of()).isEmpty());
