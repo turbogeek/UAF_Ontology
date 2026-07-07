@@ -828,7 +828,15 @@ public class SemanticAlignmentPlugin extends Plugin {
                         ? "Base concept: (none - free alignment)"
                         : "Base concept (locked): " + auto.label()
                                 + (auto.foundationalLabel() != null ? "  /  " + auto.foundationalLabel() : "");
-                SwingUtilities.invokeLater(() -> baseConceptLabel.setText(baseText));
+                SwingUtilities.invokeLater(() -> {
+                    baseConceptLabel.setText(baseText);
+                    // A NEW element selection resets the manual search box, so the element's own
+                    // (scope-aware) suggestions show instead of lingering results for a previously
+                    // typed query. Only touch it when non-empty (avoids a redundant refresh).
+                    if (searchField != null && !searchField.getText().isEmpty()) {
+                        searchField.setText("");
+                    }
+                });
                 refreshSuggestions();
             } catch (Exception e) {
                 log.error("Selection handling failed", e);

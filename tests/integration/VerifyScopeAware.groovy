@@ -85,7 +85,25 @@ try {
     diag('created Class government (' + holder.gClass.getHumanType() + ') and Activity government ('
             + holder.gAct.getHumanType() + ') in ' + PKG_NAME)
 
+    // Clear any lingering search text (a prior test may have left the box dirty), so selection
+    // is ELEMENT-DRIVEN (scope-aware) rather than a stale typed search. The plugin also clears
+    // on selection now; this keeps the test deterministic in isolation.
+    def findByName = { String nm ->
+        def ref = new AtomicReference()
+        def walk
+        walk = { java.awt.Component c ->
+            if (ref.get() != null) { return }
+            if (nm == c.getName()) { ref.set(c); return }
+            if (c instanceof java.awt.Container) { c.getComponents().each { walk(it) } }
+        }
+        SwingUtilities.invokeAndWait { java.awt.Window.getWindows().each { w -> if (ref.get() == null) { walk(w) } } }
+        return ref.get()
+    }
+    def searchField = findByName('semantic.conceptField')
+    if (searchField != null) { SwingUtilities.invokeAndWait { searchField.setText('') } }
+
     def selectAndRead = { el, String label ->
+        if (searchField != null) { SwingUtilities.invokeAndWait { searchField.setText('') } }
         long mark = JOURNAL.exists() ? JOURNAL.length() : 0L
         SwingUtilities.invokeAndWait {
             def tree = app.getMainFrame().getBrowser().getContainmentTree()
