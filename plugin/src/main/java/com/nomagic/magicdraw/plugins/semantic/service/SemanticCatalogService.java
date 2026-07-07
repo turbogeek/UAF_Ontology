@@ -134,7 +134,8 @@ public final class SemanticCatalogService {
         ConceptCategoryIndex catIndex = ConceptCategoryIndex.build(catalog.model());
         long catMs = (System.nanoTime() - t0) / 1_000_000L;
         LayerRouter layers = LayerRouter.load(pluginDir);
-        ranker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDir), catIndex, layers);
+        ranker = new SuggestionRanker(catalog.index(), StereotypeRouter.load(pluginDir), catIndex, layers,
+                com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry.load(pluginDir));
         resolver = UafConceptResolver.fromModel(catalog.model());
         String summary = "{\"concepts\":" + catalog.index().size()
                 + ",\"tboxTriples\":" + catalog.model().size()

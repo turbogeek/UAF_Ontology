@@ -75,6 +75,8 @@ public class SemanticAlignmentPlugin extends Plugin {
     private static volatile SuggestionRanker suggestionRanker;
     // Automatic UAF-stereotype -> ontology-concept resolver (derived from uaf_ontology).
     private static volatile UafConceptResolver uafResolver;
+    // Human-readable ontology names/descriptions for the sidebar ("from cco" -> what CCO is).
+    private static volatile com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry ontologyRegistry;
     // Thin client to the out-of-process Semantic Catalog Service (scope-aware suggestions live
     // there, keeping the BFO/category heap OUT of Cameo). null until connected/started; when
     // ready, element-driven suggestions route through it and the in-JVM ranker is the fallback.
@@ -282,6 +284,21 @@ public class SemanticAlignmentPlugin extends Plugin {
      *
      * @return summary string for the REST response
      */
+    /** Ontology display metadata, loaded once (classpath default + optional plugin-dir override). */
+    static com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry ontologyRegistry() {
+        com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry r = ontologyRegistry;
+        if (r == null) {
+            synchronized (SemanticAlignmentPlugin.class) {
+                r = ontologyRegistry;
+                if (r == null) {
+                    r = com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry.load(pluginDirectory);
+                    ontologyRegistry = r;
+                }
+            }
+        }
+        return r;
+    }
+
     static String reloadCatalog() {
         CatalogLoader.LoadedCatalog catalog = CatalogLoader.loadMerged(pluginDirectory);
         catalogModel = catalog.model();
@@ -608,9 +625,11 @@ public class SemanticAlignmentPlugin extends Plugin {
                         html.append("<b>").append(htmlEscape(s.entry().label())).append("</b> &nbsp; ")
                                 .append(htmlEscape(s.entry().curie())).append(" &nbsp; ")
                                 .append(Math.round(s.score() * 100)).append('%');
-                        if (s.entry().ontologyId() != null && !s.entry().ontologyId().isBlank()) {
+                        com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry.Info onto =
+                                ontologyRegistry().forConcept(s.entry().prefix(), s.entry().ontologyId());
+                        if (onto.shortName() != null && !onto.shortName().isBlank()) {
                             html.append(" &nbsp;<span style='color:#64748b'>[")
-                                    .append(htmlEscape(s.entry().ontologyId())).append("]</span>");
+                                    .append(htmlEscape(onto.shortName())).append("]</span>");
                         }
                         if (!ctx.isEmpty()) {
                             html.append("<br><span style='color:#94a3b8'>").append(ctx).append("</span>");
@@ -620,11 +639,19 @@ public class SemanticAlignmentPlugin extends Plugin {
                         }
                         html.append("</div></html>");
                         setText(html.toString());
-                        // Width-capped, escaped tooltip so long ontology comments don't render
-                        // as one very wide popup (owner report).
-                        String tip = s.entry().comment() == null || s.entry().comment().isBlank()
+                        // Tooltip explains WHAT the source ontology is (owner: "what is cco?"),
+                        // then the concept's own comment/IRI. Width-capped + escaped.
+                        StringBuilder tip = new StringBuilder("<html><div style='width:340px'>");
+                        tip.append("<b>").append(htmlEscape(onto.fullName())).append("</b>");
+                        if (onto.description() != null && !onto.description().isBlank()) {
+                            tip.append("<br>").append(htmlEscape(onto.description()));
+                        }
+                        String detail = s.entry().comment() == null || s.entry().comment().isBlank()
                                 ? s.entry().iri() : s.entry().comment();
-                        setToolTipText("<html><div style='width:320px'>" + htmlEscape(tip) + "</div></html>");
+                        if (detail != null && !detail.isBlank()) {
+                            tip.append("<hr>").append(htmlEscape(detail));
+                        }
+                        setToolTipText(tip.append("</div></html>").toString());
                     }
                     return c;
                 }

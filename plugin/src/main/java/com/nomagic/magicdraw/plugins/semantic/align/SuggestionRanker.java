@@ -35,19 +35,29 @@ public final class SuggestionRanker {
     private final StereotypeRouter router;
     private final ConceptCategoryIndex categories;
     private final LayerRouter layerRouter;
+    private final OntologyRegistry ontologies;
 
     public SuggestionRanker(ConceptIndex index, StereotypeRouter router) {
-        this(index, router, ConceptCategoryIndex.empty(), LayerRouter.fromProperties(new java.util.Properties()));
+        this(index, router, ConceptCategoryIndex.empty(),
+                LayerRouter.fromProperties(new java.util.Properties()), OntologyRegistry.defaults());
     }
 
     /** Scope-aware constructor: adds BFO construct-kind classification and UAF-layer routing. */
     public SuggestionRanker(ConceptIndex index, StereotypeRouter router,
                             ConceptCategoryIndex categories, LayerRouter layerRouter) {
+        this(index, router, categories, layerRouter, OntologyRegistry.defaults());
+    }
+
+    /** Full constructor: also carries the ontology registry for human-readable source names. */
+    public SuggestionRanker(ConceptIndex index, StereotypeRouter router,
+                            ConceptCategoryIndex categories, LayerRouter layerRouter,
+                            OntologyRegistry ontologies) {
         this.index = index;
         this.router = router;
         this.categories = categories == null ? ConceptCategoryIndex.empty() : categories;
         this.layerRouter = layerRouter == null
                 ? LayerRouter.fromProperties(new java.util.Properties()) : layerRouter;
+        this.ontologies = ontologies == null ? OntologyRegistry.defaults() : ontologies;
     }
 
     /** Zero-keystroke suggestions for a freshly selected element. */
@@ -203,14 +213,15 @@ public final class SuggestionRanker {
     }
 
     /** A short context/annotation snippet for display: comment, else alt labels, else ontology. */
-    private static String contextOf(ConceptEntry entry) {
+    private String contextOf(ConceptEntry entry) {
         if (entry.comment() != null && !entry.comment().isBlank()) {
             return entry.comment().trim();
         }
         if (entry.altLabels() != null && !entry.altLabels().isEmpty()) {
             return "aka " + String.join(", ", entry.altLabels());
         }
-        return entry.ontologyId() == null ? "" : ("from " + entry.ontologyId());
+        // Friendly source name, never the bare file id: "from Common Core Ontologies (CCO)".
+        return "from " + ontologies.fullName(entry.prefix(), entry.ontologyId());
     }
 
     /**
@@ -265,9 +276,9 @@ public final class SuggestionRanker {
      * boosted (e.g. "Â· fits context Â· behavior Â· resource-layer"). Falls back to the plain
      * comment/alt-label snippet when no scope signal applied.
      */
-    private static String scopedContextOf(ConceptEntry entry, ScopeContext scope,
-                                          ConceptCategoryIndex.Category cat, double contextBoost,
-                                          double layerBoost) {
+    private String scopedContextOf(ConceptEntry entry, ScopeContext scope,
+                                   ConceptCategoryIndex.Category cat, double contextBoost,
+                                   double layerBoost) {
         String base = contextOf(entry);
         if (scope.isEmpty()) {
             return base;
