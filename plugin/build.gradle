@@ -215,7 +215,8 @@ tasks.register('fetchCatalogBundle') {
 tasks.register('deployPlugin', Sync) {
     description = "Deploys the plugin into ${cameoHome}/plugins/${pluginId} (restart Cameo afterwards)."
     group = 'distribution'
-    dependsOn tasks.named('jar'), tasks.named('generatePluginDescriptor'), tasks.named('fetchCatalogBundle')
+    dependsOn tasks.named('jar'), tasks.named('generatePluginDescriptor'), tasks.named('fetchCatalogBundle'),
+            tasks.named('serviceJar')
     doFirst {
         // A running Cameo holds the deployed jars open; a Sync against locked files dies
         // halfway and leaves a corrupt plugin folder. Fail fast with a clear instruction.
@@ -252,6 +253,10 @@ tasks.register('deployPlugin', Sync) {
     }
     // Permissive breadth bundle fetched at build time (CCO/BFO/QUDT/PROV/ODRL/DPV).
     from(catalogBundleDir) { into 'catalog' }
+    // Out-of-process Semantic Catalog Service: the plugin auto-starts this as a local child
+    // JVM (or connects to a shared server) so the ontology heap never lives in Cameo.
+    from(tasks.named('serviceJar'))
+    from(serviceDir.map { it.dir('lib') }) { into 'service-lib' }
     // tbox/ is runtime-writable (integration tests drop consistency axioms there)
     preserve { include 'tbox/**' }
 }
