@@ -12,6 +12,7 @@ import com.nomagic.magicdraw.plugins.semantic.align.UafConceptResolver;
 import com.nomagic.magicdraw.plugins.semantic.align.terms.AlignmentCandidate;
 import com.nomagic.magicdraw.plugins.semantic.align.terms.CapabilityGuard;
 import com.nomagic.magicdraw.plugins.semantic.align.terms.Ols4TermSource;
+import com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource;
 import com.nomagic.magicdraw.plugins.semantic.commands.TransactionWrapper;
 import com.nomagic.magicdraw.plugins.semantic.metadata.StereotypeManager;
 import com.nomagic.magicdraw.plugins.semantic.rest.SemanticRestService;
@@ -81,10 +82,14 @@ public class SemanticAlignmentPlugin extends Plugin {
     // keyless, remote-reference (license-clean). Override the whole list with
     // -Dsemantic.plugin.ols.endpoints (comma-separated base URLs); each also honors
     // -Dsemantic.plugin.ols4.baseurl for a single air-gapped instance. Stateless + thread-safe.
-    private static final java.util.List<Ols4TermSource> ONLINE_SOURCES = buildOnlineSources();
+    private static final java.util.List<com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource>
+            ONLINE_SOURCES = buildOnlineSources();
 
-    private static java.util.List<Ols4TermSource> buildOnlineSources() {
-        java.util.List<Ols4TermSource> sources = new java.util.ArrayList<>();
+    private static java.util.List<com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource>
+            buildOnlineSources() {
+        java.util.List<com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource> sources =
+                new java.util.ArrayList<>();
+        // OLS-family (keyless): EBI OLS4 + TIB engineering terminology.
         String cfg = System.getProperty("semantic.plugin.ols.endpoints");
         if (cfg != null && !cfg.isBlank()) {
             for (String base : cfg.split(",")) {
@@ -96,7 +101,60 @@ public class SemanticAlignmentPlugin extends Plugin {
             sources.add(new Ols4TermSource()); // EBI OLS4 (its own default / -Dsemantic.plugin.ols4.baseurl)
             sources.add(new Ols4TermSource("https://api.terminology.tib.eu/api")); // TIB (engineering)
         }
+        // OntoPortal family (one adapter, N portals): each enabled ONLY when its API key is set
+        // via -Dsemantic.plugin.ontoportal.<portal>.apikey (see design/ontology_sources.md /
+        // the end-user key instructions). Covers medical-device (BioPortal), manufacturing/SE
+        // (IndustryPortal), materials (MatPortal).
+        addOntoPortal(sources, "bioportal", "https://data.bioontology.org");
+        addOntoPortal(sources, "industryportal", "https://industryportal.enit.fr");
+        addOntoPortal(sources, "matportal", "https://matportal.org");
         return sources;
+    }
+
+    // OntoPortal keys are read from ~/.semantic_alignment_plugin/ontoportal.properties
+    // (portal.apikey=…) so end users never edit Cameo JVM options; a -Dsemantic.plugin.
+    // ontoportal.<portal>.<prop> system property overrides the file. See design/ontoportal_setup.md.
+    private static final java.util.Properties ONTOPORTAL_CONFIG = loadOntoPortalConfig();
+
+    private static java.util.Properties loadOntoPortalConfig() {
+        java.util.Properties props = new java.util.Properties();
+        try {
+            java.io.File f = DiagnosticLog.getLogDirectory().resolve("ontoportal.properties").toFile();
+            if (f.isFile()) {
+                try (java.io.InputStream in = new java.io.FileInputStream(f)) {
+                    props.load(in);
+                }
+            }
+        } catch (Throwable ignored) {
+            // no config file is the normal (portals disabled) case
+        }
+        return props;
+    }
+
+    private static String ontoPortalProp(String portal, String suffix, String fallback) {
+        String sys = System.getProperty("semantic.plugin.ontoportal." + portal + "." + suffix);
+        if (sys != null && !sys.isBlank()) {
+            return sys;
+        }
+        String fromFile = ONTOPORTAL_CONFIG.getProperty(portal + "." + suffix);
+        return (fromFile != null && !fromFile.isBlank()) ? fromFile : fallback;
+    }
+
+    private static void addOntoPortal(
+            java.util.List<com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource> sources,
+            String portal, String defaultUrl) {
+        String key = ontoPortalProp(portal, "apikey", null);
+        if (key == null || key.isBlank()) {
+            return; // portal not enabled - no key configured
+        }
+        String url = ontoPortalProp(portal, "url", defaultUrl);
+        if (url == null || url.isBlank()) {
+            return;
+        }
+        String onts = ontoPortalProp(portal, "ontologies", null);
+        sources.add(new com.nomagic.magicdraw.plugins.semantic.align.terms.OntoPortalTermSource(
+                portal, url, key, onts));
+        log.info("OntoPortal term source enabled: " + portal + " @ " + url);
     }
 
     // Panel per open project so diagram-click routing reaches the right sidebar.
@@ -932,7 +990,7 @@ public class SemanticAlignmentPlugin extends Plugin {
                 // Merge across sources, de-dup by IRI (first source wins), so EBI + TIB overlap
                 // collapses to one row per concept.
                 java.util.LinkedHashMap<String, AlignmentCandidate> merged = new java.util.LinkedHashMap<>();
-                for (Ols4TermSource src : ONLINE_SOURCES) {
+                for (TermSource src : ONLINE_SOURCES) {
                     try {
                         for (AlignmentCandidate c : src.search(query, ontologyFilter, 8)) {
                             if (c.iri() != null && !c.iri().isBlank()) {
@@ -1003,7 +1061,7 @@ public class SemanticAlignmentPlugin extends Plugin {
                 for (String iri : iris) {
                     try {
                         java.util.Optional<AlignmentCandidate> opt = java.util.Optional.empty();
-                        for (Ols4TermSource src : ONLINE_SOURCES) {
+                        for (TermSource src : ONLINE_SOURCES) {
                             opt = src.lookup(iri);
                             if (opt.isPresent()) {
                                 break;
