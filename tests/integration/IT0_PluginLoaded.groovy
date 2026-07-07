@@ -11,7 +11,7 @@ import com.nomagic.magicdraw.plugins.PluginUtils
 
 import java.text.SimpleDateFormat
 
-final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
+final String LOG_DIR = System.getProperty('semantic.it.logdir', new File(System.getProperty('user.home'), '.semantic_alignment_plugin/it-logs').getAbsolutePath())
 final File LOG = new File(LOG_DIR, 'IT0_PluginLoaded.log')
 LOG.getParentFile().mkdirs()
 try { LOG.bytes = new byte[0] } catch (Throwable ignored) {}

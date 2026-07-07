@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities
 import java.text.SimpleDateFormat
 import java.util.concurrent.atomic.AtomicReference
 
-final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
+final String LOG_DIR = System.getProperty('semantic.it.logdir', new File(System.getProperty('user.home'), '.semantic_alignment_plugin/it-logs').getAbsolutePath())
 final String PKG_NAME = 'ScopeAwareIT'
 final String GOV = 'http://www.commoncoreontologies.org/ont00001335' // Government (object)
 final String ACT = 'http://www.commoncoreontologies.org/ont00000142' // Act of Government (occurrent)

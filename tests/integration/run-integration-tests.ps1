@@ -20,8 +20,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $testDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$logDir = Join-Path (Split-Path -Parent (Split-Path -Parent $testDir)) 'UAF_Ontology\logs'
-if (-not (Test-Path $logDir)) { $logDir = 'E:\_Documents\git\UAF_Ontology\logs' }
+# Portable log dir: the IT scripts default to <user.home>/.semantic_alignment_plugin/it-logs
+# (System.getProperty('semantic.it.logdir', ...)); the runner reads from the same place. Override
+# with $env:SEMANTIC_IT_LOGDIR (and pass a matching -Dsemantic.it.logdir to Cameo if you do).
+$logDir = if ($env:SEMANTIC_IT_LOGDIR) { $env:SEMANTIC_IT_LOGDIR }
+          else { Join-Path $HOME '.semantic_alignment_plugin/it-logs' }
+New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 
 $tests = @('IT0_PluginLoaded', 'IT1_ProfileAndFixture', 'IT2_MappingUndo',
            'IT3_GuiSelection', 'IT4_GuiAudit', 'IT5_AuditViolations',

@@ -12,7 +12,7 @@ import com.nomagic.magicdraw.openapi.uml.SessionManager
 import javax.swing.SwingUtilities
 import java.text.SimpleDateFormat
 
-final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
+final String LOG_DIR = System.getProperty('semantic.it.logdir', new File(System.getProperty('user.home'), '.semantic_alignment_plugin/it-logs').getAbsolutePath())
 final String PKG_NAME = 'SemanticAlignmentIT'
 
 final File LOG = new File(LOG_DIR, 'IT9_CleanupFixture.log')

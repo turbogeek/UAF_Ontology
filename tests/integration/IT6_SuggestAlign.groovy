@@ -20,7 +20,7 @@ import java.awt.event.MouseEvent
 import java.text.SimpleDateFormat
 import java.util.concurrent.atomic.AtomicReference
 
-final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
+final String LOG_DIR = System.getProperty('semantic.it.logdir', new File(System.getProperty('user.home'), '.semantic_alignment_plugin/it-logs').getAbsolutePath())
 final String PKG_NAME = 'SemanticAlignmentIT'
 final String REST = 'http://127.0.0.1:8766'
 

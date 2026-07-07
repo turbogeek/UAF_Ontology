@@ -15,7 +15,7 @@ import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper
 import javax.swing.SwingUtilities
 import java.text.SimpleDateFormat
 
-final String LOG_DIR = 'E:\\_Documents\\git\\UAF_Ontology\\logs'
+final String LOG_DIR = System.getProperty('semantic.it.logdir', new File(System.getProperty('user.home'), '.semantic_alignment_plugin/it-logs').getAbsolutePath())
 final String STEREO_NAME = 'SemanticAlignment'
 final String PROP_NAME = 'mappedConceptURI'
 final String PKG_NAME = 'SemanticAlignmentIT'
