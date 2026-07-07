@@ -44,6 +44,38 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
+// The standalone Semantic Catalog Service (out-of-process) bundles log4j 1.x - Cameo provides
+// log4j to the plugin as compileOnly, so it is absent from the plugin's runtimeClasspath.
+configurations {
+    serviceLog4j
+}
+dependencies {
+    serviceLog4j 'log4j:log4j:1.2.17'
+}
+
+// Out-of-process service artifacts: a THIN jar (only the Cameo-free classes are ever loaded)
+// plus its dependency jars in build/service/lib/. Separate jars (not a fat jar) so each Jena
+// module keeps its own META-INF/services ServiceLoader file - a fat jar with EXCLUDE drops the
+// duplicates and Jena's ARQ/RIOT subsystems fail to initialize. Runs locally (auto-started by
+// the plugin) or on a server via:  java -cp "semantic-catalog-service.jar;lib/*" <Main>
+def serviceDir = layout.buildDirectory.dir('service')
+tasks.register('serviceLibs', Copy) {
+    description = 'Copies the service runtime dependencies (Jena + log4j) into build/service/lib.'
+    from(configurations.runtimeClasspath + configurations.serviceLog4j)
+    into serviceDir.map { it.dir('lib') }
+}
+tasks.register('serviceJar', Jar) {
+    description = 'Builds the standalone Semantic Catalog Service thin jar (out-of-process).'
+    group = 'distribution'
+    dependsOn tasks.named('classes'), tasks.named('serviceLibs')
+    archiveFileName = 'semantic-catalog-service.jar'
+    destinationDirectory = serviceDir
+    manifest {
+        attributes('Main-Class': 'com.nomagic.magicdraw.plugins.semantic.service.SemanticCatalogService')
+    }
+    from sourceSets.main.output
+}
+
 // NOTE: --enable-preview is deliberately absent. Preview-flagged class files refuse to
 // load in a JVM started without the flag, and Cameo's JVM is not started with it.
 
