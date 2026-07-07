@@ -133,6 +133,11 @@ public final class CatalogLoader {
         return new LoadedCatalog(index, union);
     }
 
+    // QUDT models quantity kinds and units as INSTANCES (qudt:QuantityKind / qudt:Unit),
+    // not owl:Class; SKOS vocabularies use skos:Concept. Index those alongside owl:Class so
+    // units/quantities (for MOE/TPM alignment) and SKOS thesauri become searchable concepts.
+    private static final String QUDT_NS = "http://qudt.org/schema/qudt/";
+
     private static void loadFile(File file, ConceptIndex index, Model union) {
         Model model = ModelFactory.createDefaultModel();
         RDFDataMgr.read(model, file.getAbsolutePath());
@@ -141,41 +146,55 @@ public final class CatalogLoader {
         String ontologyId = file.getName().replaceFirst("\\.ttl$", "");
         Map<String, String> nsToPrefix = invert(model.getNsPrefixMap());
 
-        StmtIterator classes = model.listStatements(null, RDF.type, OWL.Class);
-        while (classes.hasNext()) {
-            Resource subject = classes.next().getSubject();
-            if (!subject.isURIResource()) {
-                continue; // anonymous restrictions are not alignment targets
+        List<Resource> conceptTypes = List.of(
+                OWL.Class,
+                model.createResource(SKOS_NS + "Concept"),
+                model.createResource(QUDT_NS + "QuantityKind"),
+                model.createResource(QUDT_NS + "Unit"));
+        Set<Resource> seen = new HashSet<>();
+        for (Resource conceptType : conceptTypes) {
+            StmtIterator it = model.listStatements(null, RDF.type, conceptType);
+            while (it.hasNext()) {
+                Resource subject = it.next().getSubject();
+                if (!subject.isURIResource() || !seen.add(subject)) {
+                    continue; // anonymous restrictions / already indexed under another type
+                }
+                indexSubject(subject, model, index, ontologyId, nsToPrefix);
             }
-            String iri = subject.getURI();
-            String ns = subject.getNameSpace();
-            String prefix = nsToPrefix.getOrDefault(ns, ontologyId);
-            String local = subject.getLocalName();
-
-            // W3C ORG carries multilingual labels; a French "organisation"@fr must not
-            // become the primary label or exact-match ranking silently breaks. English
-            // (or untagged) wins; every other language becomes a searchable alias.
-            List<String> allLabels = literals(subject, RDFS.label.getURI(), model);
-            String label = preferEnglish(subject, RDFS.label);
-            if (label == null || label.isBlank()) {
-                label = local;
-            }
-            List<String> altLabels = new ArrayList<>(allLabels);
-            altLabels.remove(label);
-            altLabels.addAll(literals(subject, SKOS_NS + "prefLabel", model));
-            altLabels.addAll(literals(subject, SKOS_NS + "altLabel", model));
-            String comment = preferEnglish(subject, RDFS.comment);
-
-            Set<String> tokens = new HashSet<>(ConceptIndex.tokenize(label));
-            tokens.addAll(ConceptIndex.tokenize(local));
-            for (String alt : altLabels) {
-                tokens.addAll(ConceptIndex.tokenize(alt));
-            }
-
-            index.add(new ConceptEntry(iri, prefix + ":" + local, label,
-                    List.copyOf(altLabels), comment == null ? "" : comment,
-                    ontologyId, prefix, Set.copyOf(tokens)));
         }
+    }
+
+    /** Builds and adds one ConceptEntry for a URI subject (class, SKOS concept, or QUDT term). */
+    private static void indexSubject(Resource subject, Model model, ConceptIndex index,
+            String ontologyId, Map<String, String> nsToPrefix) {
+        String iri = subject.getURI();
+        String ns = subject.getNameSpace();
+        String prefix = nsToPrefix.getOrDefault(ns, ontologyId);
+        String local = subject.getLocalName();
+
+        // W3C ORG carries multilingual labels; a French "organisation"@fr must not become
+        // the primary label or exact-match ranking silently breaks. English (or untagged)
+        // wins; every other language becomes a searchable alias.
+        List<String> allLabels = literals(subject, RDFS.label.getURI(), model);
+        String label = preferEnglish(subject, RDFS.label);
+        if (label == null || label.isBlank()) {
+            label = local;
+        }
+        List<String> altLabels = new ArrayList<>(allLabels);
+        altLabels.remove(label);
+        altLabels.addAll(literals(subject, SKOS_NS + "prefLabel", model));
+        altLabels.addAll(literals(subject, SKOS_NS + "altLabel", model));
+        String comment = preferEnglish(subject, RDFS.comment);
+
+        Set<String> tokens = new HashSet<>(ConceptIndex.tokenize(label));
+        tokens.addAll(ConceptIndex.tokenize(local));
+        for (String alt : altLabels) {
+            tokens.addAll(ConceptIndex.tokenize(alt));
+        }
+
+        index.add(new ConceptEntry(iri, prefix + ":" + local, label,
+                List.copyOf(altLabels), comment == null ? "" : comment,
+                ontologyId, prefix, Set.copyOf(tokens)));
     }
 
     private static Map<String, String> invert(Map<String, String> prefixToNs) {

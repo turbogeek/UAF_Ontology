@@ -142,10 +142,48 @@ ${libEntries}
     }
 }
 
+// Permissive ontology bundle (CCO/BFO/QUDT/PROV/ODRL/DPV) fetched at BUILD time into
+// build/catalog-bundle (never committed - owner policy: store only the URL config in
+// catalog-bundle.properties, download on demand). deployPlugin copies these into the
+// deployed catalog/ where CatalogLoader indexes them for broader-domain alignment.
+def catalogBundleDir = layout.buildDirectory.dir('catalog-bundle')
+tasks.register('fetchCatalogBundle') {
+    description = 'Downloads the permissive ontology bundle into build/catalog-bundle (skips already-present files).'
+    group = 'build'
+    def cfg = new File(projectDir, 'catalog-bundle.properties')
+    inputs.file cfg
+    outputs.dir catalogBundleDir
+    doLast {
+        def props = new Properties()
+        cfg.withInputStream { props.load(it) }
+        def outDir = catalogBundleDir.get().asFile
+        outDir.mkdirs()
+        props.each { name, url ->
+            def target = new File(outDir, name + '.ttl')
+            if (target.exists() && target.length() > 0) {
+                logger.lifecycle("catalog-bundle: ${name} present (${target.length()} bytes)")
+                return
+            }
+            logger.lifecycle("catalog-bundle: fetching ${name} <- ${url}")
+            try {
+                def conn = new URL(url).openConnection()
+                conn.setConnectTimeout(15000); conn.setReadTimeout(90000)
+                conn.setRequestProperty('Accept', 'text/turtle, application/rdf+xml;q=0.8, */*;q=0.5')
+                conn.setRequestProperty('User-Agent', 'CameoSemanticAlignmentPlugin/build-fetch')
+                conn.inputStream.withCloseable { input -> target.withOutputStream { out -> out << input } }
+                logger.lifecycle("catalog-bundle: ${name} -> ${target.length()} bytes")
+            } catch (Exception e) {
+                logger.warn("catalog-bundle: FAILED ${name} (${url}): ${e.message} - skipping this ontology.")
+                if (target.exists() && target.length() == 0) { target.delete() }
+            }
+        }
+    }
+}
+
 tasks.register('deployPlugin', Sync) {
     description = "Deploys the plugin into ${cameoHome}/plugins/${pluginId} (restart Cameo afterwards)."
     group = 'distribution'
-    dependsOn tasks.named('jar'), tasks.named('generatePluginDescriptor')
+    dependsOn tasks.named('jar'), tasks.named('generatePluginDescriptor'), tasks.named('fetchCatalogBundle')
     doFirst {
         // A running Cameo holds the deployed jars open; a Sync against locked files dies
         // halfway and leaves a corrupt plugin folder. Fail fast with a clear instruction.
@@ -180,6 +218,8 @@ tasks.register('deployPlugin', Sync) {
                 'gufo.ttl', 'bmm.ttl', 'org.ttl', 'sumo.ttl', 'uaf_bridge.ttl'
         into 'catalog'
     }
+    // Permissive breadth bundle fetched at build time (CCO/BFO/QUDT/PROV/ODRL/DPV).
+    from(catalogBundleDir) { into 'catalog' }
     // tbox/ is runtime-writable (integration tests drop consistency axioms there)
     preserve { include 'tbox/**' }
 }
