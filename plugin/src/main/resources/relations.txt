@@ -1,0 +1,29 @@
+# Curated relation phrases for compound-concept differentia. One verb phrase per line; they read
+# directly in SBVR ("A X is a <genus> that <relation> a <qualifier>"). Order here is the dropdown
+# order. Drop a relations.txt in the deployed plugin directory to ADD your own (appended below
+# these). Trace: design/compound_concepts.md
+has function
+performs
+targets
+detects
+is part of
+has part
+composed of
+made of
+located in
+measured by
+has property
+has value
+realizes
+supports
+controls
+monitors
+connected to
+interfaces with
+produces
+consumes
+requires
+provides
+causes
+caused by
+mitigates

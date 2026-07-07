@@ -284,6 +284,23 @@ public class SemanticAlignmentPlugin extends Plugin {
      *
      * @return summary string for the REST response
      */
+    private static volatile com.nomagic.magicdraw.plugins.semantic.align.RelationVocabulary relationVocab;
+
+    /** Curated relation phrases for compound concepts (classpath default + plugin-dir override). */
+    static com.nomagic.magicdraw.plugins.semantic.align.RelationVocabulary ontologyRelations() {
+        com.nomagic.magicdraw.plugins.semantic.align.RelationVocabulary v = relationVocab;
+        if (v == null) {
+            synchronized (SemanticAlignmentPlugin.class) {
+                v = relationVocab;
+                if (v == null) {
+                    v = com.nomagic.magicdraw.plugins.semantic.align.RelationVocabulary.load(pluginDirectory);
+                    relationVocab = v;
+                }
+            }
+        }
+        return v;
+    }
+
     /** Ontology display metadata, loaded once (classpath default + optional plugin-dir override). */
     static com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry ontologyRegistry() {
         com.nomagic.magicdraw.plugins.semantic.align.OntologyRegistry r = ontologyRegistry;
@@ -521,6 +538,7 @@ public class SemanticAlignmentPlugin extends Plugin {
         private final JList<ConceptSuggestion> suggestionList = new JList<>(suggestionModel);
         private final JLabel suggestStatus = new JLabel(" ");
         private final JButton applySelectedButton = new JButton("Apply Selected Concept(s)");
+        private final JButton composeButton = new JButton("Compose Concept…");
         private final JTextField searchField = new JTextField();
         private final JButton ols4Button = new JButton("Search Online Ontologies");
         private final JButton auditButton = new JButton("Run Audit");
@@ -687,6 +705,15 @@ public class SemanticAlignmentPlugin extends Plugin {
             applySelectedButton.setAlignmentX(Component.LEFT_ALIGNMENT);
             applySelectedButton.addActionListener(e -> applySelectedSuggestions());
             root.add(applySelectedButton);
+
+            // Compose a COMPOUND concept (genus + differentia) from the selected suggestions so
+            // the element's meaning reads correctly in SBVR (owner request).
+            composeButton.setName("semantic.composeButton");
+            composeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            composeButton.setToolTipText("Combine the selected concepts into a compound definition "
+                    + "(genus + relations) that reads as one SBVR sentence.");
+            composeButton.addActionListener(e -> composeSelectedSuggestions());
+            root.add(composeButton);
             root.add(Box.createVerticalStrut(10));
 
             // Search narrows the suggestion list live; Enter keeps the expert path
@@ -930,53 +957,7 @@ public class SemanticAlignmentPlugin extends Plugin {
             }
             String summary = String.join(", ", picks);
             try {
-                if (project.isProjectClosed() || project.isProjectDisposed()
-                        || project.isDisposed(element)) {
-                    DiagnosticLog.event("MAPPING", "Rejected: project or element no longer alive");
-                    appendConsole("[FAIL] The project or element is no longer open.");
-                    return;
-                }
-                if (!element.isEditable()) {
-                    DiagnosticLog.event("MAPPING", element.getHumanName()
-                            + " -> " + summary + " | status=REJECTED read-only element");
-                    appendConsole("[FAIL] Element is read-only (library or locked element).");
-                    return;
-                }
-                // Alignment requires the model to be instrumented (explicit opt-in, owner
-                // requirement). If it isn't, offer to instrument now rather than silently
-                // mounting the profile behind the user's back.
-                if (!StereotypeManager.isInstrumented(project)) {
-                    int choice = JOptionPane.showConfirmDialog(
-                            com.nomagic.magicdraw.core.Application.getInstance().getMainFrame(),
-                            "This model is not yet instrumented for semantics.\n"
-                                    + "Instrument it now (adds the Semantic Alignment profile\n"
-                                    + "and a model-level ontology root IRI + version)?",
-                            "Instrument Model",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (choice != JOptionPane.YES_OPTION) {
-                        DiagnosticLog.event("MAPPING", "Rejected: model not instrumented (user declined)");
-                        appendConsole("[FAIL] Model is not instrumented. "
-                                + "Use Tools > Semantic Alignment > Instrument Model.");
-                        return;
-                    }
-                    // Mount the shipped profile module - OUTSIDE the session.
-                    if (!StereotypeManager.ensureProfileAvailable(project)) {
-                        DiagnosticLog.event("MAPPING", "Rejected: Semantic Alignment Profile module unavailable");
-                        appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
-                        return;
-                    }
-                    final String rootIri = StereotypeManager.defaultRootIri(project);
-                    TransactionWrapper.executeWrite(project, "Instrument Model for Semantics",
-                            () -> StereotypeManager.applyModelInstrumentation(project, rootIri, "1.0.0",
-                                    "semantic-alignment-plugin/" + VERSION));
-                    DiagnosticLog.event("INSTRUMENT", project.getName()
-                            + " (auto from align) rootIRI=" + rootIri);
-                    appendConsole("[OK] Model instrumented (root IRI " + rootIri + ").");
-                } else if (!StereotypeManager.ensureProfileAvailable(project)) {
-                    // Instrumented models still need the profile module resolvable (e.g. a
-                    // model instrumented in a prior session, reopened fresh).
-                    DiagnosticLog.event("MAPPING", "Rejected: Semantic Alignment Profile module unavailable");
-                    appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
+                if (!ensureAlignable(element, summary)) {
                     return;
                 }
                 // Build the ordered concept list: pinned base first, then prior concepts, then
@@ -1000,6 +981,129 @@ public class SemanticAlignmentPlugin extends Plugin {
                 maybeWarnCapabilityActivity(picks); // advisory capability/activity guard
             } catch (Exception e) {
                 log.error("Semantic mapping failed", e);
+                DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + summary
+                        + " | status=FAILED | " + e.getMessage());
+                appendConsole("[FAIL] " + e.getMessage());
+            }
+        }
+
+        /**
+         * Shared alive/editable/instrumented/profile guards for the apply paths. Returns false
+         * (with a message already shown) when the element cannot be aligned; may prompt to
+         * instrument. Throws only on a genuine transaction error (handled by the caller).
+         */
+        private boolean ensureAlignable(Element element, String summary) throws Exception {
+            if (project.isProjectClosed() || project.isProjectDisposed() || project.isDisposed(element)) {
+                DiagnosticLog.event("MAPPING", "Rejected: project or element no longer alive");
+                appendConsole("[FAIL] The project or element is no longer open.");
+                return false;
+            }
+            if (!element.isEditable()) {
+                DiagnosticLog.event("MAPPING", element.getHumanName()
+                        + " -> " + summary + " | status=REJECTED read-only element");
+                appendConsole("[FAIL] Element is read-only (library or locked element).");
+                return false;
+            }
+            if (!StereotypeManager.isInstrumented(project)) {
+                int choice = JOptionPane.showConfirmDialog(
+                        com.nomagic.magicdraw.core.Application.getInstance().getMainFrame(),
+                        "This model is not yet instrumented for semantics.\n"
+                                + "Instrument it now (adds the Semantic Alignment profile\n"
+                                + "and a model-level ontology root IRI + version)?",
+                        "Instrument Model", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (choice != JOptionPane.YES_OPTION) {
+                    DiagnosticLog.event("MAPPING", "Rejected: model not instrumented (user declined)");
+                    appendConsole("[FAIL] Model is not instrumented. "
+                            + "Use Tools > Semantic Alignment > Instrument Model.");
+                    return false;
+                }
+                if (!StereotypeManager.ensureProfileAvailable(project)) {
+                    DiagnosticLog.event("MAPPING", "Rejected: Semantic Alignment Profile module unavailable");
+                    appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
+                    return false;
+                }
+                final String rootIri = StereotypeManager.defaultRootIri(project);
+                TransactionWrapper.executeWrite(project, "Instrument Model for Semantics",
+                        () -> StereotypeManager.applyModelInstrumentation(project, rootIri, "1.0.0",
+                                "semantic-alignment-plugin/" + VERSION));
+                DiagnosticLog.event("INSTRUMENT", project.getName() + " (auto from align) rootIRI=" + rootIri);
+                appendConsole("[OK] Model instrumented (root IRI " + rootIri + ").");
+            } else if (!StereotypeManager.ensureProfileAvailable(project)) {
+                DiagnosticLog.event("MAPPING", "Rejected: Semantic Alignment Profile module unavailable");
+                appendConsole("[FAIL] Semantic Alignment Profile module could not be mounted.");
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Opens the Compose Concept dialog for the selected element: the genus is the pinned base
+         * (or the first selected suggestion when there is no base), and the other selected
+         * suggestions become differentia rows. On Apply the encoded clauses REPLACE the element's
+         * concepts (they define its full compound meaning). Trace: design/compound_concepts.md
+         */
+        private void composeSelectedSuggestions() {
+            Element element = selectedElement;
+            if (element == null) {
+                appendConsole("[FAIL] Select an element first.");
+                return;
+            }
+            java.util.List<ConceptSuggestion> picks = suggestionList.getSelectedValuesList();
+            String genusIri = pinnedBaseURI;
+            String genusLabel = null;
+            java.util.List<com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef> quals =
+                    new java.util.ArrayList<>();
+            if (genusIri == null || genusIri.isBlank()) {
+                if (picks.isEmpty()) {
+                    appendConsole("[FAIL] Select the genus + qualifier concepts (Ctrl-click several).");
+                    return;
+                }
+                genusIri = picks.get(0).entry().iri();
+                genusLabel = picks.get(0).entry().label();
+                for (int i = 1; i < picks.size(); i++) {
+                    quals.add(new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef(
+                            picks.get(i).entry().iri(), picks.get(i).entry().label()));
+                }
+            } else {
+                for (ConceptSuggestion s : picks) {
+                    quals.add(new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog.ConceptRef(
+                            s.entry().iri(), s.entry().label()));
+                }
+            }
+            if (quals.isEmpty()) {
+                appendConsole("[FAIL] Select at least one qualifier concept to compose with the base.");
+                return;
+            }
+            java.awt.Frame owner = com.nomagic.magicdraw.core.Application.getInstance().getMainFrame();
+            DiagnosticLog.event("COMPOSE", "open dialog for " + selectedName + " genus="
+                    + genusIri + " qualifiers=" + quals.size());
+            new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog(
+                    owner, selectedName, genusIri, genusLabel, quals,
+                    ontologyRelations().phrases(), this::applyCompoundFromUI).setVisible(true);
+        }
+
+        /** Stores the encoded compound clauses (genus first, then relation|IRI), REPLACING prior concepts. */
+        private void applyCompoundFromUI(java.util.List<String> encoded) {
+            Element element = selectedElement;
+            if (element == null || encoded == null || encoded.isEmpty()) {
+                appendConsole("[FAIL] Nothing to apply.");
+                return;
+            }
+            String summary = "compound(" + encoded.size() + " clauses)";
+            try {
+                if (!ensureAlignable(element, summary)) {
+                    return;
+                }
+                final java.util.List<String> ordered = new java.util.ArrayList<>(encoded);
+                Project owner = Project.getProject(element);
+                TransactionWrapper.executeWrite(owner != null ? owner : project, "Apply Compound Concept",
+                        () -> StereotypeManager.setSemanticConcepts(element, ordered));
+                DiagnosticLog.event("MAPPING", element.getHumanName() + " := " + summary
+                        + " | status=OK | compound");
+                appendConsole("[OK] Applied compound concept (" + encoded.size() + " clauses).");
+                handleSelection(element);
+            } catch (Exception e) {
+                log.error("Compound apply failed", e);
                 DiagnosticLog.event("MAPPING", element.getHumanName() + " -> " + summary
                         + " | status=FAILED | " + e.getMessage());
                 appendConsole("[FAIL] " + e.getMessage());

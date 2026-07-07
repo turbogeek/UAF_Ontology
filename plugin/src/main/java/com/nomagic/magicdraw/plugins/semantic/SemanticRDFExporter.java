@@ -146,13 +146,40 @@ public class SemanticRDFExporter {
 
         Resource elementResource = model.createResource(elementURI(element));
         elementResource.addProperty(RDF.type, model.createResource(conceptURI));
-        // mappedConceptURI is multi-valued: index 0 is the base concept (above); emit one
-        // rdf:type per additional narrowing concept so the derived ontology reflects every
-        // annotation (design/use_cases.md UC-2.2).
-        for (String extra : getAllAlignedConceptURIs(element)) {
-            if (!extra.equals(conceptURI)) {
-                elementResource.addProperty(RDF.type, model.createResource(extra));
+        // COMPOUND-aware: mappedConceptURI holds the genus (index 0, typed above) then either a
+        // bare IRI (an extra type) or a "<relation> | <IRI>" differentia. Emit rdf:type for extra
+        // types, and a relation triple for each differentia so the derived ontology captures WHAT
+        // the element is (design/compound_concepts.md; UC-2.2/UC-2.7).
+        java.util.List<String> rawValues = getRawMappedValues(element);
+        for (int i = 1; i < rawValues.size(); i++) {
+            com.nomagic.magicdraw.plugins.semantic.align.CompoundConcept.Clause clause =
+                    com.nomagic.magicdraw.plugins.semantic.align.CompoundConcept.decode(rawValues.get(i));
+            String qualifier = resolveConceptURI(clause.conceptIri());
+            if (qualifier == null) {
+                continue;
             }
+            if (clause.relation() == null || clause.relation().isBlank()) {
+                if (!qualifier.equals(conceptURI)) {
+                    elementResource.addProperty(RDF.type, model.createResource(qualifier));
+                }
+            } else {
+                // Mint a local overlay relation under the project namespace, labelled with the
+                // curated phrase; never mutates the upstream ontologies (the qualifier IRI does
+                // point at the real concept).
+                org.apache.jena.rdf.model.Property rel =
+                        model.createProperty(PROJECT_NS, camelCase(clause.relation()));
+                model.add(rel, RDFS.label, clause.relation());
+                elementResource.addProperty(rel, model.createResource(qualifier));
+            }
+        }
+        // A compound definition reads correctly in SBVR - emit it as skos:definition provenance.
+        com.nomagic.magicdraw.plugins.semantic.align.CompoundConcept compound =
+                com.nomagic.magicdraw.plugins.semantic.align.CompoundConcept.parse(
+                        namedLabel(element), rawValues);
+        if (compound.isCompound()) {
+            elementResource.addProperty(
+                    model.createProperty("http://www.w3.org/2004/02/skos/core#", "definition"),
+                    compound.toSbvr(new SBVREngine()));
         }
 
         // Bare element name, not getHumanName()'s "Class EchoBase" - the label feeds
@@ -246,6 +273,51 @@ public class SemanticRDFExporter {
             }
         }
         return resolved;
+    }
+
+    /** Raw stored mappedConceptURI values (undecoded), in order - base first. */
+    private java.util.List<String> getRawMappedValues(Element element) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        if (alignmentStereotype == null || element == null) {
+            return out;
+        }
+        List<?> values = StereotypesHelper.getStereotypePropertyValue(
+                element, alignmentStereotype, PROPERTY_NAME);
+        if (values != null) {
+            for (Object v : values) {
+                if (v != null) {
+                    out.add(v.toString());
+                }
+            }
+        }
+        return out;
+    }
+
+    /** The element's plain name (feeds the compound concept's label), else its human name. */
+    private static String namedLabel(Element element) {
+        if (element instanceof com.nomagic.uml2.ext.magicdraw.classes.mdkernel.NamedElement ne
+                && ne.getName() != null && !ne.getName().isEmpty()) {
+            return ne.getName();
+        }
+        return element == null ? "" : element.getHumanName();
+    }
+
+    /** A curated relation phrase -> a camelCase local property name ("has function" -> hasFunction). */
+    private static String camelCase(String phrase) {
+        if (phrase == null || phrase.isBlank()) {
+            return DEFAULT_RELATION_NAME;
+        }
+        String[] words = phrase.trim().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            String w = words[i];
+            if (w.isEmpty()) {
+                continue;
+            }
+            char c0 = i == 0 ? Character.toLowerCase(w.charAt(0)) : Character.toUpperCase(w.charAt(0));
+            sb.append(c0).append(w.substring(1));
+        }
+        return sb.length() == 0 ? DEFAULT_RELATION_NAME : sb.toString();
     }
 
     private Optional<String> resolveAlignment(Element element) {
