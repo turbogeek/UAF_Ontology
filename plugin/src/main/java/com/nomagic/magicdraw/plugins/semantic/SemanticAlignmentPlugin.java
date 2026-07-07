@@ -11,7 +11,6 @@ import com.nomagic.magicdraw.plugins.semantic.align.SuggestionRanker;
 import com.nomagic.magicdraw.plugins.semantic.align.UafConceptResolver;
 import com.nomagic.magicdraw.plugins.semantic.align.terms.AlignmentCandidate;
 import com.nomagic.magicdraw.plugins.semantic.align.terms.CapabilityGuard;
-import com.nomagic.magicdraw.plugins.semantic.align.terms.Ols4TermSource;
 import com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource;
 import com.nomagic.magicdraw.plugins.semantic.commands.TransactionWrapper;
 import com.nomagic.magicdraw.plugins.semantic.metadata.StereotypeManager;
@@ -76,6 +75,14 @@ public class SemanticAlignmentPlugin extends Plugin {
     private static volatile SuggestionRanker suggestionRanker;
     // Automatic UAF-stereotype -> ontology-concept resolver (derived from uaf_ontology).
     private static volatile UafConceptResolver uafResolver;
+    // OntoPortal keys are read from ~/.semantic_alignment_plugin/ontoportal.properties
+    // (portal.apikey=…) so end users never edit Cameo JVM options; a -Dsemantic.plugin.
+    // ontoportal.<portal>.<prop> system property overrides the file. See design/ontoportal_setup.md.
+    // MUST be declared BEFORE ONLINE_SOURCES: buildOnlineSources() reads ONTOPORTAL_CONFIG during
+    // static init and Java runs field initializers in TEXTUAL ORDER - declaring it after threw an
+    // NPE in <clinit> that failed the whole plugin to load (owner: no startup exceptions).
+    private static final java.util.Properties ONTOPORTAL_CONFIG = loadOntoPortalConfig();
+
     // OLS-family online term sources (same REST API shape). Default: EBI OLS4 (~280
     // life-science ontologies) + the TIB Terminology Service (100+ engineering/physics/
     // chemistry/materials ontologies - the systems-engineering breadth OLS4 lacks). Both
@@ -87,34 +94,10 @@ public class SemanticAlignmentPlugin extends Plugin {
 
     private static java.util.List<com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource>
             buildOnlineSources() {
-        java.util.List<com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource> sources =
-                new java.util.ArrayList<>();
-        // OLS-family (keyless): EBI OLS4 + TIB engineering terminology.
-        String cfg = System.getProperty("semantic.plugin.ols.endpoints");
-        if (cfg != null && !cfg.isBlank()) {
-            for (String base : cfg.split(",")) {
-                if (!base.isBlank()) {
-                    sources.add(new Ols4TermSource(base.trim()));
-                }
-            }
-        } else {
-            sources.add(new Ols4TermSource()); // EBI OLS4 (its own default / -Dsemantic.plugin.ols4.baseurl)
-            sources.add(new Ols4TermSource("https://api.terminology.tib.eu/api")); // TIB (engineering)
-        }
-        // OntoPortal family (one adapter, N portals): each enabled ONLY when its API key is set
-        // via -Dsemantic.plugin.ontoportal.<portal>.apikey (see design/ontology_sources.md /
-        // the end-user key instructions). Covers medical-device (BioPortal), manufacturing/SE
-        // (IndustryPortal), materials (MatPortal).
-        addOntoPortal(sources, "bioportal", "https://data.bioontology.org");
-        addOntoPortal(sources, "industryportal", "https://industryportal.enit.fr");
-        addOntoPortal(sources, "matportal", "https://matportal.org");
-        return sources;
+        // Delegated to a Cameo-free, unit-tested factory that is null-safe and never throws, so
+        // this static-field initializer cannot fail plugin load (regression: OnlineSourceFactory).
+        return com.nomagic.magicdraw.plugins.semantic.align.terms.OnlineSourceFactory.build(ONTOPORTAL_CONFIG);
     }
-
-    // OntoPortal keys are read from ~/.semantic_alignment_plugin/ontoportal.properties
-    // (portal.apikey=…) so end users never edit Cameo JVM options; a -Dsemantic.plugin.
-    // ontoportal.<portal>.<prop> system property overrides the file. See design/ontoportal_setup.md.
-    private static final java.util.Properties ONTOPORTAL_CONFIG = loadOntoPortalConfig();
 
     private static java.util.Properties loadOntoPortalConfig() {
         java.util.Properties props = new java.util.Properties();
@@ -129,32 +112,6 @@ public class SemanticAlignmentPlugin extends Plugin {
             // no config file is the normal (portals disabled) case
         }
         return props;
-    }
-
-    private static String ontoPortalProp(String portal, String suffix, String fallback) {
-        String sys = System.getProperty("semantic.plugin.ontoportal." + portal + "." + suffix);
-        if (sys != null && !sys.isBlank()) {
-            return sys;
-        }
-        String fromFile = ONTOPORTAL_CONFIG.getProperty(portal + "." + suffix);
-        return (fromFile != null && !fromFile.isBlank()) ? fromFile : fallback;
-    }
-
-    private static void addOntoPortal(
-            java.util.List<com.nomagic.magicdraw.plugins.semantic.align.terms.TermSource> sources,
-            String portal, String defaultUrl) {
-        String key = ontoPortalProp(portal, "apikey", null);
-        if (key == null || key.isBlank()) {
-            return; // portal not enabled - no key configured
-        }
-        String url = ontoPortalProp(portal, "url", defaultUrl);
-        if (url == null || url.isBlank()) {
-            return;
-        }
-        String onts = ontoPortalProp(portal, "ontologies", null);
-        sources.add(new com.nomagic.magicdraw.plugins.semantic.align.terms.OntoPortalTermSource(
-                portal, url, key, onts));
-        log.info("OntoPortal term source enabled: " + portal + " @ " + url);
     }
 
     // Panel per open project so diagram-click routing reaches the right sidebar.
