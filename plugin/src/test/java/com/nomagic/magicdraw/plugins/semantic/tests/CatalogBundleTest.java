@@ -76,4 +76,17 @@ public class CatalogBundleTest {
         assertTrue("QUDT 'Force' quantity kind should be indexed by label",
                 anyLabelEquals(index, "Force"));
     }
+
+    @Test
+    public void testImceSystemsEngineeringConceptsIndexedFromOwl() {
+        ConceptIndex index = loadBundle();
+        // The openCAESAR IMCE foundation vocabularies are .owl (RDF/XML) produced by
+        // scripts/fetch-oml-vocabularies.sh - proves the loader now indexes .owl, not just
+        // .ttl. Skipped when the OML step has not been run (only CCO/BFO/QUDT/PROV present).
+        boolean imcePresent = anyIriContains(index, "imce.jpl.nasa.gov");
+        Assume.assumeTrue("IMCE OWL not staged (run scripts/fetch-oml-vocabularies.sh) - skipping",
+                imcePresent);
+        assertTrue("IMCE mission concepts (Component/Function/...) must index from .owl",
+                anyIriContains(index, "imce.jpl.nasa.gov/foundation/mission"));
+    }
 }

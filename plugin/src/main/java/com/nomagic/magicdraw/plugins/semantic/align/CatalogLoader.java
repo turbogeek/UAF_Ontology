@@ -53,11 +53,17 @@ public final class CatalogLoader {
         return dir;
     }
 
+    /** True for any RDF file the catalog indexes (Turtle, RDF/XML .owl/.rdf). */
+    private static boolean isRdfFile(String name) {
+        String n = name.toLowerCase();
+        return n.endsWith(".ttl") || n.endsWith(".owl") || n.endsWith(".rdf");
+    }
+
     /** Merges the shipped plugin catalog with the user's on-demand imports. */
     public static LoadedCatalog loadMerged(File pluginDirectory) {
         LoadedCatalog shipped = loadAll(resolveCatalogDirectory(pluginDirectory));
         File userDir = resolveUserCatalogDirectory();
-        File[] userFiles = userDir.listFiles((d, name) -> name.toLowerCase().endsWith(".ttl"));
+        File[] userFiles = userDir.listFiles((d, name) -> isRdfFile(name));
         if (userFiles == null || userFiles.length == 0) {
             return shipped;
         }
@@ -106,7 +112,7 @@ public final class CatalogLoader {
                     + "Deploy catalog/ with the plugin or set -D" + CATALOG_PROPERTY);
             return new LoadedCatalog(index, union);
         }
-        File[] files = catalogDirectory.listFiles((d, name) -> name.toLowerCase().endsWith(".ttl"));
+        File[] files = catalogDirectory.listFiles((d, name) -> isRdfFile(name));
         if (files == null || files.length == 0) {
             DiagnosticLog.event("ERROR", "Concept catalog is empty: " + catalogDirectory);
             return new LoadedCatalog(index, union);
@@ -143,7 +149,7 @@ public final class CatalogLoader {
         RDFDataMgr.read(model, file.getAbsolutePath());
         union.add(model);
         union.setNsPrefixes(model.getNsPrefixMap());
-        String ontologyId = file.getName().replaceFirst("\\.ttl$", "");
+        String ontologyId = file.getName().replaceFirst("(?i)\\.(ttl|owl|rdf)$", "");
         Map<String, String> nsToPrefix = invert(model.getNsPrefixMap());
 
         List<Resource> conceptTypes = List.of(
