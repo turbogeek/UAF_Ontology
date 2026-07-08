@@ -1063,10 +1063,19 @@ public class SemanticAlignmentPlugin extends Plugin {
             for (ConceptSuggestion s : suggestionList.getSelectedValuesList()) {
                 seed.add(refFor(s));
             }
+            // New (user-created) concepts live in THIS model's derived-ontology namespace.
+            String localNs;
+            try {
+                String root = StereotypeManager.defaultRootIri(project);
+                localNs = (root == null || root.isBlank()) ? "http://purl.org/uaf/ontology#"
+                        : (root.endsWith("#") || root.endsWith("/") ? root : root + "#");
+            } catch (Throwable t) {
+                localNs = "http://purl.org/uaf/ontology#";
+            }
             DiagnosticLog.event("COMPOSE", "open composer for " + selectedName
                     + " (genus=" + (genus == null ? "-" : genus.iri()) + " seed=" + seed.size() + ")");
             new com.nomagic.magicdraw.plugins.semantic.ui.ComposeConceptDialog(
-                    owner, selectedName, genus, seed, ontologyRelations().phrases(),
+                    owner, selectedName, genus, seed, ontologyRelations().phrases(), localNs,
                     this::searchConceptRefs, this::applyCompoundFromUI).setVisible(true);
         }
 

@@ -47,13 +47,19 @@ try {
     Thread.sleep(1500)
 
     def R = new ConcurrentHashMap()
-    def doSearch = { String q, boolean online -> SwingUtilities.invokeLater {
-        def sf = findWin('semantic.compose.searchField'); def oc = findWin('semantic.compose.onlineCheck'); def sb = findWin('semantic.compose.searchButton')
-        if (sf) sf.setText(q); if (oc) oc.setSelected(online); if (sb) sb.doClick()
+    def doSearch = { String q -> SwingUtilities.invokeLater {   // leave 'online' at its default
+        def sf = findWin('semantic.compose.searchField'); def sb = findWin('semantic.compose.searchButton')
+        if (sf) sf.setText(q); if (sb) sb.doClick()
     } }
-    // 1. open the composer (modal)
+    // 1. open the composer (modal) + check defaults / new buttons
     SwingUtilities.invokeLater { def b = findWin('semantic.composeButton'); R.opened = (b != null); if (b) b.doClick() }
     Thread.sleep(2500)
+    SwingUtilities.invokeLater {
+        def oc = findWin('semantic.compose.onlineCheck'); R.onlineDefault = (oc ? oc.isSelected() : null)
+        R.newConcept = (findWin('semantic.compose.newConceptButton') != null)
+        R.newRelation = (findWin('semantic.compose.newRelationButton') != null)
+    }
+    Thread.sleep(500)
     // 2. search a GENUS ("aircraft") and add it as the genus
     doSearch('aircraft', false); Thread.sleep(4000)
     SwingUtilities.invokeLater {

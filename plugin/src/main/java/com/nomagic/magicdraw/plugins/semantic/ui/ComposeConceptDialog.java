@@ -4,8 +4,8 @@ import com.nomagic.magicdraw.plugins.semantic.SBVREngine;
 import com.nomagic.magicdraw.plugins.semantic.align.CompoundConcept;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -13,6 +13,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -26,22 +27,27 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * "Compose Concept" is a full concept COMPOSER (owner design): SEARCH ontologies (local + online),
- * see what each concept MEANS (its definition), ADD concepts to the compound as the genus ("is a
- * kind of") or as a differentia (a relation applied to a qualifier), ARRANGE/remove them, and
- * watch the compound's SBVR build LIVE ("A Mosquito Killing Drone is a Drone that kills a
- * Mosquito"). On Apply it returns the encoded {@code mappedConceptURI} values.
+ * "Compose Concept" is a full concept COMPOSER (owner design): SEARCH ontologies (local + online,
+ * online on by default), see what each concept MEANS, ADD concepts in ANY order as the genus
+ * ("is a kind of") or as a relation (differentia), REORDER them and promote any to genus, CREATE
+ * NEW concepts (a drone isn't in any ontology - define it as a local overlay concept) and ADD NEW
+ * relation verbs, all while the compound's SBVR builds LIVE. Apply returns the encoded
+ * {@code mappedConceptURI} values.
  *
- * <p>Pure Swing (Cameo has no JavaFX). All controls carry {@code semantic.compose.*} names for
- * GUI tests. Search runs OFF the EDT via {@link ConceptSearch}. Trace: design/compound_concepts.md</p>
+ * <p>Pure Swing (Cameo has no JavaFX); {@code semantic.compose.*} names for GUI tests; search runs
+ * off the EDT via {@link ConceptSearch}. Trace: design/compound_concepts.md,
+ * design/how-to-mosquito-killing-drone.md</p>
  */
 public final class ComposeConceptDialog extends JDialog {
 
-    /** A concept the user can search for, inspect, and add. */
+    /** A concept the user can search for, inspect, add, or newly create. */
     public record ConceptRef(String iri, String label, String ontology, String definition) {
         public ConceptRef(String iri, String label) {
             this(iri, label, "", "");
@@ -70,12 +76,14 @@ public final class ComposeConceptDialog extends JDialog {
     }
 
     private final SBVREngine sbvr = new SBVREngine();
-    private final List<String> relationPhrases;
+    private final List<String> relationPhrases;         // mutable - the user can add verbs
     private final ConceptSearch search;
+    private final String localNamespace;                // for newly-created local concepts
+    private int relSeq = 0;                              // stable relation-combo naming
 
     private final JTextField nameField = new JTextField(22);
     private final JTextField searchField = new JTextField(18);
-    private final JCheckBox onlineCheck = new JCheckBox("online");
+    private final JCheckBox onlineCheck = new JCheckBox("online", true); // default ON (owner)
     private final DefaultListModel<ConceptRef> resultsModel = new DefaultListModel<>();
     private final JList<ConceptRef> resultsList = new JList<>(resultsModel);
     private final JTextArea conceptSbvr = new JTextArea(4, 28);
@@ -84,14 +92,17 @@ public final class ComposeConceptDialog extends JDialog {
     private final JLabel genusLabel = new JLabel("(none - add a genus)");
     private final JPanel diffPanel = new JPanel();
     private final List<DiffRow> diffRows = new ArrayList<>();
-    private final JTextArea compoundSbvr = new JTextArea(4, 30);
+    private final JTextArea compoundSbvr = new JTextArea(5, 30);
 
     public ComposeConceptDialog(Frame owner, String elementName, ConceptRef initialGenus,
                                 List<ConceptRef> initialDifferentia, List<String> relationPhrases,
-                                ConceptSearch search, Consumer<List<String>> onApply) {
+                                String localNamespace, ConceptSearch search,
+                                Consumer<List<String>> onApply) {
         super(owner, "Compose Concept", true);
-        this.relationPhrases = relationPhrases == null ? List.of() : relationPhrases;
+        this.relationPhrases = new ArrayList<>(relationPhrases == null ? List.of() : relationPhrases);
         this.search = search;
+        this.localNamespace = (localNamespace == null || localNamespace.isBlank())
+                ? "http://purl.org/uaf/ontology#" : localNamespace;
         this.genus = initialGenus;
         setName("semantic.composeDialog");
 
@@ -100,7 +111,7 @@ public final class ComposeConceptDialog extends JDialog {
         content.add(buildHeader(elementName), BorderLayout.NORTH);
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildSearchPane(), buildBuilderPane());
         split.setResizeWeight(0.5);
-        split.setDividerLocation(420);
+        split.setDividerLocation(430);
         content.add(split, BorderLayout.CENTER);
         content.add(buildButtons(onApply), BorderLayout.SOUTH);
 
@@ -112,7 +123,7 @@ public final class ComposeConceptDialog extends JDialog {
         refreshGenus();
         updateCompoundSbvr();
         setContentPane(content);
-        setPreferredSize(new Dimension(900, 560));
+        setPreferredSize(new Dimension(920, 580));
         pack();
         if (owner != null) {
             setLocationRelativeTo(owner);
@@ -129,12 +140,20 @@ public final class ComposeConceptDialog extends JDialog {
         header.add(new JLabel("     is a kind of "));
         genusLabel.setName("semantic.compose.genusLabel");
         header.add(genusLabel);
+        JButton clearGenus = new JButton("clear");
+        clearGenus.setName("semantic.compose.clearGenusButton");
+        clearGenus.addActionListener(e -> {
+            genus = null;
+            refreshGenus();
+            updateCompoundSbvr();
+        });
+        header.add(clearGenus);
         return header;
     }
 
     private JPanel buildSearchPane() {
         JPanel pane = new JPanel(new BorderLayout(4, 4));
-        pane.setBorder(BorderFactory.createTitledBorder("1. Search ontologies for concepts"));
+        pane.setBorder(BorderFactory.createTitledBorder("Find or create concepts"));
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
         searchField.setName("semantic.compose.searchField");
         searchField.addActionListener(e -> doSearch());
@@ -142,16 +161,21 @@ public final class ComposeConceptDialog extends JDialog {
         searchBtn.setName("semantic.compose.searchButton");
         searchBtn.addActionListener(e -> doSearch());
         onlineCheck.setName("semantic.compose.onlineCheck");
+        JButton newConcept = new JButton("New concept…");
+        newConcept.setName("semantic.compose.newConceptButton");
+        newConcept.setToolTipText("Define a concept that isn't in any ontology (a local overlay concept).");
+        newConcept.addActionListener(e -> createNewConcept());
         top.add(searchField);
         top.add(searchBtn);
         top.add(onlineCheck);
+        top.add(newConcept);
         pane.add(top, BorderLayout.NORTH);
 
         resultsList.setName("semantic.compose.resultsList");
         resultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         resultsList.addListSelectionListener(e -> showConceptMeaning());
         JScrollPane resultsScroll = new JScrollPane(resultsList);
-        resultsScroll.setPreferredSize(new Dimension(400, 220));
+        resultsScroll.setPreferredSize(new Dimension(400, 210));
         pane.add(resultsScroll, BorderLayout.CENTER);
 
         JPanel south = new JPanel(new BorderLayout(4, 4));
@@ -178,11 +202,19 @@ public final class ComposeConceptDialog extends JDialog {
 
     private JPanel buildBuilderPane() {
         JPanel pane = new JPanel(new BorderLayout(4, 4));
-        pane.setBorder(BorderFactory.createTitledBorder("2. Compose - genus + relations"));
+        pane.setBorder(BorderFactory.createTitledBorder("Compose (add in any order, reorder, promote)"));
+        JPanel tools = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        JButton newRel = new JButton("New relation…");
+        newRel.setName("semantic.compose.newRelationButton");
+        newRel.setToolTipText("Add a relation verb (e.g. \"kills\") to the dropdown list.");
+        newRel.addActionListener(e -> createNewRelation());
+        tools.add(newRel);
+        pane.add(tools, BorderLayout.NORTH);
+
         diffPanel.setName("semantic.compose.diffPanel");
         diffPanel.setLayout(new BoxLayout(diffPanel, BoxLayout.Y_AXIS));
         JScrollPane diffScroll = new JScrollPane(diffPanel);
-        diffScroll.setPreferredSize(new Dimension(420, 240));
+        diffScroll.setPreferredSize(new Dimension(430, 230));
         pane.add(diffScroll, BorderLayout.CENTER);
 
         compoundSbvr.setName("semantic.compose.sbvrPreview");
@@ -203,7 +235,13 @@ public final class ComposeConceptDialog extends JDialog {
         JButton apply = new JButton("Apply Compound Concept");
         apply.setName("semantic.compose.applyButton");
         apply.addActionListener(e -> {
-            if (onApply != null && genus != null) {
+            if (genus == null) {
+                JOptionPane.showMessageDialog(this, "Set a genus (\"is a kind of\") first - select a "
+                        + "concept and click \"Set as genus\", or promote a relation row with its "
+                        + "\"genus\" button.", "Compose Concept", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            if (onApply != null) {
                 onApply.accept(encodedClauses());
             }
             dispose();
@@ -213,7 +251,7 @@ public final class ComposeConceptDialog extends JDialog {
         return buttons;
     }
 
-    // --- search -----------------------------------------------------------------------------
+    // --- search / create --------------------------------------------------------------------
 
     private void doSearch() {
         final String q = searchField.getText();
@@ -234,7 +272,7 @@ public final class ComposeConceptDialog extends JDialog {
             SwingUtilities.invokeLater(() -> {
                 resultsModel.clear();
                 if (results.isEmpty()) {
-                    resultsModel.addElement(new ConceptRef("", "(no matches for \"" + q.trim() + "\")", "", ""));
+                    resultsModel.addElement(new ConceptRef("", "(no matches - use \"New concept…\")", "", ""));
                 } else {
                     for (ConceptRef r : results) {
                         resultsModel.addElement(r);
@@ -246,14 +284,47 @@ public final class ComposeConceptDialog extends JDialog {
         worker.start();
     }
 
+    /** Define a concept that isn't in any ontology - a local overlay concept in this model. */
+    private void createNewConcept() {
+        String name = JOptionPane.showInputDialog(this,
+                "Name of the new concept (e.g. Drone):", "New concept", JOptionPane.PLAIN_MESSAGE);
+        if (name == null || name.isBlank()) {
+            return;
+        }
+        String def = JOptionPane.showInputDialog(this,
+                "Optional short definition of \"" + name.trim() + "\":", "New concept",
+                JOptionPane.PLAIN_MESSAGE);
+        ConceptRef ref = new ConceptRef(localNamespace + camelCase(name), name.trim(), "new (this model)",
+                def == null ? "" : def.trim());
+        resultsModel.add(0, ref);
+        resultsList.setSelectedIndex(0);
+        showConceptMeaning();
+    }
+
+    /** Add a relation verb to the dropdown list (and every existing row's dropdown). */
+    private void createNewRelation() {
+        String phrase = JOptionPane.showInputDialog(this,
+                "New relation verb phrase (e.g. kills, suppresses):", "New relation",
+                JOptionPane.PLAIN_MESSAGE);
+        if (phrase == null || phrase.isBlank()) {
+            return;
+        }
+        String p = phrase.trim();
+        if (!relationPhrases.contains(p)) {
+            relationPhrases.add(0, p);
+            for (DiffRow dr : diffRows) {
+                ((DefaultComboBoxModel<String>) dr.relation.getModel()).insertElementAt(p, 0);
+            }
+        }
+    }
+
     private void showConceptMeaning() {
         ConceptRef r = resultsList.getSelectedValue();
         if (r == null || r.iri() == null || r.iri().isBlank()) {
             conceptSbvr.setText("");
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append(r.label());
+        StringBuilder sb = new StringBuilder(r.label());
         if (r.ontology() != null && !r.ontology().isBlank()) {
             sb.append("  — ").append(r.ontology());
         }
@@ -267,15 +338,19 @@ public final class ComposeConceptDialog extends JDialog {
         conceptSbvr.setCaretPosition(0);
     }
 
-    // --- build ------------------------------------------------------------------------------
+    // --- build / arrange --------------------------------------------------------------------
 
     private void setGenusFromSelection() {
         ConceptRef r = selectedResult();
         if (r != null) {
-            genus = r;
-            refreshGenus();
-            updateCompoundSbvr();
+            setGenus(r);
         }
+    }
+
+    private void setGenus(ConceptRef r) {
+        genus = r;
+        refreshGenus();
+        updateCompoundSbvr();
     }
 
     private void addDifferentiaFromSelection() {
@@ -292,29 +367,66 @@ public final class ComposeConceptDialog extends JDialog {
     }
 
     private void addDifferentia(ConceptRef concept) {
-        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 1));
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 1));
         row.add(new JLabel("that"));
-        JComboBox<String> rel = new JComboBox<>(relationPhrases.toArray(new String[0]));
+        JComboBox<String> rel = new JComboBox<>(new DefaultComboBoxModel<>(relationPhrases.toArray(new String[0])));
         rel.setEditable(true);
-        rel.setName("semantic.compose.relation." + diffRows.size());
+        rel.setName("semantic.compose.relation." + (relSeq++));
         rel.addActionListener(e -> updateCompoundSbvr());
         row.add(rel);
-        JLabel lbl = new JLabel(concept.label());
-        row.add(lbl);
-        JButton remove = new JButton("✕");
-        remove.setToolTipText("Remove this relation");
+        row.add(new JLabel(concept.label()));
         DiffRow dr = new DiffRow(concept, rel, row);
-        remove.addActionListener(e -> {
+        row.add(iconButton("↑", "Move up", () -> moveDiff(dr, -1)));
+        row.add(iconButton("↓", "Move down", () -> moveDiff(dr, 1)));
+        row.add(iconButton("genus", "Make this the genus (is a kind of)", () -> promoteToGenus(dr)));
+        row.add(iconButton("✕", "Remove", () -> {
             diffRows.remove(dr);
-            diffPanel.remove(row);
-            diffPanel.revalidate();
-            diffPanel.repaint();
+            rebuildDiffPanel();
             updateCompoundSbvr();
-        });
-        row.add(remove);
+        }));
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
         diffRows.add(dr);
-        diffPanel.add(row);
+        rebuildDiffPanel();
+    }
+
+    private JButton iconButton(String text, String tip, Runnable action) {
+        JButton b = new JButton(text);
+        b.setMargin(new java.awt.Insets(1, 4, 1, 4));
+        b.setToolTipText(tip);
+        b.addActionListener(e -> action.run());
+        return b;
+    }
+
+    private void moveDiff(DiffRow dr, int delta) {
+        int i = diffRows.indexOf(dr);
+        int j = i + delta;
+        if (i < 0 || j < 0 || j >= diffRows.size()) {
+            return;
+        }
+        diffRows.set(i, diffRows.get(j));
+        diffRows.set(j, dr);
+        rebuildDiffPanel();
+        updateCompoundSbvr();
+    }
+
+    /** Promote a differentia to the genus; the old genus (if any) becomes a differentia row. */
+    private void promoteToGenus(DiffRow dr) {
+        ConceptRef oldGenus = genus;
+        genus = dr.concept;
+        diffRows.remove(dr);
+        rebuildDiffPanel();
+        if (oldGenus != null) {
+            addDifferentia(oldGenus);
+        }
+        refreshGenus();
+        updateCompoundSbvr();
+    }
+
+    private void rebuildDiffPanel() {
+        diffPanel.removeAll();
+        for (DiffRow dr : diffRows) {
+            diffPanel.add(dr.panel);
+        }
         diffPanel.revalidate();
         diffPanel.repaint();
     }
@@ -345,12 +457,28 @@ public final class ComposeConceptDialog extends JDialog {
     }
 
     private void updateCompoundSbvr() {
-        if (genus == null) {
-            compoundSbvr.setText("Add a genus (\"is a kind of\") to begin.");
+        if (genus == null && diffRows.isEmpty()) {
+            compoundSbvr.setText("Search for a concept, then \"Set as genus\" or \"Add as → relation\" "
+                    + "(in any order).");
             return;
         }
-        compoundSbvr.setText(previewSbvr());
+        String text = previewSbvr();
+        if (genus == null) {
+            text += "\n\n(tip: set a genus with \"Set as genus\" or a row's \"genus\" button.)";
+        }
+        compoundSbvr.setText(text);
         compoundSbvr.setCaretPosition(0);
+    }
+
+    private static String camelCase(String s) {
+        String[] w = s.trim().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String p : w) {
+            if (!p.isEmpty()) {
+                sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1));
+            }
+        }
+        return sb.length() == 0 ? "Concept" : sb.toString();
     }
 
     /** Minimal DocumentListener that runs one callback on any change. */
