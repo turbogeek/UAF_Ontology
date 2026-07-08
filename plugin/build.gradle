@@ -229,6 +229,29 @@ tasks.register('deployPlugin', Sync) {
                         "Deployed plugin jar is locked - close CATIA Magic before running deployPlugin.")
             }
         }
+        // The append-open test above can pass SPURIOUSLY on Windows even while a live JVM has the
+        // jar memory-mapped for read. Overwriting the jar under that running Cameo corrupts its
+        // cached ZipFile offsets, so the next lazily-loaded class reads a bad local header ->
+        // "NoClassDefFoundError: ... invalid LOC header (bad signature)" (the 2026-07-08 incident).
+        // The reliable signal that OUR plugin's Cameo is live is its REST harness answering; refuse
+        // to deploy while it is, unless explicitly overridden (-PallowLiveDeploy=true).
+        if (!project.hasProperty('allowLiveDeploy')) {
+            int harnessPort = (project.findProperty('harnessPort') ?: '8765').toString().toInteger()
+            def sock = new java.net.Socket()
+            try {
+                sock.connect(new java.net.InetSocketAddress('127.0.0.1', harnessPort), 600)
+                throw new GradleException(
+                        "A Cameo instance appears to be RUNNING (Semantic plugin REST harness answered on " +
+                        "127.0.0.1:${harnessPort}). Deploying now would hot-overwrite jars held open by that " +
+                        "JVM and corrupt it (NoClassDefFoundError: 'invalid LOC header'). Stop Cameo first - " +
+                        "POST tests/integration/ShutdownCameo.groovy to the harness (or run scripts/redeploy.ps1) - " +
+                        "then re-run deployPlugin. Override with -PallowLiveDeploy=true only if the port is stale.")
+            } catch (java.net.ConnectException | java.net.SocketTimeoutException ignored) {
+                // nothing listening -> no live Cameo with our plugin -> safe to deploy
+            } finally {
+                try { sock.close() } catch (Throwable ignored) {}
+            }
+        }
     }
     into "${cameoHome}/plugins/${pluginId}"
     from tasks.named('jar')
