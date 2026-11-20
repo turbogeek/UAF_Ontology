@@ -1,0 +1,8 @@
+19:32:24.458  === verify-auto-match START ===
+19:32:24.460  project: UAF SAR Sample
+19:32:24.670  OK ActualOrganization [Maritime & Coast Guard Agency] -> autoConcept=ActualOrganization (-) | userConcept=- | sbvr=Instance: Maritime & Coast Guard Agency is a Actual Organization.
+19:32:24.752  OK ActualPost [c2 chief] -> autoConcept=ActualPost (-) | userConcept=- | sbvr=Instance: C2 Chief is a Actual Post.
+19:32:24.814  OK ResourceArtifact [Boat] -> autoConcept=ResourceArtifact (-) | userConcept=- | sbvr=Instance: Boat is a Resource Artifact.
+19:32:24.848  OK Capability [SAR] -> autoConcept=Capability (Aspect) | userConcept=- | sbvr=Instance: SAR is a Capability.  (foundational: Aspect)
+19:32:24.849  RESULT: PASS
+19:32:24.850  === verify-auto-match DONE ===

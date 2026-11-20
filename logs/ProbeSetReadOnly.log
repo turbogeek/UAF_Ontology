@@ -1,0 +1,7 @@
+12:02:31.441  === probe-set-readonly START ===
+12:02:31.449  package editable BEFORE: true
+12:02:31.452  findOrLoadModule -> com.nomagic.magicdraw.persistence.ci.xmi.c@4ca06f1
+12:02:31.455  module usages: 1
+12:02:31.460  setReadOnlyOnTask(true) done
+12:02:31.462  package editable AFTER: true
+12:02:31.463  === probe-set-readonly DONE ===

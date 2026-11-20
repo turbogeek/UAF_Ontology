@@ -1,8 +1,8 @@
-﻿17:58:12.573  === IT2 mapping-undo START ===
-17:58:12.634  created probe: UndoProbe_1783292292584
-17:58:12.759  mapping applied OK -> bmm:Goal
-17:58:12.838  undo OK: stereotype removed
-17:58:13.326  redo OK: mapping restored -> bmm:Goal
-17:58:13.328  RESULT: PASS
-17:58:13.330  === IT2 DONE ===
+﻿22:34:45.510  === IT2 mapping-undo START ===
+22:34:45.535  created probe: UndoProbe_1783308885516
+22:34:45.674  mapping applied OK -> bmm:Goal
+22:34:45.721  undo OK: stereotype removed
+22:34:45.770  redo OK: mapping restored -> bmm:Goal
+22:34:45.771  RESULT: PASS
+22:34:45.772  === IT2 DONE ===
 

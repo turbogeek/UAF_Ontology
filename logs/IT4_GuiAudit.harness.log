@@ -1,13 +1,13 @@
-﻿17:58:15.648  === IT4 gui-audit START ===
-17:58:16.068  Run Audit clicked
-17:58:16.579  audit event: 2026-07-05 17:58:16.376 | AUDIT | project=Use Case Tester | consistent=true | shaclViolations=0 | tboxFiles=0 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl
-17:58:16.582  export size: 1331 chars
-17:58:16.584  export contains type assertion (MilitaryBase)
-17:58:16.585  export contains containment (hasPart)
-17:58:16.586  export contains association (connectedTo)
-17:58:16.587  export contains label (label)
-17:58:16.601  Jena parsed export OK: 12 triples
-17:58:16.607  badge OK: STATUS: CONSISTENT
-17:58:16.608  RESULT: PASS
-17:58:16.609  === IT4 DONE ===
+﻿22:34:47.049  === IT4 gui-audit START ===
+22:34:47.154  Run Audit clicked
+22:34:47.919  audit event: 2026-07-05 22:34:47.739 | AUDIT | project=UAF SAR Sample | consistent=true | shaclViolations=0 | tboxFiles=0 | shapes=semantic-plugin-shapes.ttl | export=C:\Users\DBR2\.semantic_alignment_plugin\last-audit-export.ttl
+22:34:47.921  export size: 1332 chars
+22:34:47.925  export contains type assertion (MilitaryBase)
+22:34:47.926  export contains containment (hasPart)
+22:34:47.927  export contains association (connectedTo)
+22:34:47.928  export contains label (label)
+22:34:47.951  Jena parsed export OK: 12 triples
+22:34:47.956  badge OK: STATUS: CONSISTENT
+22:34:47.958  RESULT: PASS
+22:34:47.959  === IT4 DONE ===
 

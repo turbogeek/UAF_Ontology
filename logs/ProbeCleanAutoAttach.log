@@ -1,0 +1,8 @@
+22:33:02.284  === probe-clean-auto-attach START ===
+22:33:05.217  fresh project: Untitled1
+22:33:05.219  not auto-attached; trying clean useModule from install profiles dir
+22:33:05.223  mount file: E:\Magic SW\CMSoS26xR1pr\profiles\Semantic Alignment Profile.mdzip exists=true
+22:33:05.718  useModule returned: true
+22:33:05.898  RESOLVED via useModule: Semantic Alignment Profile::Semantic Alignment Profile::SemanticAlignment
+22:33:06.868  OUTCOME: USEMODULE_OK
+22:33:06.870  === probe-clean-auto-attach DONE ===

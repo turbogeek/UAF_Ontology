@@ -1,14 +1,14 @@
-﻿17:58:10.272  === IT0 plugin-loaded START ===
-17:58:10.419  plugin loaded: com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin | classloader=java.net.URLClassLoader@5f5efbfc
-17:58:10.426  plugin directory: E:\Magic SW\CMSoS26xR1pr\plugins\com.nomagic.magicdraw.plugins.semantic
-17:58:10.436  class OK: com.nomagic.magicdraw.plugins.semantic.SemanticRDFExporter
-17:58:10.440  class OK: com.nomagic.magicdraw.plugins.semantic.SHACLValidator
-17:58:10.441  class OK: com.nomagic.magicdraw.plugins.semantic.SBVREngine
-17:58:10.444  class OK: com.nomagic.magicdraw.plugins.semantic.DiagnosticLog
-17:58:10.445  class OK: org.apache.jena.rdf.model.ModelFactory
-17:58:10.447  class OK: org.apache.jena.shacl.ShaclValidator
-17:58:10.450  journal OK: C:\Users\DBR2\.semantic_alignment_plugin\semantic-plugin.log (30209 bytes)
-17:58:10.469  SBVR smoke test OK: Instance: Echo Base is a Military Base.
-17:58:10.470  RESULT: PASS
-17:58:10.472  === IT0 DONE ===
+﻿22:34:43.936  === IT0 plugin-loaded START ===
+22:34:43.945  plugin loaded: com.nomagic.magicdraw.plugins.semantic.SemanticAlignmentPlugin | classloader=java.net.URLClassLoader@31d5ce58
+22:34:43.949  plugin directory: E:\Magic SW\CMSoS26xR1pr\plugins\com.nomagic.magicdraw.plugins.semantic
+22:34:43.959  class OK: com.nomagic.magicdraw.plugins.semantic.SemanticRDFExporter
+22:34:43.962  class OK: com.nomagic.magicdraw.plugins.semantic.SHACLValidator
+22:34:43.964  class OK: com.nomagic.magicdraw.plugins.semantic.SBVREngine
+22:34:43.966  class OK: com.nomagic.magicdraw.plugins.semantic.DiagnosticLog
+22:34:43.967  class OK: org.apache.jena.rdf.model.ModelFactory
+22:34:43.970  class OK: org.apache.jena.shacl.ShaclValidator
+22:34:43.973  journal OK: C:\Users\DBR2\.semantic_alignment_plugin\semantic-plugin.log (67945 bytes)
+22:34:43.991  SBVR smoke test OK: Instance: Echo Base is a Military Base.
+22:34:43.992  RESULT: PASS
+22:34:43.993  === IT0 DONE ===
 

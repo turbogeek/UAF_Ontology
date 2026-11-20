@@ -1,11 +1,12 @@
-﻿17:58:14.148  === IT3 gui-selection START ===
-17:58:14.367  selection event: 2026-07-05 17:58:14.312 | SELECTION | Class EchoBase | stereotypes=SemanticAlignment | concept=sumo:MilitaryBase | sbvr=Instance: Echo Base is a Military Base.
-17:58:14.369  SBVR sentence correct for mapped element
-17:58:14.826  sidebar label OK: Selected Element: Class EchoBase
-17:58:14.848  sidebar SBVR area OK: Instance: Echo Base is a Military Base.
-17:58:15.487  mapping event: 2026-07-05 17:58:15.484 | MAPPING | Class GuiMappingProbe -> sumo:Device | status=OK
-17:58:15.489  model confirms GuiMappingProbe is now aligned
-17:58:15.491  sidebar refresh event: 2026-07-05 17:58:15.480 | SELECTION | Class GuiMappingProbe | stereotypes=SemanticAlignment | concept=sumo:Device | sbvr=Instance: Gui Mapping Probe is a Device.
-17:58:15.493  RESULT: PASS
-17:58:15.494  === IT3 DONE ===
+﻿22:34:46.288  === IT3 gui-selection START ===
+22:34:46.407  selection event: 2026-07-05 22:34:46.372 | SELECTION | Semantic Alignment EchoBase | stereotypes=SemanticAlignment | autoConcept=- | userConcept=sumo:MilitaryBase | sbvr=Instance: Echo Base is a Military Base.
+22:34:46.408  SBVR sentence correct for mapped element
+22:34:46.661  sidebar label OK: Selected Element: Semantic Alignment EchoBase
+22:34:46.664  sidebar SBVR area OK: Instance: Echo Base is a Military Base.
+22:34:46.672  note: GuiMappingProbe already mapped (rerun) - GUI mapping still exercised
+22:34:46.738  mapping event: 2026-07-05 22:34:46.737 | MAPPING | Semantic Alignment GuiMappingProbe -> sumo:Device | status=OK
+22:34:46.740  model confirms GuiMappingProbe is now aligned
+22:34:46.742  sidebar refresh event: 2026-07-05 22:34:46.735 | SELECTION | Semantic Alignment GuiMappingProbe | stereotypes=SemanticAlignment | autoConcept=- | userConcept=sumo:Device | sbvr=Instance: Gui Mapping Probe is a Device.
+22:34:46.743  RESULT: PASS
+22:34:46.745  === IT3 DONE ===
 

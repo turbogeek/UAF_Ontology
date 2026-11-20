@@ -1,0 +1,5 @@
+21:45:27.253  === probe-auto-attach-new START ===
+21:45:27.613  closed active project
+21:45:29.438  createProject returned null
+21:45:29.440  RESULT: FAIL
+21:45:29.441  === probe-auto-attach-new DONE ===

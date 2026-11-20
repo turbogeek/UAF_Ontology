@@ -1,0 +1,15 @@
+10:10:40.006  === probe-deployed-instrument START ===
+10:10:40.191  [PASS] plugin classloader located
+10:10:40.194  [PASS] StereotypeManager class deployed
+10:10:40.195  [PASS] SemanticMenuConfigurator class deployed
+10:10:46.515  [PASS] not instrumented initially
+10:10:46.955  [PASS] ensureProfileAvailable (deployed)
+10:10:46.957    defaultRootIri -> http://semantic.alignment/model/Untitled1#
+10:10:46.992  [PASS] isInstrumented after instrument
+10:10:46.993  [PASS] one aligned element
+10:10:47.007    removeAllInstrumentation -> 2
+10:10:47.008  [PASS] removed 2 applications (model + element)
+10:10:47.010  [PASS] not instrumented after removal
+10:10:47.011  [PASS] zero aligned after removal
+10:10:48.302  RESULT: PASS
+10:10:48.303  === probe-deployed-instrument DONE ===

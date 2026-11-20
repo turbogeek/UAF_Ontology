@@ -1,0 +1,21 @@
+09:51:22.558  === probe-instrument START ===
+09:51:24.741  project: Untitled1
+09:51:24.759  mount from: E:\Magic SW\CMSoS26xR1pr\profiles\Semantic Alignment Profile.mdzip exists=true
+09:51:25.248  useModule -> true
+09:51:25.253  [PASS] SemanticAlignment stereotype resolves
+09:51:25.260  [PASS] SemanticModel stereotype resolves
+09:51:25.299  [PASS] model root has SemanticModel
+09:51:25.301  [PASS] element has SemanticAlignment
+09:51:25.303    ontologyRootIRI=[http://semantic.alignment/model/Untitled1#]  ontologyVersion=[1.0.0]
+09:51:25.310  [PASS] root IRI stored
+09:51:25.312  [PASS] version stored
+09:51:25.313    aligned elements=1  instrumented models=1
+09:51:25.315  [PASS] one aligned element
+09:51:25.316  [PASS] one instrumented model
+09:51:25.342    aligned after=0  models after=0
+09:51:25.343  [PASS] no aligned elements after un-instrument
+09:51:25.344  [PASS] no instrumented models after un-instrument
+09:51:25.346  [PASS] element clean
+09:51:25.346  [PASS] model root clean
+09:51:26.054  RESULT: PASS
+09:51:26.056  === probe-instrument DONE ===

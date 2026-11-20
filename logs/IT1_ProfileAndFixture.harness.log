@@ -1,10 +1,10 @@
-﻿17:58:11.135  === IT1 profile-and-fixture START ===
-17:58:11.148  active project: Use Case Tester
-17:58:11.837  created stereotype: UAF Semantic Alignment Profile::SemanticAlignment
-17:58:12.015  echoBase aligned OK -> sumo:MilitaryBase
-17:58:12.016  ionCannon aligned OK -> sumo:Device
-17:58:12.017  transport aligned OK -> sumo:Vehicle
-17:58:12.018  GuiMappingProbe unmapped as required
-17:58:12.020  RESULT: PASS
-17:58:12.021  === IT1 DONE ===
+﻿22:34:44.794  === IT1 profile-and-fixture START ===
+22:34:44.797  active project: UAF SAR Sample
+22:34:44.811  shipped profile mounted; stereotype: Semantic Alignment Profile::Semantic Alignment Profile::SemanticAlignment
+22:34:45.212  echoBase aligned OK -> sumo:MilitaryBase
+22:34:45.213  ionCannon aligned OK -> sumo:Device
+22:34:45.215  transport aligned OK -> sumo:Vehicle
+22:34:45.216  GuiMappingProbe unmapped as required
+22:34:45.217  RESULT: PASS
+22:34:45.218  === IT1 DONE ===
 

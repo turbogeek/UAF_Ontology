@@ -1,0 +1,202 @@
+19:04:14.138  === probe-uaf-stereotypes START ===
+19:04:27.501  loaded: UAF SAR Sample
+19:04:29.186  distinct UAF stereotypes applied in sample: 522
+19:04:29.209  --- focus stereotypes (name | ID | profile | example element) ---
+19:04:29.215    Capability | _15_1_f00036a_1212649835563_629884_49577 | UAF | e.g. SAR
+19:04:29.216    Capability Structural Map | _17_0_4beta_90d02a1_1358412210509_624038_65608 | Products | e.g. SAR Structural Map
+19:04:29.218    CapabilityRole | _16_9_8f40297_1283322646142_143031_6656 | UAF | e.g. dsm
+19:04:29.219    Capability Behavioral Map | _17_0_4beta_90d02a1_1358412140946_539992_65594 | Products | e.g. Land SAR Behavioral Map
+19:04:29.220    OperationalPerformer | _15_1_f00036a_1212649835688_312195_49696 | UAF | e.g. Searcher ph2
+19:04:29.221    OperationalActivity | _15_1_f00036a_1212649835672_434798_49688 | UAF | e.g. Search
+19:04:29.222    OperationalActivityAction | _15_1_f00036a_1213208081750_507064_13137 | UAF | e.g. Send Distress Signal
+19:04:29.223    StandardOperationalActivity | _15_1_f00036a_1212649835672_343865_49686 | UAF | e.g. Find Victim
+19:04:29.224    MapsToCapability | _15_5_f00036a_1218077127970_196344_42995 | UAF | e.g. 
+19:04:29.227    Op-Tr Operational Performers to Capabilities Mapping Matrix | _19_0beta_90d02a1_1487140448066_554569_79743 | UAF Products | e.g. Operational Performers to Capabilities Mapping Matrix
+19:04:29.228    Personnel | _18_4beta_8740266_1458293557425_468573_72132 | UAF Packages | e.g. Personnel
+19:04:29.228    Personnel Taxonomy Package | _18_4beta_8740266_1457347243476_865620_68590 | Personnel Packages | e.g. Personnel Taxonomy
+19:04:29.229    Organization | _15_1_f00036a_1212649837750_29451_148049 | UAF | e.g. UK SAR Operator
+19:04:29.230    ResourceRole | _15_1_f00036a_1213191143312_605171_5915 | UAF | e.g. search and Rescue
+19:04:29.231    ResourceAssociation | _17_0_1_8f40297_1301996701127_618964_55479 | Extra stereotypes | e.g. 
+19:04:29.232    Post | _15_1_f00036a_1212649837750_176846_148050 | UAF | e.g. UK SAR SC Member
+19:04:29.233    ResourcePort | _15_1_f00036a_1212649835610_452845_49626 | UAF | e.g. resourcePort1
+19:04:29.233    Person | _16_5beta2_8f40297_1237891492835_992188_4134 | UAF | e.g. Marine Radio Operator
+19:04:29.234    ResourceStateDescription | _15_5_f00036a_1218621278739_810454_111446 | UAF | e.g. Maritime Rescue Team Phase 3
+19:04:29.234    Ps-St Personnel States | _18_4beta_8740266_1460540364727_993028_74331 | UAF Products | e.g. Maritime Rescue Team Phase 3
+19:04:29.235    ResourceSignal | _19_0beta_90d02a1_1495531513192_131011_4720 | UAF | e.g. Distress Beacon
+19:04:29.236    Ps-Pr Personnel Process Flow | _19_0beta_90d02a1_1485265152366_775802_78917 | UAF Products | e.g. Determine Destination
+19:04:29.237    Ps-Sq Personnel Sequences | _18_5_8740266_1483946757716_66712_78976 | UAF Products | e.g. UK SAR Organization Phase3
+19:04:29.238    ResourceMessage | _16_0_1_f00036a_1234538498627_986821_7151 | UAF | e.g. 
+19:04:29.239    ResourceExchange | _15_1_f00036a_1212649835625_919233_49642 | UAF | e.g. flow for DistressSignal
+19:04:29.240    Ps-Tx Personnel Taxonomy | _18_4beta_8740266_1460540289618_561810_74321 | UAF Products | e.g. Typical Organizations
+19:04:29.242    Ps-Tx Personnel Taxonomy Table | _18_5beta_8740266_1477064822659_266623_76888 | UAF Products | e.g. Personnel Taxonomy Table
+19:04:29.244    Personnel Structure Package | _18_4beta_8740266_1457347243254_212258_68584 | Personnel Packages | e.g. Personnel Structure
+19:04:29.246    Ps-Sr Personnel Structure | _18_4beta_8740266_1458651850239_514196_73861 | UAF Products | e.g. Personnel Structure
+19:04:29.248    Personnel Roadmap Package | _18_4beta_8740266_1457347225393_54800_68572 | Personnel Packages | e.g. Personnel Roadmap
+19:04:29.249    Personnel Evolution Report | _19_0beta_8e8028e_1485757446155_164474_78919 | Reports | e.g. Personnel Evolution (.docx)
+19:04:29.249    Ps-Rm Personnel Evolution | _18_4beta_8ae027d_1460469532632_619689_74167 | UAF Products | e.g. WholeLifeConfiguration Version of SAR Organization Context
+19:04:29.251    Ps-Rm Personnel Forecast | _19_0beta_90d02a1_1485264819624_601467_78910 | UAF Products | e.g. Personnel Forecast
+19:04:29.252    Ps-Rm Personnel Availability Gantt Chart | _19_0_1_90d02a1_1527766108332_796408_89608 | UAF Products | e.g. Personnel Availability Gantt Chart
+19:04:29.254    Personnel Connectivity Package | _18_4beta_8740266_1460541053849_490284_74345 | Personnel Packages | e.g. Personnel Connectivity
+19:04:29.255    Personnel Connectivity Table Report | _19_0beta_8e8028e_1485758196784_634224_79003 | Reports | e.g. Personnel Connectivity (.xlsx)
+19:04:29.256    Personnel Role Based Connectivity Table Report | _19_0beta_8e8028e_1485758645925_944739_79054 | Reports | e.g. Personnel Role-based Connectivity (.xlsx)
+19:04:29.258    Ps-Cn Personnel Connectivity Diagram | _19_0_90d02a1_1515675522792_50429_88548 | UAF Products | e.g. Personnel Connectivity
+19:04:29.259    Ps-Cn Personnel Connectivity Table | _18_4beta_8ae027d_1460469388781_718188_74148 | UAF Products | e.g. Personnel Connectivity Table
+19:04:29.260    Personnel States Package | _18_4beta_8740266_1460541054168_9198_74353 | Personnel Packages | e.g. Personnel States
+19:04:29.260    Personnel Processes Package | _19_0beta_8740266_1485952975378_848589_79056 | Personnel Packages | e.g. Personnel Processes
+19:04:29.261    Rs-Pr Resources Process Flow | _18_4beta_8740266_1458733146622_161116_73877 | UAF Products | e.g. Find Person in Distress
+19:04:29.261    ResourceParameter | _15_5_f00036a_1219327826484_366839_50826 | UAF | e.g. input
+19:04:29.261    Ps-Pr Personnel Processes | _18_5_8740266_1483946706209_755560_78961 | UAF Products | e.g. Personnel Processes
+19:04:29.262    Personnel Parameters Package | _19_0beta_8e8028e_1485760515608_705533_79235 | Personnel Packages | e.g. Personnel Parameters
+19:04:29.263    Personnel Sequences Package | _19_0beta_8740266_1485956613870_399492_79082 | Personnel Packages | e.g. Personnel Sequences
+19:04:29.263    Personnel Constraints Package | _19_0beta_8e8028e_1485760471630_600149_79224 | Personnel Packages | e.g. Personnel Constraints
+19:04:29.265    Personnel Constraints Report | _19_0beta_8e8028e_1485759040414_174175_79109 | Reports | e.g. Personnel Constraints (.xlsx)
+19:04:29.266    ResourceConstraint | _15_1_f00036a_1212649835594_786352_49620 | UAF | e.g. resourceConstraint1
+19:04:29.266    Ps-Ct Personnel Constraints | _18_5_8740266_1483945927500_800460_78913 | UAF Products | e.g. Personnel Constraints
+19:04:29.268    Ps-Ct Personnel Constraints Definition | _19_0_8c30285_1523445567913_380872_88628 | UAF Products | e.g. Personnel Constraints Definition
+19:04:29.269    Personnel Information Package | _19_0_90d02a1_1516613110640_389422_88678 | Personnel Packages | e.g. Personnel Information
+19:04:29.270    ResourceInformation | _18_1_90d02a1_1421150988925_169524_5072 | UAF | e.g. EmergencyNotification
+19:04:29.272    Personnel Traceability Package | _2021x_2_42c0144_1629450633640_179674_19479 | Personnel Packages | e.g. Personnel Traceability
+19:04:29.273    Personnel Motivation Package | _2021x_2_42c0144_1629285323552_975331_19403 | Personnel Packages | e.g. Personnel Motivation
+19:04:29.275    Resources | _18_4beta_8740266_1457617626689_769713_70595 | UAF Packages | e.g. Resources
+19:04:29.277    Resources Connectivity Package | _18_4beta_8740266_1457345041279_946831_68470 | Resources Packages | e.g. Resources Connectivity
+19:04:29.278    Resources Connectivity Table Report | _18_4beta_8ae027d_1461135680323_367433_74517 | Reports | e.g. Resource Connectivity (.xlsx)
+19:04:29.280    Resources Role based Connectivity Table Report | _18_4beta_8ae027d_1461135680343_1618_74519 | Reports | e.g. Resource Role-based Connectivity (.xlsx)
+19:04:29.282    Rs-Cn Resources Connectivity Matrix | _18_4beta_8ae027d_1461244466250_605087_75095 | UAF Products | e.g. Resources Connectivity Matrix
+19:04:29.283    Rs-Cn Resources Connectivity Table | _18_4beta_8ae027d_1456403289248_77325_67493 | UAF Products | e.g. Resources Connectivity Table
+19:04:29.285    Rs-Cn Resources Role-based Connectivity Table | _18_4beta_8ae027d_1456403972926_136981_67592 | UAF Products | e.g. Resources Role-based Connectivity Table
+19:04:29.287    Rs-Cn Resources Connectivity Diagram | _19_0_90d02a1_1515675189349_469025_88510 | UAF Products | e.g. Resources Connectivity
+19:04:29.288    Resources Constraints Package | _18_4beta_8740266_1457345073141_633825_68476 | Resources Packages | e.g. Resources Constraints
+19:04:29.290    Resources Constraints Report | _18_4beta_8ae027d_1461135738998_17933_74533 | Reports | e.g. Resource Constraints (.xlsx)
+19:04:29.291    Rs-Ct Resources Constraints | _18_4beta_8ae027d_1456403463300_423201_67531 | UAF Products | e.g. Resource Constraints
+19:04:29.292    Resources Sequences Package | _18_4beta_8740266_1457345073583_324913_68488 | Resources Packages | e.g. Resources Sequences
+19:04:29.293    Resources Processes Package | _18_4beta_8740266_1457345073916_726456_68500 | Resources Packages | e.g. Resources Processes
+19:04:29.294    Rs-Pr Resources Processes | _18_4beta_8740266_1458732992011_533094_73850 | UAF Products | e.g. Rescue Victim
+19:04:29.295    Resources Roadmap Package | _18_4beta_8740266_1457345074095_614833_68506 | Resources Packages | e.g. Resources Roadmap
+19:04:29.297    Resources Evolution Report | _18_4beta_8ae027d_1461135790168_623662_74543 | Reports | e.g. Resource Evolution (.docx)
+19:04:29.299    Rs-Rm Resources Evolution | _18_4beta_8ae027d_1456403606510_76103_67561 | UAF Products | e.g. WholeLifeConfiguration Version Of Maritime SAR Resource Architecture
+19:04:29.300    Rs-Rm Resources Forecast | _18_4beta_8ae027d_1456403427783_112348_67523 | UAF Products | e.g. Resources Forecast
+19:04:29.302    Resources States Package | _18_4beta_8740266_1457345195831_229222_68512 | Resources Packages | e.g. Resources States
+19:04:29.303    Resources Structure Package | _18_4beta_8740266_1457345196040_499176_68518 | Resources Packages | e.g. Resources Structure
+19:04:29.305    Rs-Sr Resources Structure | _19_0beta_90d02a1_1487657865175_705267_80387 | UAF Products | e.g. Resources Structure
+19:04:29.307    Resources Taxonomy Package | _18_4beta_8740266_1457345196204_468545_68524 | Resources Packages | e.g. Resources Taxonomy
+19:04:29.308    ResourceArchitecture | _15_1_f00036a_1212649835610_295695_49625 | UAF | e.g. Maritime Rescue Architecture v1
+19:04:29.309    Rs-Cn Resources Internal Connectivity | _18_4beta_8740266_1458733433123_860051_73958 | UAF Products | e.g. Maritime Rescue Architecture v1
+19:04:29.310    Rs-Sq Resources Sequences | _18_4beta_8740266_1458731917900_924856_73766 | UAF Products | e.g. Maritime Rescue Architecture v1
+19:04:29.311    ResourceConnector | _16_5beta2_8f40297_1237892217773_263612_4164 | UAF | e.g. 
+19:04:29.314    CapabilityConfiguration | _16_9_8f40297_1283512444898_303891_15796 | UAF | e.g. Maritime Rescue Unit v2
+19:04:29.315    ResourceArtifact | _15_1_f00036a_1212649835594_786592_49618 | UAF | e.g. Boat
+19:04:29.317    Rs-St Resources States | _18_4beta_8740266_1458733580431_6043_73985 | UAF Products | e.g. Aircraft
+19:04:29.318    ResourceInterface | _18_2beta_8ae027d_1429516971491_552554_5160 | UAF | e.g. BeaconInstruction
+19:04:29.319    ActualResource | _18_1_90d02a1_1420635446081_698654_4841 | UAF | e.g. Maritime Rescue Unit v1 _ Initial Values
+19:04:29.319    Rs-Tx Resources Taxonomy | _18_4beta_8740266_1458733787138_157362_74039 | UAF Products | e.g. Performers
+19:04:29.320    Rs-Tx Resources Taxonomy Table | _18_5beta_8740266_1477064855749_763019_76909 | UAF Products | e.g. Resources Taxonomy Table
+19:04:29.322    Resources Traceability Package | _18_4beta_8740266_1457345261940_516145_68530 | Resources Packages | e.g. Resources Traceability
+19:04:29.322    Rs-Tr Resources to Operational Activities Mapping Matrix | _19_0_90d02a1_1515592653231_392342_88716 | UAF Products | e.g. Resources to Operational Activities Mapping Matrix
+19:04:29.324    Resources Information Package | _18_4beta_8740266_1457345073386_121869_68482 | Resources Packages | e.g. Resources Information
+19:04:29.325    Resources Parameters Package | _18_4beta_8740266_1457345073768_874752_68494 | Resources Packages | e.g. Resources Parameters
+19:04:29.327    Me-Rs-M Resources Actual Measurements | _19_0beta_90d02a1_1487675609152_490772_81716 | UAF Products | e.g. Resources Actual Classification Measurements
+19:04:29.328    Me-Rs-M Resources Typical Measurements | _19_0beta_90d02a1_1487675609154_431868_81717 | UAF Products | e.g. Resources Typical Classification Measurements
+19:04:29.329    Resources Motivation Package | _2021x_2_42c0144_1629285446107_534421_19412 | Resources Packages | e.g. Resources Motivation
+19:04:29.330    ResourceMitigation | _18_3beta_8740266_1442559135656_559221_5297 | UAF | e.g. Communication Redundancy
+19:04:29.331    Sc-Cn Security Internal Connectivity Resource | _18_5beta_8740266_1476171965437_509865_76569 | UAF Products | e.g. Communication Redundancy
+19:04:29.332    Sc-Cn Security Connectivity Table Resource | _18_5beta_8740266_1476172008275_244672_76576 | UAF Products | e.g. Security Connectivity
+19:04:29.334    Sc-Cn Security Role-based Connectivity Table Resource | _18_5beta_8740266_1476172042283_430370_76586 | UAF Products | e.g. Security Role-based Connectivity Table
+19:04:29.336    Pj-Tr Actual Responsible Resources to Actual Projects Mapping Matrix | _18_4beta_8740266_1458559514299_184015_74060 | UAF Products | e.g. Actual Responsible Resources to Actual Projects Mapping Matrix
+19:04:29.337    ProjectActivity | _16_9_8f40297_1283252101398_964122_4148 | UAF | e.g. SAR Lifecycle Project
+19:04:29.339    ProjectActivityAction | _17_0_3beta_7d40257_1350630293093_193908_3375 | UAF | e.g. SAR Phase 1 Requirements Capture
+19:04:29.339    Actual Resources | _18_4beta_8740266_1458295280038_842082_72987 | UAF Packages | e.g. Actual Resources
+19:04:29.340    Actual Resources Structure Package | _18_4beta_8740266_1457354756068_802359_68656 | Actual Resources Packages | e.g. Actual Resources Structure
+19:04:29.341    ActualOrganization | _15_1_f00036a_1212649837750_530959_148054 | UAF | e.g. Maritime & Coast Guard Agency
+19:04:29.342    ActualOrganizationRole | _15_1_f00036a_1213174621759_185791_4812 | UAF | e.g. Actual Organization Role
+19:04:29.343    ActualPost | _15_1_f00036a_1212649837750_161657_148053 | UAF | e.g. c2 chief
+19:04:29.343    ActualPerson | _16_5beta2_8f40297_1237891237085_534216_4100 | UAF | e.g. Betty Boss
+19:04:29.344    FillsPost | _16_5beta2_8f40297_1237891436960_435228_4115 | UAF | e.g. 
+19:04:29.344    Ar-Sr Actual Resources Structure | _18_4beta_8740266_1460552293765_913537_74860 | UAF Products | e.g. Actual Organizations
+19:04:29.346    Actual Resources Connectivity Package | _18_4beta_8740266_1457354756053_885517_68650 | Actual Resources Packages | e.g. Actual Resources Connectivity
+19:04:29.348    Ar-Cn Actual Resources Connectivity | _18_4beta_8740266_1460552426918_513905_74867 | UAF Products | e.g. Security Domain
+19:04:29.350    Actual Resources Parameters Package | _19_0beta_90d02a1_1487147134586_276335_80107 | Actual Resources Packages | e.g. Actual Resources Parameters
+19:04:29.353    Actual Resources Taxonomy Package | _19_0_1_8c30285_1543499567298_430239_89292 | Actual Resources Packages | e.g. Actual Resources Taxonomy
+19:04:29.354    auxiliaryResource | _12_1_8f90291_1173963323875_662612_98 | MagicDraw Profile | e.g. Utils
+19:04:29.354    ResourceRoleMapping | _17_0_8ba0276_1300776320016_142336_54891 | UAF Customization | e.g. 
+19:04:29.356    ResourceRoleTable | _17_0_8ba0276_1300970741974_194209_55283 | UAF Customization | e.g. ResourceRole
+19:04:29.358    systemValidationSuite | _17_0_4beta_f980370_1360063430560_486321_2911 | Validation Profile | e.g. Composition Integrity
+19:04:29.360  --- all stereotype names (first 40) ---
+19:04:29.381    A1 Report
+19:04:29.383    AV-1 DARS Report
+19:04:29.384    AV-1 Report
+19:04:29.385    AV-2 Report
+19:04:29.387    AV-2 Tabular Report
+19:04:29.389    AcV2GanttChartDiagram
+19:04:29.390    Actual Resources
+19:04:29.391    Actual Resources Connectivity Package
+19:04:29.392    Actual Resources Parameters Package
+19:04:29.394    Actual Resources Structure Package
+19:04:29.396    Actual Resources Taxonomy Package
+19:04:29.396    ActualEnduringTask
+19:04:29.399    ActualEnterprisePhase
+19:04:29.400    ActualMeasurement
+19:04:29.401    ActualMeasurementSet
+19:04:29.402    ActualOrganization
+19:04:29.403    ActualOrganizationRole
+19:04:29.403    ActualPerson
+19:04:29.404    ActualPost
+19:04:29.404    ActualProject
+19:04:29.405    ActualProjectMilestone
+19:04:29.406    ActualProjectMilestoneRole
+19:04:29.407    ActualPropertySet
+19:04:29.409    ActualResource
+19:04:29.411    ActualRisk
+19:04:29.412    ActualStrategicPhaseTable
+19:04:29.414    Affects
+19:04:29.415    AffectsInContext
+19:04:29.416    All Views Report
+19:04:29.418    All Views Viewpoint
+19:04:29.419    Am-If Dictionary
+19:04:29.420    Analysis
+19:04:29.421    Ar-Cn Actual Resources Connectivity
+19:04:29.421    Ar-Sr Actual Resources Structure
+19:04:29.422    ArbitraryConnector
+19:04:29.423    ArchitecturalDescription
+19:04:29.425    Architecture Management
+19:04:29.426    Architecture Management Connectivity Package
+19:04:29.427    Architecture Management Constraints Package
+19:04:29.429    Architecture Management Information Package
+19:04:30.344  UNCAUGHT
+groovy.lang.MissingMethodException: No signature of method: getName for class: com.nomagic.uml2.ext.magicdraw.classes.mdkernel.impl.SlotImpl is applicable for argument types: () values: []
+Possible solutions: getValue(), getAt(java.lang.String), getClass(), getID(), getID(), getOwner()
+	at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.unwrap(ScriptBytecodeAdapter.java:74)
+	at org.codehaus.groovy.vmplugin.v8.IndyGuardsFiltersAndSignatures.unwrap(IndyGuardsFiltersAndSignatures.java:163)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:344)
+	at ProbeUafStereotypes$_run_closure10.doCall(ProbeUafStereotypes.groovy:80)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:338)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:274)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:270)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1010)
+	at groovy.lang.Closure.call(Closure.java:471)
+	at groovy.lang.Closure.call(Closure.java:460)
+	at org.codehaus.groovy.runtime.DefaultGroovyMethods.collect(DefaultGroovyMethods.java:2425)
+	at org.codehaus.groovy.runtime.DefaultGroovyMethods.collect(DefaultGroovyMethods.java:2362)
+	at org.codehaus.groovy.runtime.DefaultGroovyMethods.collect(DefaultGroovyMethods.java:2472)
+	at org.codehaus.groovy.runtime.dgm$622.doMethodInvoke(Unknown Source)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:344)
+	at ProbeUafStereotypes.run(ProbeUafStereotypes.groovy:80)
+	at groovy.lang.GroovyShell.evaluate(GroovyShell.java:489)
+	at groovy.lang.GroovyShell.evaluate(GroovyShell.java:533)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:344)
+	at ScriptRunner$_run_closure1.doCall(start-harness.groovy:533)
+	at ScriptRunner$_run_closure1.doCall(start-harness.groovy)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:338)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:274)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:270)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1010)
+	at groovy.lang.Closure.call(Closure.java:471)
+	at groovy.lang.Closure.call(Closure.java:450)
+	at groovy.lang.Closure.run(Closure.java:543)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+19:04:30.348  RESULT: FAIL
+19:04:30.350  === probe-uaf-stereotypes DONE ===

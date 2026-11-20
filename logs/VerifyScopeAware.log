@@ -1,0 +1,11 @@
+14:08:14.711  === VerifyScopeAware START ===
+14:08:14.839  created Class government (Class) and Activity government (Activity) in ScopeAwareIT
+14:08:15.269  Class/STRUCTURE SUGGEST: 2026-07-07 14:08:15.151 | SUGGEST | government | query=- | via=service(scope) | scope=STRUCTURE/null/terms=2 | count=12 | top=cco:ont00001335:92, cco:ont00000408:74, cco:ont00000946:74, cco:ont00001152:74, cco:ont00000685:73, cco:ont00000532:73, cco:ont00000094:62, cco:ont00000662:61, cco:ont00000545:61, cco:ont00000661:37, dpv:GovernmentalOrganisation:37, dpv:G2GContract:35
+14:08:15.485  Activity/BEHAVIOR SUGGEST: 2026-07-07 14:08:15.354 | SUGGEST | government | query=- | via=service(scope) | scope=BEHAVIOR/null/terms=2 | count=12 | top=cco:ont00000142:63, cco:ont00001335:56, cco:ont00000408:38, cco:ont00000946:38, cco:ont00001152:38, cco:ont00000661:37, cco:ont00000685:37, dpv:GovernmentalOrganisation:37, cco:ont00000532:36, dpv:G2GContract:35, dpv:G2BContract:34, dpv:G2CContract:34
+14:08:15.486  STRUCTURE via=service? true  |  BEHAVIOR via=service? true
+14:08:15.490  STRUCTURE ranks: Government=0 ActOfGovernment=-1
+14:08:15.491  BEHAVIOR  ranks: Government=1 ActOfGovernment=0
+14:08:15.492  OK STRUCTURE: Government (object) leads
+14:08:15.493  OK BEHAVIOR: Act of Government (process) lifted above the exact object
+14:08:15.494  RESULT: PASS
+14:08:15.495  === VerifyScopeAware DONE ===

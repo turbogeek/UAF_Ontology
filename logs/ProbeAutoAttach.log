@@ -1,0 +1,6 @@
+22:32:27.116  === probe-auto-attach START ===
+22:32:27.160  project: UAF SAR Sample
+22:32:27.171  SemanticAlignment NOT resolvable. Attached modules:
+22:32:27.207    (could not list modules: groovy.lang.MissingMethodException: No signature of method: getAvailableDescriptorsForProject for class: com.nomagic.magicdraw.core.project.ProjectsManager is applicable for argument types: (com.nomagic.magicdraw.core.Project) values: [com.nomagic.magicdraw.core.Project@5af5180d ( _2026x_1_2b0010b_1783308744382_982458_24973 UAF SAR Sample )])
+22:32:27.209  RESULT: FAIL
+22:32:27.210  === probe-auto-attach DONE ===

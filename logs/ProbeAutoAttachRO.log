@@ -1,0 +1,5 @@
+13:08:10.350  === probe-auto-attach-ro START ===
+13:08:12.175  fresh project: Untitled1
+13:08:12.180  WITHOUT useModule: SemanticAlignment=null  pkg=absent
+13:08:12.182  StandardProfilesHelper not found in either package
+13:08:12.836  === probe-auto-attach-ro DONE ===

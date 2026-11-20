@@ -1,0 +1,37 @@
+21:40:45.982  === probe-installed-profile-mount START ===
+21:40:45.988  profiles dir: E:\Magic SW\CMSoS26xR1pr\profiles\
+21:40:45.990  profile file exists: true (57564 bytes)
+21:40:46.345    (dismissing dialog: Loading...)
+21:40:46.380  mount attempt threw
+java.lang.NullPointerException: Cannot invoke method getName() on null object
+	at org.codehaus.groovy.runtime.NullObject.invokeMethod(NullObject.java:115)
+	at org.codehaus.groovy.vmplugin.v8.IndyGuardsFiltersAndSignatures.invokeGroovyObjectInvoker(IndyGuardsFiltersAndSignatures.java:151)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:344)
+	at ProbeInstalledProfileMount$_run_closure4.doCall(ProbeInstalledProfileMount.groovy:44)
+	at ProbeInstalledProfileMount$_run_closure4.doCall(ProbeInstalledProfileMount.groovy)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:338)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:274)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:270)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1010)
+	at groovy.lang.Closure.call(Closure.java:471)
+	at groovy.lang.Closure.call(Closure.java:450)
+	at groovy.lang.Closure.run(Closure.java:543)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:308)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:742)
+	at com.nomagic.utils.EventTracker.dispatchEvent(EventTracker.java:31)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+
+21:40:46.383  RESULT: THREW
+21:40:46.385  === probe-installed-profile-mount DONE ===

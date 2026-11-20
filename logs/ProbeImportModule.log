@@ -1,0 +1,22 @@
+18:59:30.013  === probe-import-module START ===
+18:59:30.023  importModule threw
+java.lang.IllegalArgumentException: module not found
+	at com.nomagic.magicdraw.core.project.ProjectsManager.importModule(ProjectsManager.java:880)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:344)
+	at ProbeImportModule$_run_closure3.doCall(ProbeImportModule.groovy:31)
+	at ProbeImportModule$_run_closure3.doCall(ProbeImportModule.groovy)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:338)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:274)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:270)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1010)
+	at groovy.lang.Closure.call(Closure.java:471)
+	at groovy.lang.Closure.call(Closure.java:450)
+	at groovy.lang.Closure.run(Closure.java:543)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+18:59:30.523  completed: threw
+18:59:31.527  stereotype resolvable after import: false
+18:59:31.528  RESULT: FAIL
+18:59:31.529  === probe-import-module DONE ===

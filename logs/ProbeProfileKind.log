@@ -1,0 +1,15 @@
+11:59:03.024  === probe-profile-kind START ===
+11:59:03.038  ModulesService static methods: [attachModule, attachModuleOnTask, detachModules, detachModulesAndRemoveUnreachable, detachModulesAndRemoveUnreachableOnTask, detachModulesOnTask, findOrLoadLocalModule, findOrLoadModule, getMountPoint, importModule, importModuleOnTask, processException, reMount, reMountOnTask, removeModules, removeModulesOnTask, setAutoLoadKind, setAutoLoadKindOnTask, setCompatibleVersion, setInternalVersion, setReShared, setReSharedOnTask, setReadOnly, setReadOnlyOnTask, setSharePreferredPath, setSharePreferredPathOnTask, setStandardSystemProfile, setStickyVersion, setStickyVersionOnTask, setUsedVersion, setUsedVersionOnTask, share, shareOnTask, unShare, unShareOnTask]
+11:59:03.042  --- profile-like packages under the model ---
+11:59:03.056    UAF Customization                cls=ProfileImpl      editable=false readOnly=no-method ownerCls=ModelImpl
+11:59:03.059    Report Profile                   cls=ProfileImpl      editable=false readOnly=no-method ownerCls=ModelImpl
+11:59:03.061    UML Standard Profile             cls=PackageImpl      editable=false readOnly=no-method ownerCls=ModelImpl
+11:59:03.062    MD Customization for ViewsViewpoints cls=PackageImpl      editable=false readOnly=no-method ownerCls=ModelImpl
+11:59:03.063    MD Customization for SysML       cls=PackageImpl      editable=false readOnly=no-method ownerCls=ModelImpl
+11:59:03.064    MD Customization for Requirements cls=PackageImpl      editable=false readOnly=no-method ownerCls=ModelImpl
+11:59:03.066    Semantic Alignment Profile       cls=PackageImpl      editable=true readOnly=no-method ownerCls=ModelImpl
+11:59:03.067    Customization Stereotypes        cls=DiagramImpl      editable=true readOnly=no-method ownerCls=ModelImpl
+11:59:03.069  --- stereotypes ---
+11:59:03.078    SemanticAlignment    editable=false invisible=true ownerCls=ProfileImpl
+11:59:03.081    Challenge(UAF)       editable=false invisible=false ownerCls=PackageImpl
+11:59:03.082  === probe-profile-kind DONE ===

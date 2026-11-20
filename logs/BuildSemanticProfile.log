@@ -1,0 +1,13 @@
+13:03:56.285  === build-semantic-profile START ===
+13:05:22.757  project: Untitled1
+13:05:23.080  customization created
+13:05:23.099  SemanticModel customization created
+13:05:23.132  applied auxiliaryResource to root model; isAux=true
+13:05:23.562  profile authored
+13:05:23.564  isInvisible(SemanticAlignment)=true
+13:05:23.565  isInvisible(SemanticModel)=true
+13:05:23.603  shareOnTask -> com.nomagic.ci.persistence.local.a.l.f@729bdd3b
+13:05:23.605  setStandardSystemProfile(true) done
+13:05:24.145  saveProject -> true (65442 bytes)
+13:05:25.258  RESULT: PASS
+13:05:25.259  === build-semantic-profile DONE ===

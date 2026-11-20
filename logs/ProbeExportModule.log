@@ -1,0 +1,5 @@
+18:49:53.408  === probe-export-module START ===
+18:49:56.953  profile package built
+18:49:58.993  DIALOG t=0ms title="Save" modal=true buttons=[Recent Items, Desktop, Documents, LP16-DBR2-DSA, Network, Save, Cancel]
+18:49:58.994  === probe-export-module DONE (leaving project + any dialog as-is for inspection) ===
+18:50:52.630  exportModule returned normally

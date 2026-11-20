@@ -1,0 +1,11 @@
+11:55:51.943  === probe-mount-sar START ===
+11:55:51.949  project: Mission Engineering Sample (SAR)
+11:55:51.954  profile file: E:\Magic SW\CMSoS26xR1pr\profiles\Semantic Alignment Profile.mdzip exists=true size=63988
+11:55:51.957  profiles dir: E:\Magic SW\CMSoS26xR1pr\profiles\
+11:55:51.960  stereotype BEFORE mount: com.nomagic.uml2.ext.magicdraw.mdprofiles.impl.StereotypeImpl@2acbdb0a _2026x_1_2b0010b_1783356331643_124171_1321/_2026x_1_2b0010b_1783356331643_124171_1321
+11:55:51.970  descriptor: com.nomagic.magicdraw.core.project.c@71fef166
+11:55:51.979  useModule -> true
+11:55:51.981  stereotype AFTER mount: com.nomagic.uml2.ext.magicdraw.mdprofiles.impl.StereotypeImpl@2acbdb0a _2026x_1_2b0010b_1783356331643_124171_1321/_2026x_1_2b0010b_1783356331643_124171_1321
+11:55:51.991  captured dialogs: (none)
+11:55:52.019  primary project has no getProjectUsages; methods: []
+11:55:52.021  === probe-mount-sar DONE ===

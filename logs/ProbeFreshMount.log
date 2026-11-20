@@ -1,0 +1,13 @@
+13:05:49.627  === probe-fresh-mount START ===
+13:05:52.049  fresh project: Untitled1
+13:05:52.051  mounting: E:\_Documents\git\UAF_Ontology\plugin\profiles\Semantic Alignment Profile.mdzip exists=true
+13:05:52.671  useModule -> true
+13:05:52.673  [PASS] SemanticAlignment stereotype resolves
+13:05:52.674  [PASS] stereotype read-only
+13:05:52.676  [PASS] stereotype invisible
+13:05:52.685  profile pkg: PackageImpl editable=true
+13:05:52.686  [PASS] profile package present after mount
+13:05:52.687  [FAIL] profile package is READ-ONLY (mounts like UAF, not embedded)
+13:05:52.693  [PASS] no stray editable Customization diagram crossed in
+13:05:53.422  RESULT: FAIL [profile package is READ-ONLY (mounts like UAF, not embedded)]
+13:05:53.423  === probe-fresh-mount DONE ===

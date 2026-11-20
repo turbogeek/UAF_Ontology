@@ -1,0 +1,20 @@
+11:57:36.411  === live-verify-sar START ===
+11:57:36.415  [PASS] plugin classloader located
+11:57:36.419  active project: Mission Engineering Sample (SAR)
+11:57:36.421  [PASS] SAR sample is open
+11:57:36.441  [PASS] "Extreme Weather Conditions" element found
+11:57:36.444    its stereotypes: [Challenge]
+11:57:36.448  [PASS] element carries a UAF Challenge stereotype
+11:57:36.450  [PASS] ensureProfileAvailable (deployed) mounted the module
+11:57:36.452  [PASS] SemanticAlignment stereotype resolves
+11:57:36.453  [PASS] stereotype is READ-ONLY (used module, not embedded)
+11:57:36.454  [PASS] stereotype isInvisible == true (Base Classifier)
+11:57:36.459  [FAIL] profile is a read-only used module (not an editable embed)
+11:57:36.464    resolved base concept: http://purl.org/uaf/ontology#Challenge
+11:57:36.466  [PASS] base concept resolves to a uaf:Challenge IRI
+11:57:36.515    stored concepts: [http://purl.org/uaf/ontology#Challenge, http://example.org/Extreme, http://example.org/Weather]
+11:57:36.518  [PASS] three concepts stored (multi-valued)
+11:57:36.519  [PASS] base concept is index 0
+11:57:36.561  temp element removed
+11:57:36.564  RESULT: FAIL [profile is a read-only used module (not an editable embed)]
+11:57:36.566  === live-verify-sar DONE ===

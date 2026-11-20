@@ -1,0 +1,11 @@
+08:02:09.008  === probe-catalog-search START ===
+08:02:09.264  [PASS] plugin located
+08:02:09.281  [PASS] suggestionRanker present (catalog loaded)
+08:02:09.348    "Force" -> 15 : [https://www.commoncoreontologies.org/ont00000570, http://qudt.org/vocab/quantitykind/Force, http://qudt.org/vocab/quantitykind/ForceConstant, http://qudt.org/vocab/quantitykind/ForceMagnitude, http://qudt.org/vocab/quantitykind/ForcePerAngle, http://qudt.org/vocab/quantitykind/ForcePerArea]
+08:02:09.373  [PASS] QUDT quantity kind surfaces for "Force"
+08:02:09.381    "Organization" -> 15 : [http://www.w3.org/ns/prov#Organization, http://qudt.org/schema/qudt/Organization, http://www.ontologyportal.org/SUMO.owl#Organization, http://purl.org/uaf/ontology#Organization, https://www.commoncoreontologies.org/ont00001180, http://purl.org/uaf/uafsml#def-organization]
+08:02:09.387  [PASS] CCO concept surfaces for "Organization"
+08:02:09.391    "Permission" -> 9 : [https://w3id.org/dpv#Permission, http://www.w3.org/ns/odrl/2/Permission, https://w3id.org/dpv#PermissionManagement, https://w3id.org/dpv#PermissionUtilised, https://w3id.org/dpv#PermissionNotUtilised, https://w3id.org/dpv#hasPermission]
+08:02:09.397  [PASS] governance vocab surfaces for "Permission"
+08:02:09.400  RESULT: PASS
+08:02:09.402  === probe-catalog-search DONE ===

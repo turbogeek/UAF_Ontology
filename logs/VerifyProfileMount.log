@@ -1,0 +1,6 @@
+18:55:10.507  === verify-profile-mount START ===
+18:55:10.510  project: Use Case Tester
+18:55:10.512  stereotype before mount: false
+18:55:30.635  ensureProfileAvailable returned null in 20004ms
+18:55:30.637  RESULT: FAIL (stereotype not resolvable after mount)
+18:55:30.638  === verify-profile-mount DONE ===

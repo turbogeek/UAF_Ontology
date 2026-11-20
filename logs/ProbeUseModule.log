@@ -1,0 +1,7 @@
+18:56:58.486  === probe-use-module START ===
+18:56:58.488  module exists=true size=57564
+18:56:58.491  descriptor: com.nomagic.magicdraw.core.project.c@bb9bec78
+18:56:59.014  DIALOG at t=0ms: ["Error" modal=true buttons=[Details, Export To File..., OK]]
+18:56:59.014  stereotype resolvable: false
+18:56:59.016  === probe-use-module DONE ===
+18:57:16.079  useModule(off-EDT) returned false in 17588ms

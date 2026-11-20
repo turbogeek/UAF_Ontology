@@ -1,0 +1,7 @@
+18:58:09.654  === capture-usemodule-error START ===
+18:58:10.184  DIALOG "Error":
+18:58:10.193    LABEL:    
+18:58:10.195    LABEL: Load error:Module not found
+18:58:10.196    TEXT: Sun Jul 05 18:58:09 CDT 2026 | java.io.IOException: Module not found | 	at com.nomagic.magicdraw.persistence.URIResolver.createSkipModuleException(URIResolver.java:966) | 	at com.nomagic.magicdraw.persistence.URIResolver.toPhysicalInternal(URIResolver.java:333) | 	at com.nomagic.magicdraw.pers
+18:58:10.197    TEXT: <html> |   <head> |      |   </head> |   <body> |     <nobr>&#8226;You can find solution for various problems in our <a href="https://docs.nomagic.com/display/FAQ">FAQ  |     list</a>.<br>&#8226;<a href="http://docs.nomagic.com">Documentation</a>  |     also can help to understand reason of th
+18:58:10.290  === capture-usemodule-error DONE ===

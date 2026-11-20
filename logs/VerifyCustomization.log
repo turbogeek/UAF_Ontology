@@ -1,0 +1,10 @@
+22:34:06.324  === verify-customization START ===
+22:34:06.327  project: UAF SAR Sample
+22:34:06.788  ensureProfileAvailable -> true
+22:34:06.791  stereotype OK: Semantic Alignment Profile::Semantic Alignment Profile::SemanticAlignment isInvisible=false
+22:34:08.731  customization element: SemanticAlignment Customization
+22:34:08.733    hideMetatype=[true] representationText=[Semantic Alignment] category=[Semantic Alignment]
+22:34:08.735    standardExpertConfiguration entries=3
+22:34:08.736  INVISIBLE mechanism OK: hideMetatype=true
+22:34:08.738  RESULT: PASS
+22:34:08.739  === verify-customization DONE ===

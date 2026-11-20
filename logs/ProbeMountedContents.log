@@ -1,0 +1,9 @@
+22:28:01.423  === probe-mounted-contents START ===
+22:28:02.408  project: Untitled1
+22:28:02.409  stereotypes before mount: 139
+22:28:02.651  useModule: true
+22:28:04.156  stereotypes after mount: 140 (delta 1)
+22:28:04.163  any named *Semantic*: [SemanticAlignment]
+22:28:04.168  top-level packages: [UML Standard Profile, Semantic Alignment Profile]
+22:28:04.169  getStereotype(name,profile): true
+22:28:04.765  === probe-mounted-contents DONE ===

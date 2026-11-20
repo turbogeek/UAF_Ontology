@@ -1,0 +1,30 @@
+16:40:38.019  === open-scratch-project START ===
+16:42:01.350  threw
+java.lang.InterruptedException
+	at java.base/java.lang.Object.wait0(Native Method)
+	at java.base/java.lang.Object.wait(Object.java:366)
+	at java.base/java.lang.Object.wait(Object.java:339)
+	at java.desktop/java.awt.EventQueue.invokeAndWait(EventQueue.java:1365)
+	at java.desktop/java.awt.EventQueue.invokeAndWait(EventQueue.java:1346)
+	at java.desktop/javax.swing.SwingUtilities.invokeAndWait(SwingUtilities.java:1480)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:344)
+	at OpenScratchProject.run(OpenScratchProject.groovy:19)
+	at groovy.lang.GroovyShell.evaluate(GroovyShell.java:489)
+	at groovy.lang.GroovyShell.evaluate(GroovyShell.java:533)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:344)
+	at ScriptRunner$_run_closure1.doCall(start-harness.groovy:566)
+	at ScriptRunner$_run_closure1.doCall(start-harness.groovy)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:338)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:274)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:270)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1010)
+	at groovy.lang.Closure.call(Closure.java:471)
+	at groovy.lang.Closure.call(Closure.java:450)
+	at groovy.lang.Closure.run(Closure.java:543)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+16:42:01.353  RESULT: FAIL
+16:42:01.354  === open-scratch-project DONE ===
+16:42:01.393  created project: null

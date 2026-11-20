@@ -1,0 +1,11 @@
+21:16:03.536  === probe-ols4-http START ===
+21:16:03.538  java proxy props: http=null:null https=null:null useSystemProxies=null
+21:16:03.539  -- attempt 1: plain HttpClient --
+21:16:03.979  FAILED: java.io.IOException: EOF reached while reading  <-  java.io.EOFException: EOF reached while reading
+21:16:03.981  -- attempt 2: HttpClient with system ProxySelector --
+21:16:04.423  FAILED: java.io.IOException: EOF reached while reading  <-  java.io.EOFException: EOF reached while reading
+21:16:04.424  default ProxySelector for url: [DIRECT]
+21:16:04.425  env HTTPS_PROXY=null HTTP_PROXY=null
+21:16:04.426  -- attempt 3: HttpClient forced HTTP/1.1 --
+21:16:05.098  OK status=200 bytes=6637 ver=HTTP_1_1
+21:16:05.099  === probe-ols4-http DONE ===

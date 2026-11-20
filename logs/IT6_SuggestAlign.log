@@ -1,11 +1,11 @@
-17:58:18.711  === IT6 suggest-align START ===
-17:58:18.743  REST healthy: {"service":"semantic-alignment","endpoints":["/sparql","/metrics","/metrics/reset","/catalog/reload"]}
-17:58:18.775  created SuggestProbe_1783292298754
-17:58:26.992  note: no zero-keystroke SUGGEST event (acceptable for signal-less name)
-17:58:27.249  narrowed: 2026-07-05 17:58:27.197 | SUGGEST | SuggestProbe_1783292298754 | query=Organization | top=org:Organization:56, sumo:Organization:56, uaf:Organization:56, uafsml:def-organization:56, org:OrganizationalUnit:39, uaf:OrganizationInPhase:39, uaf:OrganizationalResource:39, uafsml:def-organizationmetadata:39
-17:58:27.286  mapping: 2026-07-05 17:58:27.285 | MAPPING | Class SuggestProbe_1783292298754 -> http://www.w3.org/ns/org#Organization | status=OK
-17:58:27.288  stored IRI OK: http://www.w3.org/ns/org#Organization
-17:58:27.291  metrics: {"clicks":1,"keystrokes":0}
-17:58:27.299  click budget OK: 1 clicks (budget <= 2)
-17:58:27.300  RESULT: PASS
-17:58:27.302  === IT6 DONE ===
+14:07:55.560  === IT6 suggest-align START ===
+14:07:55.609  REST healthy: {"service":"semantic-alignment","endpoints":["/sparql","/metrics","/metrics/reset","/catalog/reload"]}
+14:07:55.664  created SuggestProbe_1783451275629
+14:08:03.876  note: no zero-keystroke SUGGEST event (acceptable for signal-less name)
+14:08:04.101  narrowed: 2026-07-07 14:08:04.061 | SUGGEST | SuggestProbe_1783451275629 | query=Organization | via=service | scope=STRUCTURE/null/terms=6 | count=12 | top=project:Organization:64, prov-o:Organization:64, qudt:Organization:64, sumo:Organization:64, uaf:Organization:64, cco:ont00001180:58, uafsml:def-organization:58, org:Organization:55, cco:ont00000568:41, cco:ont00000647:41, uaf:OrganizationInPhase:41, cco:ont00000175:40
+14:08:04.224  mapping: 2026-07-07 14:08:04.222 | MAPPING | Semantic Alignment SuggestProbe_1783451275629 += http://www.w3.org/ns/org#Organization | base=- | status=OK
+14:08:04.226  stored IRI OK: http://www.w3.org/ns/org#Organization
+14:08:04.229  metrics: {"clicks":0,"keystrokes":0}
+14:08:04.239  click budget OK: 0 clicks (budget <= 2)
+14:08:04.241  RESULT: PASS
+14:08:04.241  === IT6 DONE ===

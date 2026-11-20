@@ -1,0 +1,13 @@
+15:11:50.304  === probe-ols4-sidebar START ===
+15:11:50.343  [PASS] search field found
+15:11:50.344  [PASS] OLS4 button found
+15:11:50.346  [PASS] suggestion list found
+15:11:50.418  clicked OLS4 for "gearbox"; awaiting network...
+15:11:51.685  journal: 2026-07-06 15:11:51.493 | TERMSOURCE | online 'gearbox' -> 7 from 2 source(s) : OEO:00280019, ohdab:Q666614, ohdab:Q666615, ohdab:Q666616, ont00000301, ,
+15:11:51.686  [PASS] OLS4 TERMSOURCE journal event fired
+15:11:51.691  [PASS] online returned candidates (count > 0)
+15:11:51.693  [PASS] results came from >= 2 federated sources
+15:11:51.697  OLS4 rows in suggestion list: 7
+15:11:51.698  [PASS] at least one OLS4 row appended to the list
+15:11:51.698  RESULT: PASS
+15:11:51.700  === probe-ols4-sidebar DONE ===

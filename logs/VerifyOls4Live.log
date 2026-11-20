@@ -1,0 +1,8 @@
+21:18:08.598  === verify-ols4-live START ===
+21:18:08.795  term source: ols4:https://www.ebi.ac.uk/ols4/api
+21:18:09.975  OLS4 search returned 5 candidates (live)
+21:18:09.982  top: NCIT:C54117 | Search | ont=ncit
+21:18:10.145  Semantic_Type (live): Activity
+21:18:10.172  capability guard correctly FLAGGED Activity-in-Capability-slot: This term is a Activity (a process/activity), but a Capability is the ABILITY to
+21:18:10.175  RESULT: PASS
+21:18:10.177  === verify-ols4-live DONE ===

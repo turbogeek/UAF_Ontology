@@ -1,0 +1,9 @@
+18:39:16.100  === probe-module-mount START ===
+18:39:16.101  profile file exists=true size=56119
+18:39:16.106  descriptor created: com.nomagic.magicdraw.core.project.c@bb9bec78
+18:39:16.623  DIALOG(S) VISIBLE at t=0ms: [Error modal=true]
+18:39:16.632    buttons: [, , , , , , , , , , , , Details, Export To File..., OK]
+18:39:16.634  final result: pending
+18:39:16.635  stereotype resolvable now: false
+18:39:16.635  === probe-module-mount DONE ===
+18:39:29.695  useModule returned: false
